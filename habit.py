@@ -1,3 +1,7 @@
+import db
+from datetime import date, datetime
+
+
 class Habit:
     def __init__(self, name, periodicity, user):
         self.__name = name
@@ -26,8 +30,16 @@ class Habit:
     periodicity = property(__getPeriodicity, __setPeriodicity)
     user = property(__getUser)
 
-    def checkOffHabit(self):
-        # TODO: Methode "checkOffHabit" schreiben
-        pass
 
 # TODO: def __str__(self) Funktion noch in die Habit-Klasse einbauen
+
+
+class HabitDB(Habit):
+
+    def store_habit(self, data_base):
+        current_date = str(datetime.now())
+        db.add_habit(data_base, self.user, self.name, self.periodicity, current_date)
+
+    def check_off_habit(self, data_base, date: str = None):
+        db.complete_habit(data_base, self.name, date)
+

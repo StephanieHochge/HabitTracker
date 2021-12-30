@@ -43,18 +43,25 @@ def add_user(db, user_name):
     db.commit()
 
 
-def add_habit(db, user_name, name, periodicity, creation_time):
+def add_habit(db, user_name, name, periodicity, creation_time=None):
     cursor = db.cursor()
+    cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [user_name])
+    user_id = cursor.fetchall()
+    if not creation_time:
+        creation_time = str(datetime.now())
     cursor.execute("INSERT INTO Habit(FKUserID, Name, Periodicity, CreationTime) VALUES (?, ?, ?, ?)",
-                   (user_name, name, periodicity, creation_time))
+                   (user_id[0][0], name, periodicity, creation_time))
     db.commit()
 
 
-def complete_habit(db, habit_name, check_date):
+def complete_habit(db, habit_name, check_date=None):
     cursor = db.cursor()
     cursor.execute("SELECT PKHabitID FROM Habit WHERE Name = ?", [habit_name])  # sucht nach der HabitID des gesuchten Habits
     habit_id = cursor.fetchall()  # enthält list of tuples, weshalb das erste Element referenziert werden muss
-    cursor.execute("INSERT INTO Completion(FKHabitID, CompletionDate) VALUES (?, ?)", (habit_id[0][0], check_date))
+    if not check_date:
+        check_date = str(date.today())
+    cursor.execute("INSERT INTO Completion(FKHabitID, CompletionDate) VALUES (?, ?)",
+                   (habit_id[0][0], check_date))
 
 
 # cursor.execute("INSERT INTO HabitAppUser VALUES(1, 'StephanieHochge')")

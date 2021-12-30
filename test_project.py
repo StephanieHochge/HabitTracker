@@ -1,5 +1,5 @@
 import pytest
-from habit import Habit
+from habit import Habit, HabitDB
 import db
 import os  # to be able to remove the test data base
 
@@ -11,15 +11,15 @@ class TestHabit:
         db.add_user(self.data_base, "StephanieHochge")
         db.add_user(self.data_base, "RajaBe")
         db.add_user(self.data_base, "LibertyEvans")
-        db.add_habit(self.data_base, 1, "Brush teeth", "daily", "2021-12-30 07:54:24.999098")
-        db.add_habit(self.data_base, 1, "Dance", "weekly", "2021-12-31 07:54:24.999098")
-        db.add_habit(self.data_base, 1, "Clean kitchen", "monthly", "2022-01-01 07:54:24.999098")
-        db.add_habit(self.data_base, 1, "Clean bathroom", "monthly", "2022-01-01 07:56:24.999098")
-        db.complete_habit(self.data_base,"Brush teeth", "2021-12-24")
-        db.complete_habit(self.data_base,"Brush teeth", "2021-12-25")
-        db.complete_habit(self.data_base,"Brush teeth", "2021-12-26")
-        db.complete_habit(self.data_base,"Brush teeth", "2021-12-27")
-        db.complete_habit(self.data_base,"Brush teeth", "2021-12-28")
+        db.add_habit(self.data_base, "StephanieHochge", "Brush teeth", "daily")
+        db.add_habit(self.data_base, "StephanieHochge", "Dance", "weekly", "2021-12-31 07:54:24.999098")
+        db.add_habit(self.data_base, "StephanieHochge", "Clean kitchen", "monthly", "2022-01-01 07:54:24.999098")
+        db.add_habit(self.data_base, "StephanieHochge", "Clean bathroom", "monthly", "2022-01-01 07:56:24.999098")
+        db.complete_habit(self.data_base, "Brush teeth", "2021-12-24")
+        db.complete_habit(self.data_base, "Brush teeth", "2021-12-25")
+        db.complete_habit(self.data_base, "Brush teeth", "2021-12-26")
+        db.complete_habit(self.data_base, "Brush teeth", "2021-12-27")
+        db.complete_habit(self.data_base, "Brush teeth")
         # TODO: Insert further test data into test database
 
     def test_habit(self):
@@ -60,6 +60,10 @@ class TestHabit:
         results = cursor.fetchall()
         assert len(results) == 5
 
+    def test_habitDB(self):
+        habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
+        habit.store_habit(self.data_base)
+        habit.check_off_habit(self.data_base)
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
