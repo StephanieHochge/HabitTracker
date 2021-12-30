@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import date, datetime
+import os
 
 
 # TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
@@ -38,9 +39,23 @@ def create_tables(db):
 # add data into tables
 def add_user(db, user_name):
     cursor = db.cursor()
-    cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user_name])  # eine ID müsste über AutoIncrement
-    # automatisch hinzugefügt werden
+    cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user_name])
     db.commit()
+
+
+def add_habit(db, user_name, name, periodicity, creation_time):
+    cursor = db.cursor()
+    cursor.execute("INSERT INTO Habit(FKUserID, Name, Periodicity, CreationTime) VALUES (?, ?, ?, ?)",
+                   (user_name, name, periodicity, creation_time))
+    db.commit()
+
+
+def complete_habit(db, habit_name, check_date):
+    cursor = db.cursor()
+    cursor.execute("SELECT PKHabitID FROM Habit WHERE Name = ?", [habit_name])  # sucht nach der HabitID des gesuchten Habits
+    habit_id = cursor.fetchall()  # enthält list of tuples, weshalb das erste Element referenziert werden muss
+    cursor.execute("INSERT INTO Completion(FKHabitID, CompletionDate) VALUES (?, ?)", (habit_id[0][0], check_date))
+
 
 # cursor.execute("INSERT INTO HabitAppUser VALUES(1, 'StephanieHochge')")
 # cursor.execute("INSERT INTO Habit VALUES(1, 1, 'Brush Teeth', 'daily', '123')")

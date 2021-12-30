@@ -11,6 +11,15 @@ class TestHabit:
         db.add_user(self.data_base, "StephanieHochge")
         db.add_user(self.data_base, "RajaBe")
         db.add_user(self.data_base, "LibertyEvans")
+        db.add_habit(self.data_base, 1, "Brush teeth", "daily", "2021-12-30 07:54:24.999098")
+        db.add_habit(self.data_base, 1, "Dance", "weekly", "2021-12-31 07:54:24.999098")
+        db.add_habit(self.data_base, 1, "Clean kitchen", "monthly", "2022-01-01 07:54:24.999098")
+        db.add_habit(self.data_base, 1, "Clean bathroom", "monthly", "2022-01-01 07:56:24.999098")
+        db.complete_habit(self.data_base,"Brush teeth", "2021-12-24")
+        db.complete_habit(self.data_base,"Brush teeth", "2021-12-25")
+        db.complete_habit(self.data_base,"Brush teeth", "2021-12-26")
+        db.complete_habit(self.data_base,"Brush teeth", "2021-12-27")
+        db.complete_habit(self.data_base,"Brush teeth", "2021-12-28")
         # TODO: Insert further test data into test database
 
     def test_habit(self):
@@ -25,18 +34,32 @@ class TestHabit:
 
     def test_user_table_db(self):
         """
-        tests whether data can be added to the user_table
+        tests whether data can be added to the user table
         """
-        cursor = self.data_base.cursor()
-        cursor.execute("SELECT * FROM HabitAppUser")  # TODO: noch in eine Funktion packen
+        cursor = self.data_base.cursor()  # TODO: zum Testen der Tables kann noch eine Funktion geschrieben werden (
+        # Syntax wiederholt sich)
+        cursor.execute("SELECT * FROM HabitAppUser")
         results = cursor.fetchall()
         assert len(results) == 3
 
     def test_habit_table_db(self):
         """
-        tests whether a habit can be correctly inserted into the habit table of the db
+        tests whether data can be added to the habit table
         """
-        pass
+        cursor = self.data_base.cursor()
+        cursor.execute("SELECT * FROM Habit")
+        results = cursor.fetchall()
+        assert len(results) == 4
+
+    def test_completion_table_db(self):
+        """
+        tests whether data can be added to the completion table
+        """
+        cursor = self.data_base.cursor()
+        cursor.execute("SELECT * FROM Completion")
+        results = cursor.fetchall()
+        assert len(results) == 5
+
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
