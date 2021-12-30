@@ -2,6 +2,7 @@ import pytest
 from habit import Habit, HabitDB
 import db
 import os  # to be able to remove the test data base
+from user import User, UserDB
 
 
 class TestHabit:
@@ -31,6 +32,13 @@ class TestHabit:
         assert habit.periodicity == "weekly"
         assert habit.user == "StephanieHochge"
         # TODO: Entscheidung: muss ich das überhaupt testen?
+
+    def test_user(self):
+        """
+        tests whether a user object is correctly created
+        """
+        user = UserDB("StephanieHochge")
+        assert user.user_name == "StephanieHochge"
 
     def test_user_table_db(self):
         """
@@ -64,6 +72,10 @@ class TestHabit:
         habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
         habit.store_habit(self.data_base)
         habit.check_off_habit(self.data_base)
+
+    def test_userDB(self):
+        user = UserDB("HansJ")
+        user.store_user(self.data_base)
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
