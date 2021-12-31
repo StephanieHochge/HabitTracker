@@ -76,8 +76,6 @@ class TestHabit:
         db.complete_habit(self.data_base, "Clean windows", "StephanieHochge", "2022-12-30")
         db.complete_habit(self.data_base, "Go to dentist", "StephanieHochge", "2022-12-17")
 
-        # TODO: Insert further test data into test database
-
     def test_habit(self):
         """
         tests whether a habit object is correctly created
@@ -145,6 +143,13 @@ class TestHabit:
         habit_df = an.create_data_frame(self.data_base, "Habit")
         user_df = an.create_data_frame(self.data_base, "HabitAppUser")
         completion_df = an.create_data_frame(self.data_base, "Completion")
+
+    def test_return_user_habits(self):
+        """
+        tests whether user_habits are correctly returned
+        """
+        defined_habits = an.return_user_habits(self.data_base, "StephanieHochge")
+        assert len(defined_habits) == 5
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
