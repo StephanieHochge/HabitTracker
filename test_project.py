@@ -3,6 +3,7 @@ from habit import Habit, HabitDB
 import db
 import os  # to be able to remove the test data base
 from user import User, UserDB
+import analyze as an
 
 
 class TestHabit:
@@ -13,14 +14,16 @@ class TestHabit:
         db.add_user(self.data_base, "RajaBe")
         db.add_user(self.data_base, "LibertyEvans")
         db.add_habit(self.data_base, "StephanieHochge", "Brush teeth", "daily")
+        db.add_habit(self.data_base, "RajaBe", "Brush teeth", "daily")
         db.add_habit(self.data_base, "StephanieHochge", "Dance", "weekly", "2021-12-31 07:54:24.999098")
         db.add_habit(self.data_base, "StephanieHochge", "Clean kitchen", "monthly", "2022-01-01 07:54:24.999098")
         db.add_habit(self.data_base, "StephanieHochge", "Clean bathroom", "monthly", "2022-01-01 07:56:24.999098")
-        db.complete_habit(self.data_base, "Brush teeth", "2021-12-24")
-        db.complete_habit(self.data_base, "Brush teeth", "2021-12-25")
-        db.complete_habit(self.data_base, "Brush teeth", "2021-12-26")
-        db.complete_habit(self.data_base, "Brush teeth", "2021-12-27")
-        db.complete_habit(self.data_base, "Brush teeth")
+        db.add_habit(self.data_base, "StephanieHochge", "Go to dentist", "half yearly", "2022-01-01 07:56:24.999098")
+        db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-24")
+        db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-25")
+        db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-26")
+        db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-27")
+        db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge")
         # TODO: Insert further test data into test database
 
     def test_habit(self):
@@ -57,7 +60,7 @@ class TestHabit:
         cursor = self.data_base.cursor()
         cursor.execute("SELECT * FROM Habit")
         results = cursor.fetchall()
-        assert len(results) == 4
+        assert len(results) == 6
 
     def test_completion_table_db(self):
         """
@@ -69,13 +72,27 @@ class TestHabit:
         assert len(results) == 5
 
     def test_habitDB(self):
+        """
+        tests whether habits can be stored and checked off
+        """
         habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
         habit.store_habit(self.data_base)
         habit.check_off_habit(self.data_base)
 
     def test_userDB(self):
+        """
+        tests whether users can be stored
+        """
         user = UserDB("HansJ")
         user.store_user(self.data_base)
+
+    def test_create_data_frame(self):
+        """
+        tests whether data_frames can be created from data base tables
+        """
+        habit_df = an.create_data_frame(self.data_base, "Habit")
+        user_df = an.create_data_frame(self.data_base, "HabitAppUser")
+        completion_df = an.create_data_frame(self.data_base, "Completion")
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
