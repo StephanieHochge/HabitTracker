@@ -144,12 +144,21 @@ class TestHabit:
         user_df = an.create_data_frame(self.data_base, "HabitAppUser")
         completion_df = an.create_data_frame(self.data_base, "Completion")
 
-    def test_return_user_habits(self):
+    def test_return_habits(self):
         """
         tests whether user_habits are correctly returned
         """
-        defined_habits = an.return_user_habits(self.data_base, "StephanieHochge")
+        defined_habits = an.return_habits(self.data_base, "StephanieHochge")
         assert len(defined_habits) == 5
+
+    def test_return_habits_of_type(self):
+        """
+        tests whether user_habits of a specific type are correctly returned
+        """
+        weekly_habits = an.return_habits_of_type(self.data_base, "StephanieHochge", "weekly")
+        assert len(weekly_habits) == 2
+        quaterly_habits = an.return_habits_of_type(self.data_base, "StephanieHochge", "quarterly")
+        assert len(quaterly_habits) == 0
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
