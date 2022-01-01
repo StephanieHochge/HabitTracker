@@ -4,6 +4,7 @@ import db
 import os  # to be able to remove the test data base
 from user import User, UserDB
 import analyze as an
+from datetime import date
 
 
 class TestHabit:
@@ -128,6 +129,12 @@ class TestHabit:
         habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
         habit.store_habit(self.data_base)
         habit.check_off_habit(self.data_base)
+        habit.check_off_habit(self.data_base, "2021-12-05")
+        assert habit.last_completion == str(date.today())
+        habit_2 = HabitDB("Clean window", "weekly", "StephanieHochge")
+        habit_2.store_habit(self.data_base)
+        habit_2.check_off_habit(self.data_base, "2021-12-05")
+        assert habit_2.last_completion == "2021-12-05"
 
     def test_userDB(self):
         """
