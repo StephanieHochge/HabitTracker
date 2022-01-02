@@ -167,5 +167,16 @@ class TestHabit:
         quaterly_habits = an.return_habits_of_type(self.data_base, "StephanieHochge", "quarterly")
         assert len(quaterly_habits) == 0
 
+    def test_return_streak(self):
+        habit_id = an.return_habit_id(self.data_base, "Dance", "StephanieHochge")
+        assert habit_id == 3
+        habit_completions = an.return_habit_completions(self.data_base, "Dance", "StephanieHochge")
+        assert len(habit_completions) == 16
+        previos_period_start = date.fromisoformat("2021-12-01")
+        previous_period_end = date.fromisoformat("2021-12-31")
+        checked_in_period = an.check_previous_period(self.data_base, "Dance", "StephanieHochge", previos_period_start,
+                                                     previous_period_end)
+        assert checked_in_period is True
+
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
