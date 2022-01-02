@@ -19,7 +19,7 @@ class TestHabit:
         db.add_habit(self.data_base, "StephanieHochge", "Dance", "weekly", "2021-10-31 07:54:24.999098")
         db.add_habit(self.data_base, "StephanieHochge", "Clean windows", "monthly", "2021-10-31 07:54:24.999098")
         db.add_habit(self.data_base, "StephanieHochge", "Clean bathroom", "weekly", "2022-10-31 07:56:24.999098")
-        db.add_habit(self.data_base, "StephanieHochge", "Go to dentist", "half yearly", "2022-10-31 07:56:24.999098")
+        db.add_habit(self.data_base, "StephanieHochge", "Go to dentist", "yearly", "2022-10-31 07:56:24.999098")
         db.complete_habit(self.data_base, "Brush teeth", "RajaBe")
         db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-01")
         db.complete_habit(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-02")
@@ -168,15 +168,35 @@ class TestHabit:
         assert len(quaterly_habits) == 0
 
     def test_return_streak(self):
+        # test if return_habit_id returns the correct habit_id
         habit_id = an.return_habit_id(self.data_base, "Dance", "StephanieHochge")
         assert habit_id == 3
+
+        # test if return_habit_completions returns the correct table
         habit_completions = an.return_habit_completions(self.data_base, "Dance", "StephanieHochge")
         assert len(habit_completions) == 16
-        previos_period_start = date.fromisoformat("2021-12-01")
-        previous_period_end = date.fromisoformat("2021-12-31")
-        checked_in_period = an.check_previous_period(self.data_base, "Dance", "StephanieHochge", previos_period_start,
-                                                     previous_period_end)
+
+        # test whether the check_in_period function works properly
+        previous_period = {"start": date.fromisoformat("2021-12-01"), "end": date.fromisoformat("2022-01-01")}
+        checked_in_period = an.check_previous_period(self.data_base, "Dance", "StephanieHochge", previous_period)
         assert checked_in_period is True
+
+        # test whether the subtract_one_period function works properly
+        previous_day = an.subtract_one_period("daily", "2021-12-30")
+        assert previous_day["start"] == date.fromisoformat("2021-12-29")
+        assert previous_day["end"] == date.fromisoformat("2021-12-30")
+
+        previous_week = an.subtract_one_period("weekly", "2021-12-30")
+        assert previous_week["start"] == date.fromisoformat("2021-12-20")
+        assert previous_week["end"] == date.fromisoformat("2021-12-27")
+
+        previous_month = an.subtract_one_period("monthly", "2021-12-30")
+        assert previous_month["start"] == date.fromisoformat("2021-11-01")
+        assert previous_month["end"] == date.fromisoformat("2021-12-01")
+
+        previous_year = an.subtract_one_period("yearly", "2021-12-30")
+        assert previous_year["start"] == date.fromisoformat("2020-01-01")
+        assert previous_year["end"] == date.fromisoformat("2021-01-01")
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde

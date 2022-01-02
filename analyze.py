@@ -1,6 +1,7 @@
 import pandas as pd
 import db
 from datetime import date, timedelta
+import dateutil.relativedelta
 
 
 # Create a pandas dataframe from database tables
@@ -87,8 +88,7 @@ def return_habits_of_type(data_base, user_name, periodicity):
 
 
 # Return the longest habit streak for a given habit
-def subtract_one_period(periodicity,
-                        check_date):  # TODO: Define subtract_one_period method (subtracts one period from current date)
+def subtract_one_period(periodicity, check_date):
     """
 
     :param periodicity:
@@ -97,33 +97,39 @@ def subtract_one_period(periodicity,
     """
     # TODO: Überprüfen, ob man das auch mit einem Dictionary machen kann
     check_date = date.fromisoformat(check_date)  # wandelt das Datum in ein Date-Format um
+    previous_period = {}
+    previous_period_start, previous_period_end = None, None
     if periodicity == "daily":
         period = timedelta(days=1)
-        previous_date = check_date - period
+        previous_period_start = check_date - period
+        previous_period_end = check_date
     elif periodicity == "weekly":
         day_in_week = check_date.weekday()
-        period = timedelta(days=day_in_week, weeks=1)
-        previous_date = check_date - period  # wahrscheinlich braucht man auch noch das Ende der Period
+        period_start = timedelta(days=day_in_week, weeks=1)
+        period_end = timedelta(days=7)
+        previous_period_start = check_date - period_start
+        previous_period_end = previous_period_start + period_end
     elif periodicity == "monthly":
         day_in_month = check_date.day
-        period = timedelta(days=day_in_month)
-    elif periodicity == "quarterly":
-        pass
-    elif periodicity == "half-yearly":
-        pass
+        period = timedelta(days=day_in_month-1)
+        previous_period_end = check_date - period
+        previous_period_start = previous_period_end - dateutil.relativedelta.relativedelta(months=1)
     else:  # periodicity == yearly
-        pass
-    return previous_date
+        previous_year = check_date.year - 1
+        previous_period_start = date.fromisoformat(f"{previous_year}-01-01")
+        previous_period_end = date.fromisoformat(f"{check_date.year}-01-01")
+    previous_period["start"] = previous_period_start
+    previous_period["end"] = previous_period_end
+    return previous_period
 
 
-def check_previous_period(data_base, habit_name, user_name, previous_period_start, previous_period_end):  # TODO: Define check_previous_period_method
+def check_previous_period(data_base, habit_name, user_name, previous_period):
     """
     checks whether habit has been completed in the previous period
     :param data_base:
     :param habit_name:
     :param user_name:
-    :param previous_period_start: of type date object
-    :param previous_period_end: of type date object
+    :param previous_period: dictionary with start and end
     :return:
     """
     completions = return_habit_completions(data_base, habit_name, user_name)
@@ -135,7 +141,7 @@ def check_previous_period(data_base, habit_name, user_name, previous_period_star
 
     in_period = []
     for dates in completion_dates:
-        if (dates >= previous_period_start) and (dates <= previous_period_end):
+        if (dates >= previous_period["start"]) and (dates < previous_period["end"]):
             in_period.append("True")
             break
         else:
