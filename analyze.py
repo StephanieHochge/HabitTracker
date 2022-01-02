@@ -87,82 +87,48 @@ def return_habits_of_type(data_base, user_name, periodicity):
     return habits_of_type["Name"]
 
 
-# Return the longest habit streak for a given habit
-def subtract_one_period(periodicity, check_date):
-    """
-
-    :param periodicity:
-    :param check_date: of type string
-    :return:
-    """
-    # TODO: Überprüfen, ob man das auch mit einem Dictionary machen kann
-    check_date = date.fromisoformat(check_date)  # wandelt das Datum in ein Date-Format um
-    previous_period = {}
-    previous_period_start, previous_period_end = None, None
-    if periodicity == "daily":
-        period = timedelta(days=1)
-        previous_period_start = check_date - period
-        previous_period_end = check_date
-    elif periodicity == "weekly":
-        day_in_week = check_date.weekday()
-        period_start = timedelta(days=day_in_week, weeks=1)
-        period_end = timedelta(days=7)
-        previous_period_start = check_date - period_start
-        previous_period_end = previous_period_start + period_end
-    elif periodicity == "monthly":
-        day_in_month = check_date.day
-        period = timedelta(days=day_in_month-1)
-        previous_period_end = check_date - period
-        previous_period_start = previous_period_end - dateutil.relativedelta.relativedelta(months=1)
-    else:  # periodicity == yearly
-        previous_year = check_date.year - 1
-        previous_period_start = date.fromisoformat(f"{previous_year}-01-01")
-        previous_period_end = date.fromisoformat(f"{check_date.year}-01-01")
-    previous_period["start"] = previous_period_start
-    previous_period["end"] = previous_period_end
-    return previous_period
-
-
-def check_previous_period(data_base, habit_name, user_name, previous_period):
-    """
-    checks whether habit has been completed in the previous period
-    :param data_base:
-    :param habit_name:
-    :param user_name:
-    :param previous_period: dictionary with start and end
-    :return:
-    """
+### Return the longest habit streak for a given habit
+# determines the first period of habit completion and the last one
+def determine_start_end_periods(data_base, habit_name, user_name, periodicity):
     completions = return_habit_completions(data_base, habit_name, user_name)
-    # filter for completions between previos_period_start and previous_period_end:
-    completion_dates_str = completions["CompletionDate"]
-    completion_dates = []
-    for dates in completion_dates_str:  # create a list of all completion dates
-        completion_dates.append(date.fromisoformat(dates))
+    completions = completions.sort_values("CompletionDate")
+    first_date = date.fromisoformat(completions.iloc[0, 2])
+    last_date = date.fromisoformat(completions.iloc[-1, 2])
+    if periodicity == "daily":
+        first_period_start = first_date
+        last_period_start = last_date
+    elif periodicity == "weekly":
+        diff_to_start = timedelta(days=first_date.weekday())  # difference of the first date to the start of the first period
+        diff_to_end = timedelta(days=last_date.weekday())
+        first_period_start = first_date - diff_to_start
+        last_period_start = last_date - diff_to_end
+    elif periodicity == "monthly":
+        diff_to_start = timedelta(days=first_date.day-1)
+        diff_to_end = timedelta(days=last_date.day-1)
+        first_period_start = first_date - diff_to_start
+        last_period_start = last_date - diff_to_end
+    else:  # periodicity == yearly
+        first_period_start = date.fromisoformat(f"{first_date.year}-01-01")
+        last_period_start = date.fromisoformat(f"{last_date.year}-01-01")
+    if first_period_start == last_period_start:
+        return {"period_start": first_period_start, "last_period_start": None}
+    else:
+        return {"first_period_start": first_period_start, "last_period_start": last_period_start}
 
-    in_period = []
-    for dates in completion_dates:
-        if (dates >= previous_period["start"]) and (dates < previous_period["end"]):
-            in_period.append("True")
-            break
-        else:
-            in_period.append("False")
-    print(in_period)
-    return any(in_period)  # gibt "True" aus, wenn das für ein Datum stimmt und false, wenn es nicht stimmt
-    # das funktioniert, aber ist das nicht vielleicht ein bisschen langsam? vielleicht kann man auch mit break stoppen?
+
+# check whether the habit has been completed in the period
+def habit_completed_in_period():
+    pass
 
 
-def calculate_streak(check_date):
-    """
-    checks whether habit was completed in time considering its periodicity
-    :return:
-    """
-    previous_period = subtract_one_period(check_date)
-    previous_period_in_time = True
-    streak = 0
-    while previous_period_in_time:
-        streak += 1
-        previous_period_in_time = check_previous_period(the, the, the, previous_period, )
-        previous_period = subtract_one_period(previous_period)
+# adds a new column to name the streaks
+def define_streaks():
+    pass
+
+
+# calculates for each streak the count
+def calculate_streak():
+    pass
 
 # Return the longest habit streak of all defined habits of a user
 
