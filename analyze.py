@@ -111,9 +111,32 @@ def determine_start_end_periods(data_base, habit_name, user_name, periodicity):
         first_period_start = date.fromisoformat(f"{first_date.year}-01-01")
         last_period_start = date.fromisoformat(f"{last_date.year}-01-01")
     if first_period_start == last_period_start:
-        return {"period_start": first_period_start, "last_period_start": None}
+        return {"first_period_start": first_period_start, "last_period_start": None}
     else:
         return {"first_period_start": first_period_start, "last_period_start": last_period_start}
+
+
+# determine all periods between the first and the last one
+def determine_periods(data_base, habit_name, user_name, periodicity):
+    start_end_period = determine_start_end_periods(data_base, habit_name, user_name, periodicity)
+    start_period = start_end_period["first_period_start"]
+    end_period = start_end_period["last_period_start"]
+    periods = []
+    if end_period is None:
+        periods.append(start_period)
+    else:
+        while start_period <= end_period:
+            periods.append(start_period)
+            if periodicity == "daily":
+                start_period += timedelta(days=1)
+            elif periodicity == "weekly":
+                start_period += timedelta(days=7)
+            elif periodicity == "monthly":
+                start_period += dateutil.relativedelta.relativedelta(months=1)
+            else:  # periodicity == "yearly"
+                start_period = date.fromisoformat(f"{start_period.year + 1}-01-01")
+    d = {"periods_start": periods}
+    return pd.DataFrame(data=d)
 
 
 # check whether the habit has been completed in the period

@@ -180,6 +180,25 @@ class TestHabit:
         period = an.determine_start_end_periods(self.data_base, "Dance", "StephanieHochge", "weekly")
         assert period["first_period_start"] == date.fromisoformat("2021-11-01")
         assert period["last_period_start"] == date.fromisoformat("2021-12-27")
+        period_2 = an.determine_start_end_periods(self.data_base, "Go to dentist", "StephanieHochge", "yearly")
+        assert period_2["first_period_start"] == date.fromisoformat("2022-01-01")
+        assert period_2["last_period_start"] is None
+        period_3 = an.determine_start_end_periods(self.data_base, "Brush teeth", "StephanieHochge", "daily")
+        assert period_3["first_period_start"] == date.fromisoformat("2021-12-01")
+        assert period_3["last_period_start"] == date.fromisoformat("2021-12-31")
+        period_4 = an.determine_start_end_periods(self.data_base, "Clean windows", "StephanieHochge", "monthly")
+        assert period_4["first_period_start"] == date.fromisoformat("2022-11-01")
+        assert period_4["last_period_start"] == date.fromisoformat("2022-12-01")
+
+        # test whether periods between first and last period are correctly calculated
+        periods = an.determine_periods(self.data_base, "Dance", "StephanieHochge", "weekly")
+        assert len(periods) == 9
+        periods_2 = an.determine_periods(self.data_base, "Clean windows", "StephanieHochge", "monthly")
+        assert len(periods_2) == 2
+        periods_3 = an.determine_periods(self.data_base, "Go to dentist", "StephanieHochge", "yearly")
+        assert len(periods_3) == 1
+        periods_4 = an.determine_periods(self.data_base, "Brush teeth", "StephanieHochge", "daily")
+        assert len(periods_4) == 31
 
 
     def teardown_method(self):
