@@ -9,14 +9,14 @@ def create_data_frame(data_base, table):
     """
     creates a pandas dataframe from database tables
     :param data_base: the database which contains the desired table
-    :param table: the table to be created - either "Habit", "HabitAppUser" or "Completion"
+    :param table: the table to be created - either "Habit", "HabitAppUser" or "Period"
     :return: dataframe from the table
     """
     habit_columns = ["PKHabitID", "FKUserID", "Name", "Periodicity", "CreationTime"]
     # TODO: Überprüfen: Gibt es eine bessere Möglichkeit, die Table Header zu übergeben?
     user_columns = ["PKUserID", "UserName"]
-    completion_columns = ["PKCompletionID", "FKHabitID", "CompletionDate"]
-    column_names = {"Habit": habit_columns, "HabitAppUser": user_columns, "Completion": completion_columns}
+    period_columns = ["PKPeriodID", "FKHabitID", "PeriodStart", "CompletionDate", "StreakName"]
+    column_names = {"Habit": habit_columns, "HabitAppUser": user_columns, "Period": period_columns}
     sql_query = pd.read_sql_query(f'''SELECT * FROM {table}''', data_base)
     return pd.DataFrame(sql_query, columns=column_names[table])
 
@@ -63,9 +63,16 @@ def return_habit_id(data_base, habit_name, user_name):
 
 # return completions of a specific habit
 def return_habit_completions(data_base, habit_name, user_name):
+    """
+
+    :param data_base: the data_base which contains the data
+    :param habit_name: the habit for which data is to be displayed
+    :param user_name: the habit's user name for which data is to be displayed
+    :return: a data frame containing all completions of the user's habit
+    """
     habit_id = return_habit_id(data_base, habit_name, user_name)
-    completion_df = create_data_frame(data_base, "Completion")
-    return completion_df.loc[completion_df["FKHabitID"] == habit_id]
+    period_df = create_data_frame(data_base, "Period")
+    return period_df.loc[period_df["FKHabitID"] == habit_id]
 
 
 # Return a list of all currently tracked habits of a user
@@ -82,71 +89,78 @@ def return_habits(data_base, user_name):
 
 # Filter for periodicity and return habits with said periodicity
 def return_habits_of_type(data_base, user_name, periodicity):
+    """
+
+    :param data_base: the database which contains the habit data
+    :param user_name: the name of the user (str)
+    :param periodicity: the periodicity for which the user looks (str)
+    :return: a pandas series with the names of the user's habits of the specified periodicity
+    """
     defined_habits = return_user_habits(data_base, user_name)
     habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity]
     return habits_of_type["Name"]
 
 
 ### Return the longest habit streak for a given habit
-# determines the first period of habit completion and the last one
-def determine_start_end_periods(data_base, habit_name, user_name, periodicity):
-    completions = return_habit_completions(data_base, habit_name, user_name)
-    completions = completions.sort_values("CompletionDate")
-    first_date = date.fromisoformat(completions.iloc[0, 2])
-    last_date = date.fromisoformat(completions.iloc[-1, 2])
+# determine the start of the period
+def determine_period_start(periodicity, check_date):
+    """
+    determines the start of the current period, in which the habit was completed
+    :param periodicity: the periodicitiy of the habit (str)
+    :param check_date: the date where the habit was checked off (str), format: "YYYY-MM-DD"
+    :return: the start of the current period (str), format: "YYYY-MM-DD"
+    """
+    check_date = date.fromisoformat(check_date)
     if periodicity == "daily":
-        first_period_start = first_date
-        last_period_start = last_date
+        period_start = check_date
     elif periodicity == "weekly":
-        diff_to_start = timedelta(days=first_date.weekday())  # difference of the first date to the start of the first period
-        diff_to_end = timedelta(days=last_date.weekday())
-        first_period_start = first_date - diff_to_start
-        last_period_start = last_date - diff_to_end
+        diff_to_start = timedelta(days=check_date.weekday())
+        period_start = check_date - diff_to_start
     elif periodicity == "monthly":
-        diff_to_start = timedelta(days=first_date.day-1)
-        diff_to_end = timedelta(days=last_date.day-1)
-        first_period_start = first_date - diff_to_start
-        last_period_start = last_date - diff_to_end
+        diff_to_start = timedelta(days=check_date.day-1)
+        period_start = check_date - diff_to_start
     else:  # periodicity == yearly
-        first_period_start = date.fromisoformat(f"{first_date.year}-01-01")
-        last_period_start = date.fromisoformat(f"{last_date.year}-01-01")
-    if first_period_start == last_period_start:
-        return {"first_period_start": first_period_start, "last_period_start": None}
-    else:
-        return {"first_period_start": first_period_start, "last_period_start": last_period_start}
+        period_start = date.fromisoformat(f"{check_date.year}-01-01")
+    period_start = str(period_start)
+    return period_start
 
 
-# determine all periods between the first and the last one
-def determine_periods(data_base, habit_name, user_name, periodicity):
-    start_end_period = determine_start_end_periods(data_base, habit_name, user_name, periodicity)
-    start_period = start_end_period["first_period_start"]
-    end_period = start_end_period["last_period_start"]
-    periods = []
-    if end_period is None:
-        periods.append(start_period)
-    else:
-        while start_period <= end_period:
-            periods.append(start_period)
-            if periodicity == "daily":
-                start_period += timedelta(days=1)
-            elif periodicity == "weekly":
-                start_period += timedelta(days=7)
-            elif periodicity == "monthly":
-                start_period += dateutil.relativedelta.relativedelta(months=1)
-            else:  # periodicity == "yearly"
-                start_period = date.fromisoformat(f"{start_period.year + 1}-01-01")
-    d = {"periods_start": periods}
-    return pd.DataFrame(data=d)
+# determine the start of the next period
+def determine_next_period_start(periodicity, check_date):
+    """
+    determines the start of the period that comes after the period in which the habit was checked off
+    :param periodicity: the periodicitiy of the habit (str)
+    :param check_date: the date where the habit was checked off (str), format: "YYYY-MM-DD"
+    :return: the start of the next period (str), format: "YYYY-MM-DD"
+    """
+    check_date = date.fromisoformat(check_date)
+    if periodicity == "daily":
+        next_period_start = check_date + timedelta(days=1)
+    elif periodicity == "weekly":
+        diff_to_start = timedelta(days=7-check_date.weekday())
+        next_period_start = check_date + diff_to_start
+    elif periodicity == "monthly":
+        diff_to_start = timedelta(days=check_date.day-1)
+        period_start = check_date - diff_to_start
+        next_period_start = period_start + dateutil.relativedelta.relativedelta(months=1)
+    else:  # periodicity == yearly
+        next_period_start = date.fromisoformat(f"{check_date.year+1}-01-01")
+    next_period_start = str(next_period_start)
+    return next_period_start
 
 
-# check whether the habit has been completed in the period
-def habit_completed_in_period():
-    pass
-
-
-# adds a new column to name the streaks
-def define_streaks():
-    pass
+# determine the start of the previous period
+def determine_previous_period_start(periodicity, period_start):
+    """
+    determines the start of the period that came before the period in which the habit was checked off
+    :param periodicity: the periodicitiy of the habit (str)
+    :param period_start: the start of the period, in which the habit was checked off (str), format: "YYYY-MM-DD"
+    :return: the start of the previous period (str), format: "YYYY-MM-DD"
+    """
+    period_start = date.fromisoformat(period_start)
+    previous_period_end = str(period_start - timedelta(days=1))
+    previous_period_start = determine_period_start(periodicity, previous_period_end)
+    return str(previous_period_start)
 
 
 # calculates for each streak the count
