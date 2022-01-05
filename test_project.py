@@ -233,5 +233,12 @@ class TestHabit:
         previous_period_start_4 = an.determine_previous_period_start("yearly", "2021-01-01")
         assert previous_period_start_4 == "2020-01-01"
 
+        # test if the longest streak of a habit is calculated correctly
+        streaks = an.calculate_streak_counts(self.data_base, "Dance", "StephanieHochge")
+        assert streaks.get(2) == 3
+
+        max_streak_for_habit = an.return_longest_streak_for_habit(self.data_base, "Brush teeth", "StephanieHochge")
+        assert max_streak_for_habit == 21
+
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde

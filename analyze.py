@@ -164,8 +164,35 @@ def determine_previous_period_start(periodicity, period_start):
 
 
 # calculates for each streak the count
-def calculate_streak():
-    pass
+def calculate_streak_counts(data_base, habit_name, user_name):
+    """
+
+    :param data_base: the database containing the data
+    :param habit_name: the habit for which the streak counts are to be returned (str)
+    :param user_name: the habit's user (str)
+    :return: a Pandas series containing the streak names as indexes and the counts
+    """
+    habit_completions = return_habit_completions(data_base, habit_name, user_name)
+    habit_completions = habit_completions.drop_duplicates(subset="PeriodStart")  # Pro Periode wird nur ein Habit
+    # gezählt (ein Habit kann mehrmals während einer Periode durchgeführt werden, dadurch erhöht sich aber nicht der
+    # Streak)
+    streaks = habit_completions.groupby(["StreakName"]).count()["PKPeriodID"]
+    return streaks
+
+
+# return the longest habit streak of the given habit
+def return_longest_streak_for_habit(data_base, habit_name, user_name):
+    """
+
+    :param data_base: the database containing the data
+    :param habit_name: the habit for which the longest streak is to be returned (str)
+    :param user_name: the habit's user (str)
+    :return: the longest streak of the given habit (int)
+    """
+    streaks = calculate_streak_counts(data_base, habit_name, user_name)
+    return streaks.agg("max")  # returns the maximum value of the series
+
+
 
 # Return the longest habit streak of all defined habits of a user
 
