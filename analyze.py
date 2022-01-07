@@ -34,6 +34,19 @@ def return_user_id(data_base, user_name):
     return user_id.iloc[0, 0]
 
 
+# checks if user name is already existing
+def check_for_user(data_base, user_name):
+    """
+    checks if the entered user name is already existing
+    :param data_base: the database containing the data
+    :param user_name: the name of the user to be checked for
+    :return: True if the user name already exists and false if not
+    """
+    user_df = create_data_frame(data_base, "HabitAppUser")
+    users = list(user_df["UserName"])
+    return True if user_name in users else False
+
+
 # filter for data records containing the habits of a specific user
 def return_user_habits(data_base, user_name):
     """

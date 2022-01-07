@@ -178,6 +178,16 @@ class TestHabit:
         user_df = an.create_data_frame(self.data_base, "HabitAppUser")
         period_df = an.create_data_frame(self.data_base, "Period")
 
+    def test_check_for_user(self):
+        """
+        tests whether the function to identify whether a user name already exists works or not
+        :return:
+        """
+        user_existing = an.check_for_user(self.data_base, "StephanieHochge")
+        assert user_existing is True
+        user_existing2 = an.check_for_user(self.data_base, "StephanieH")
+        assert user_existing2 is False
+
     def test_return_habits(self):
         """
         tests whether user_habits are correctly returned
