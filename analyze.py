@@ -97,7 +97,16 @@ def return_habits(data_base, user_name):
     :return: a pandas series containing only the habits of the user
     """
     defined_habits = return_user_habits(data_base, user_name)
-    return defined_habits["Name"]
+    return defined_habits["Name"].to_list()
+
+
+# returns the periodicity of a habit.
+def return_periodicity(data_base, user_name, habit_name):
+    defined_habits = return_user_habits(data_base, user_name)
+    habit = defined_habits.loc[defined_habits["Name"] == habit_name]
+    periodicity_series = habit["Periodicity"]
+    periodicity = periodicity_series.to_list()[0]
+    return periodicity
 
 
 # Filter for periodicity and return habits with said periodicity
@@ -130,7 +139,7 @@ def determine_period_start(periodicity, check_date):
         diff_to_start = timedelta(days=check_date.weekday())
         period_start = check_date - diff_to_start
     elif periodicity == "monthly":
-        diff_to_start = timedelta(days=check_date.day-1)
+        diff_to_start = timedelta(days=check_date.day - 1)
         period_start = check_date - diff_to_start
     else:  # periodicity == yearly
         period_start = date.fromisoformat(f"{check_date.year}-01-01")
@@ -150,14 +159,14 @@ def determine_next_period_start(periodicity, check_date):
     if periodicity == "daily":
         next_period_start = check_date + timedelta(days=1)
     elif periodicity == "weekly":
-        diff_to_start = timedelta(days=7-check_date.weekday())
+        diff_to_start = timedelta(days=7 - check_date.weekday())
         next_period_start = check_date + diff_to_start
     elif periodicity == "monthly":
-        diff_to_start = timedelta(days=check_date.day-1)
+        diff_to_start = timedelta(days=check_date.day - 1)
         period_start = check_date - diff_to_start
         next_period_start = period_start + dateutil.relativedelta.relativedelta(months=1)
     else:  # periodicity == yearly
-        next_period_start = date.fromisoformat(f"{check_date.year+1}-01-01")
+        next_period_start = date.fromisoformat(f"{check_date.year + 1}-01-01")
     next_period_start = str(next_period_start)
     return next_period_start
 
@@ -204,8 +213,6 @@ def return_longest_streak_for_habit(data_base, habit_name, user_name):
     """
     streaks = calculate_streak_counts(data_base, habit_name, user_name)
     return streaks.agg("max")  # returns the maximum value of the series
-
-
 
 # Return the longest habit streak of all defined habits of a user
 

@@ -153,12 +153,16 @@ class TestHabit:
         """
         tests whether habits can be stored and checked off
         """
-        habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
+        user = UserDB("Hansi")
+        user.store_user(self.data_base)
+        habit = HabitDB("Brush teeth", "weekly", user)
         habit.store_habit(self.data_base)
         habit.check_off_habit(self.data_base)
         habit.check_off_habit(self.data_base, "2021-12-05")
         assert habit.last_completion == str(date.today())
-        habit_2 = HabitDB("Clean window", "weekly", "StephanieHochge")
+        user2 = UserDB("Mausi")
+        user2.store_user(self.data_base)
+        habit_2 = HabitDB("Clean window", "weekly", user2)
         habit_2.store_habit(self.data_base)
         habit_2.check_off_habit(self.data_base, "2021-12-05")
         assert habit_2.last_completion == "2021-12-05"
@@ -194,6 +198,15 @@ class TestHabit:
         """
         defined_habits = an.return_habits(self.data_base, "StephanieHochge")
         assert len(defined_habits) == 5
+
+    def test_return_periodicity(self):
+        """
+        tests whether the periodicity of the habit is correctly returned
+        """
+        periodicity = an.return_periodicity(self.data_base, "StephanieHochge", "Brush teeth")
+        assert periodicity == "daily"
+        periodicity = an.return_periodicity(self.data_base, "StephanieHochge", "Dance")
+        assert periodicity == "weekly"
 
     def test_return_habits_of_type(self):
         """
@@ -249,6 +262,11 @@ class TestHabit:
 
         max_streak_for_habit = an.return_longest_streak_for_habit(self.data_base, "Brush teeth", "StephanieHochge")
         assert max_streak_for_habit == 21
+
+    # TODO: test user input (see main.py):
+        # Creating a new user:
+            # test that it is not possible to store an empty value as user name
+            # test that it is not possible to store a user name containing a space
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde

@@ -48,11 +48,11 @@ def add_user(db, user_name):
 def add_habit(db, user_name, name, periodicity, creation_time=None):
     cursor = db.cursor()
     cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [user_name])
-    user_id = cursor.fetchall()
+    user_id = cursor.fetchone()
     if not creation_time:
         creation_time = str(datetime.now())
     cursor.execute("INSERT INTO Habit(FKUserID, Name, Periodicity, CreationTime) VALUES (?, ?, ?, ?)",
-                   (user_id[0][0], name, periodicity, creation_time))
+                   (user_id[0], name, periodicity, creation_time))
     db.commit()
     # TODO: Sicherstellen, dass User nicht schon ein Habit mit demselben Namen hat
 
@@ -194,3 +194,5 @@ def add_period(db, habit_name, user_name, check_date=None):
 
 
 # TODO: @Chris: kann man sich die Tabelle mit den Daten irgendwie anders anzeigen lassen als durch ein Select-Statement?
+# TODO: Muss die Datenbank auch noch geschlossen werden? Dafür kann auch ein Context Manager eingesetzt werden:
+# https://www.youtube.com/watch?v=ZsvftkbbrR0 (ab 12:43 Min)
