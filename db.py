@@ -6,13 +6,13 @@ import os
 
 # TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
 def get_db(name="main.db"):
-    db = sqlite3.connect(name)
-    create_tables(db)
-    return db
+    database = sqlite3.connect(name)
+    create_tables(database)
+    return database
 
 
-def create_tables(db):
-    cursor = db.cursor()
+def create_tables(database):
+    cursor = database.cursor()
 
     # create HabitAppUser table
     user_table = """CREATE TABLE IF NOT EXISTS HabitAppUser
@@ -34,7 +34,7 @@ def create_tables(db):
 
     cursor.execute(period_table)
 
-    db.commit()
+    database.commit()
 
 
 # add data into tables
