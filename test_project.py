@@ -11,74 +11,83 @@ class TestHabit:
 
     def setup_method(self):
         self.data_base = db.get_db("test.db")
-        db.add_user(self.data_base, "StephanieHochge")
-        db.add_user(self.data_base, "RajaBe")
-        db.add_user(self.data_base, "LibertyEvans")
-        db.add_habit(self.data_base, "RajaBe", "Brush teeth", "daily")
-        db.add_habit(self.data_base, "StephanieHochge", "Brush teeth", "daily", "2021-11-30 07:54:24.999098")
-        db.add_habit(self.data_base, "StephanieHochge", "Dance", "weekly", "2021-10-31 07:54:24.999098")
-        db.add_habit(self.data_base, "StephanieHochge", "Clean windows", "monthly", "2021-10-31 07:54:24.999098")
-        db.add_habit(self.data_base, "StephanieHochge", "Clean bathroom", "weekly", "2022-10-31 07:56:24.999098")
-        db.add_habit(self.data_base, "StephanieHochge", "Go to dentist", "yearly", "2022-10-31 07:56:24.999098")
-        db.add_period(self.data_base, "Brush teeth", "RajaBe")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-01")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-01")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-02")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-04")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-05")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-07")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-08")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-09")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-10")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-11")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-12")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-13")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-14")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-15")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-16")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-17")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-18")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-19")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-20")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-21")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-22")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-23")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-24")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-25")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-26")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-27")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-29")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-30")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-31")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-06")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-07")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-11")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-13")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-14")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-21")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-25")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-27")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-11-28")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-02")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-04")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-05")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-16")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-18")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-19")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-30")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-11-06")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-11-13")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-11-20")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-12-04")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-12-11")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2021-12-18")
-        db.add_period(self.data_base, "Clean bathroom", "StephanieHochge", "2022-01-01")
-        db.add_period(self.data_base, "Clean windows", "StephanieHochge", "2022-11-17")
-        db.add_period(self.data_base, "Clean windows", "StephanieHochge", "2022-12-30")
-        db.add_period(self.data_base, "Go to dentist", "StephanieHochge", "2022-12-17")
-        db.add_period(self.data_base, "Go to dentist", "StephanieHochge", "2021-12-05")
-        db.add_period(self.data_base, "Brush teeth", "StephanieHochge", "2021-12-03")
-        db.add_period(self.data_base, "Dance", "StephanieHochge", "2021-12-21")
+        user_sh = UserDB("StephanieHochge")
+        user_rb = UserDB("RajaBe")
+        user_le = UserDB("LibertyEvans")
+        db.add_user(self.data_base, user_sh)
+        db.add_user(self.data_base, user_rb)
+        db.add_user(self.data_base, user_le)
+        teeth_rb = HabitDB("Brush teeth", "daily", user_rb)
+        teeth_sh = HabitDB("Brush teeth", "daily", user_sh)
+        dance_sh = HabitDB("Dance", "weekly", user_sh)
+        windows_sh = HabitDB("Clean windows", "monthly", user_sh)
+        bathroom_sh = HabitDB("Clean bathroom", "weekly", user_sh)
+        dentist_sh = HabitDB("Go to dentist", "yearly", user_sh)
+        db.add_habit(self.data_base, teeth_rb)
+        db.add_habit(self.data_base, teeth_sh, "2021-11-30 07:54:24.999098")
+        db.add_habit(self.data_base, dance_sh, "2021-10-31 07:54:24.999098")
+        db.add_habit(self.data_base, windows_sh, "2021-10-31 07:54:24.999098")
+        db.add_habit(self.data_base, bathroom_sh, "2022-10-31 07:56:24.999098")
+        db.add_habit(self.data_base, dentist_sh, "2022-10-31 07:56:24.999098")
+        db.add_period(self.data_base, teeth_rb)
+        db.add_period(self.data_base, teeth_sh, "2021-12-01")
+        db.add_period(self.data_base, teeth_sh, "2021-12-01")
+        db.add_period(self.data_base, teeth_sh, "2021-12-02")
+        db.add_period(self.data_base, teeth_sh, "2021-12-04")
+        db.add_period(self.data_base, teeth_sh, "2021-12-05")
+        db.add_period(self.data_base, teeth_sh, "2021-12-07")
+        db.add_period(self.data_base, teeth_sh, "2021-12-08")
+        db.add_period(self.data_base, teeth_sh, "2021-12-09")
+        db.add_period(self.data_base, teeth_sh, "2021-12-10")
+        db.add_period(self.data_base, teeth_sh, "2021-12-11")
+        db.add_period(self.data_base, teeth_sh, "2021-12-12")
+        db.add_period(self.data_base, teeth_sh, "2021-12-13")
+        db.add_period(self.data_base, teeth_sh, "2021-12-14")
+        db.add_period(self.data_base, teeth_sh, "2021-12-15")
+        db.add_period(self.data_base, teeth_sh, "2021-12-16")
+        db.add_period(self.data_base, teeth_sh, "2021-12-17")
+        db.add_period(self.data_base, teeth_sh, "2021-12-18")
+        db.add_period(self.data_base, teeth_sh, "2021-12-19")
+        db.add_period(self.data_base, teeth_sh, "2021-12-20")
+        db.add_period(self.data_base, teeth_sh, "2021-12-21")
+        db.add_period(self.data_base, teeth_sh, "2021-12-22")
+        db.add_period(self.data_base, teeth_sh, "2021-12-23")
+        db.add_period(self.data_base, teeth_sh, "2021-12-24")
+        db.add_period(self.data_base, teeth_sh, "2021-12-25")
+        db.add_period(self.data_base, teeth_sh, "2021-12-26")
+        db.add_period(self.data_base, teeth_sh, "2021-12-27")
+        db.add_period(self.data_base, teeth_sh, "2021-12-29")
+        db.add_period(self.data_base, teeth_sh, "2021-12-30")
+        db.add_period(self.data_base, teeth_sh, "2021-12-31")
+        db.add_period(self.data_base, dance_sh, "2021-11-06")
+        db.add_period(self.data_base, dance_sh, "2021-11-07")
+        db.add_period(self.data_base, dance_sh, "2021-11-11")
+        db.add_period(self.data_base, dance_sh, "2021-11-13")
+        db.add_period(self.data_base, dance_sh, "2021-11-14")
+        db.add_period(self.data_base, dance_sh, "2021-11-21")
+        db.add_period(self.data_base, dance_sh, "2021-11-25")
+        db.add_period(self.data_base, dance_sh, "2021-11-27")
+        db.add_period(self.data_base, dance_sh, "2021-11-28")
+        db.add_period(self.data_base, dance_sh, "2021-12-02")
+        db.add_period(self.data_base, dance_sh, "2021-12-04")
+        db.add_period(self.data_base, dance_sh, "2021-12-05")
+        db.add_period(self.data_base, dance_sh, "2021-12-16")
+        db.add_period(self.data_base, dance_sh, "2021-12-18")
+        db.add_period(self.data_base, dance_sh, "2021-12-19")
+        db.add_period(self.data_base, dance_sh, "2021-12-30")
+        db.add_period(self.data_base, bathroom_sh, "2021-11-06")
+        db.add_period(self.data_base, bathroom_sh, "2021-11-13")
+        db.add_period(self.data_base, bathroom_sh, "2021-11-20")
+        db.add_period(self.data_base, bathroom_sh, "2021-12-04")
+        db.add_period(self.data_base, bathroom_sh, "2021-12-11")
+        db.add_period(self.data_base, bathroom_sh, "2021-12-18")
+        db.add_period(self.data_base, bathroom_sh, "2022-01-01")
+        db.add_period(self.data_base, windows_sh, "2022-11-17")
+        db.add_period(self.data_base, windows_sh, "2022-12-30")
+        db.add_period(self.data_base, dentist_sh, "2022-12-17")
+        db.add_period(self.data_base, dentist_sh, "2021-12-05")
+        db.add_period(self.data_base, teeth_sh, "2021-12-03")
+        db.add_period(self.data_base, dance_sh, "2021-12-21")
 
     def test_habit(self):
         """
@@ -187,43 +196,50 @@ class TestHabit:
         tests whether the function to identify whether a user name already exists works or not
         :return:
         """
-        user_existing = an.check_for_user(self.data_base, "StephanieHochge")
+        user_sh = UserDB("StephanieHochge")
+        user_sh_2 = UserDB("StephanieH")
+        user_existing = an.check_for_user(self.data_base, user_sh)
         assert user_existing is True
-        user_existing2 = an.check_for_user(self.data_base, "StephanieH")
+        user_existing2 = an.check_for_user(self.data_base, user_sh_2)
         assert user_existing2 is False
 
     def test_return_habits(self):
         """
         tests whether user_habits are correctly returned
         """
-        defined_habits = an.return_habits(self.data_base, "StephanieHochge")
+        user_sh = UserDB("StephanieHochge")
+        defined_habits = an.return_habits(self.data_base, user_sh)
         assert len(defined_habits) == 5
 
     def test_return_periodicity(self):
         """
         tests whether the periodicity of the habit is correctly returned
         """
-        periodicity = an.return_periodicity(self.data_base, "StephanieHochge", "Brush teeth")
+        user_sh = UserDB("StephanieHochge")
+        periodicity = an.return_periodicity(self.data_base, user_sh, "Brush teeth")
         assert periodicity == "daily"
-        periodicity = an.return_periodicity(self.data_base, "StephanieHochge", "Dance")
+        periodicity = an.return_periodicity(self.data_base, user_sh, "Dance")
         assert periodicity == "weekly"
 
     def test_return_habits_of_type(self):
         """
         tests whether user_habits of a specific type are correctly returned
         """
-        weekly_habits = an.return_habits_of_type(self.data_base, "StephanieHochge", "weekly")
+        user_sh = UserDB("StephanieHochge")
+        weekly_habits = an.return_habits_of_type(self.data_base, user_sh, "weekly")
         assert len(weekly_habits) == 2
-        quaterly_habits = an.return_habits_of_type(self.data_base, "StephanieHochge", "quarterly")
+        quaterly_habits = an.return_habits_of_type(self.data_base, user_sh, "quarterly")
         assert len(quaterly_habits) == 0
 
     def test_return_streak(self):
         # test if return_habit_id returns the correct habit_id
-        habit_id = an.return_habit_id(self.data_base, "Dance", "StephanieHochge")
+        user_sh = UserDB("StephanieHochge")
+        dance_sh = HabitDB("Dance", "weekly", user_sh)
+        habit_id = an.return_habit_id(self.data_base, dance_sh)
         assert habit_id == 3
 
         # test if return_habit_completions returns the correct table
-        habit_completions = an.return_habit_completions(self.data_base, "Dance", "StephanieHochge")
+        habit_completions = an.return_habit_completions(self.data_base, dance_sh)
         assert len(habit_completions) == 17
 
         # test if period start is correctly calculated
@@ -257,16 +273,18 @@ class TestHabit:
         assert previous_period_start_4 == "2020-01-01"
 
         # test if the longest streak of a habit is calculated correctly
-        streaks = an.calculate_streak_counts(self.data_base, "Dance", "StephanieHochge")
+        streaks = an.calculate_streak_counts(self.data_base, dance_sh)
         assert streaks.get(2) == 3
 
-        max_streak_for_habit = an.return_longest_streak_for_habit(self.data_base, "Brush teeth", "StephanieHochge")
+        teeth_sh = HabitDB("Brush teeth", "daily", user_sh)
+        max_streak_for_habit = an.return_longest_streak_for_habit(self.data_base, teeth_sh)
         assert max_streak_for_habit == 21
 
     # TODO: test user input (see main.py):
         # Creating a new user:
             # test that it is not possible to store an empty value as user name
             # test that it is not possible to store a user name containing a space
+        # ist nach Max nicht unbedingt notwendig, weil die eigentliche Programmlogik schon durch die Tests abgedeckt wird
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
