@@ -61,9 +61,8 @@ class Habit:
 
 class HabitDB(Habit):
 
-    def store_habit(self, data_base):
-        current_date = str(datetime.now())
-        db.add_habit(data_base, self.user.user_name, self.name, self.periodicity, current_date)
+    def store_habit(self, data_base, creation_time=None):
+        db.add_habit(data_base, self, creation_time)
 
     def check_off_habit(self, data_base, check_date: str = None):
         """
@@ -78,5 +77,5 @@ class HabitDB(Habit):
             # last_completion wird nur geändert, wenn das aktuelle Datum von Check-Date größer ist als das last
             # completion date oder es noch keins gibt
             self.last_completion = check_date
-        db.add_period(data_base, self.name, self.user.user_name, check_date)
+        db.add_period(data_base, self, check_date)
 

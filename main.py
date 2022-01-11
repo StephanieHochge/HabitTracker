@@ -15,7 +15,8 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
         self.action_type = action_type
 
     def validate(self, document):
-        user_existing = an.check_for_user(self.database, document.text)
+        user = UserDB(document.text)
+        user_existing = an.check_for_user(self.database, user)
         if len(document.text) == 0:  # mindestens ein Zeichen muss eingegeben werden
             raise ValidationError(
                 message="Please enter at least one character",  # error message that is displayed
@@ -37,12 +38,12 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
 
 class HabitNameValidator(Validator):
 
-    def __init__(self, database, user_name):
+    def __init__(self, database, user):
         self.database = database
-        self.user_name = user_name
+        self.user = user
 
     def validate(self, document):
-        habits_of_user = an.return_habits(self.database, self.user_name)
+        habits_of_user = an.return_habits(self.database, self.user)
         if len(document.text) == 0:  # TODO: Vererbung!
             raise ValidationError(
                 message="Please enter at least one character",  # error message that is displayed
@@ -56,101 +57,110 @@ class HabitNameValidator(Validator):
 
 
 def cli():
-    database = get_db()
+    main_database = get_db()
     #  just for testing purposes, test data is inserted
-    add_user(database, "StephanieHochge")
-    add_user(database, "RajaBe")
-    add_user(database, "LibertyEvans")
-    add_habit(database, "RajaBe", "Brush teeth", "daily")
-    add_habit(database, "StephanieHochge", "Brush teeth", "daily", "2021-11-30 07:54:24.999098")
-    add_habit(database, "StephanieHochge", "Dance", "weekly", "2021-10-31 07:54:24.999098")
-    add_habit(database, "StephanieHochge", "Clean windows", "monthly", "2021-10-31 07:54:24.999098")
-    add_habit(database, "StephanieHochge", "Clean bathroom", "weekly", "2022-10-31 07:56:24.999098")
-    add_habit(database, "StephanieHochge", "Go to dentist", "yearly", "2022-10-31 07:56:24.999098")
-    add_period(database, "Brush teeth", "RajaBe")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-01")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-01")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-02")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-04")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-05")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-07")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-08")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-09")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-10")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-11")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-12")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-13")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-14")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-15")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-16")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-17")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-18")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-19")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-20")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-21")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-22")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-23")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-24")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-25")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-26")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-27")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-29")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-30")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-31")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-06")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-07")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-11")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-13")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-14")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-21")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-25")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-27")
-    add_period(database, "Dance", "StephanieHochge", "2021-11-28")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-02")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-04")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-05")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-16")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-18")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-19")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-30")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-11-06")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-11-13")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-11-20")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-12-04")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-12-11")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2021-12-18")
-    add_period(database, "Clean bathroom", "StephanieHochge", "2022-01-01")
-    add_period(database, "Clean windows", "StephanieHochge", "2022-11-17")
-    add_period(database, "Clean windows", "StephanieHochge", "2022-12-30")
-    add_period(database, "Go to dentist", "StephanieHochge", "2022-12-17")
-    add_period(database, "Go to dentist", "StephanieHochge", "2021-12-05")
-    add_period(database, "Brush teeth", "StephanieHochge", "2021-12-03")
-    add_period(database, "Dance", "StephanieHochge", "2021-12-21")
+    user_sh = UserDB("StephanieHochge")
+    user_rb = UserDB("RajaBe")
+    user_le = UserDB("LibertyEvans")
+    add_user(main_database, user_sh)
+    add_user(main_database, user_rb)
+    add_user(main_database, user_le)
+    teeth_rb = HabitDB("Brush teeth", "daily", user_rb)
+    teeth_sh = HabitDB("Brush teeth", "daily", user_sh)
+    dance_sh = HabitDB("Dance", "weekly", user_sh)
+    windows_sh = HabitDB("Clean windows", "monthly", user_sh)
+    bathroom_sh = HabitDB("Clean bathroom", "weekly", user_sh)
+    dentist_sh = HabitDB("Go to dentist", "yearly", user_sh)
+    add_habit(main_database, teeth_rb)
+    add_habit(main_database, teeth_sh, "2021-11-30 07:54:24.999098")
+    add_habit(main_database, dance_sh, "2021-10-31 07:54:24.999098")
+    add_habit(main_database, windows_sh, "2021-10-31 07:54:24.999098")
+    add_habit(main_database, bathroom_sh, "2022-10-31 07:56:24.999098")
+    add_habit(main_database, dentist_sh, "2022-10-31 07:56:24.999098")
+    add_period(main_database, teeth_rb)
+    add_period(main_database, teeth_sh, "2021-12-01")
+    add_period(main_database, teeth_sh, "2021-12-01")
+    add_period(main_database, teeth_sh, "2021-12-02")
+    add_period(main_database, teeth_sh, "2021-12-04")
+    add_period(main_database, teeth_sh, "2021-12-05")
+    add_period(main_database, teeth_sh, "2021-12-07")
+    add_period(main_database, teeth_sh, "2021-12-08")
+    add_period(main_database, teeth_sh, "2021-12-09")
+    add_period(main_database, teeth_sh, "2021-12-10")
+    add_period(main_database, teeth_sh, "2021-12-11")
+    add_period(main_database, teeth_sh, "2021-12-12")
+    add_period(main_database, teeth_sh, "2021-12-13")
+    add_period(main_database, teeth_sh, "2021-12-14")
+    add_period(main_database, teeth_sh, "2021-12-15")
+    add_period(main_database, teeth_sh, "2021-12-16")
+    add_period(main_database, teeth_sh, "2021-12-17")
+    add_period(main_database, teeth_sh, "2021-12-18")
+    add_period(main_database, teeth_sh, "2021-12-19")
+    add_period(main_database, teeth_sh, "2021-12-20")
+    add_period(main_database, teeth_sh, "2021-12-21")
+    add_period(main_database, teeth_sh, "2021-12-22")
+    add_period(main_database, teeth_sh, "2021-12-23")
+    add_period(main_database, teeth_sh, "2021-12-24")
+    add_period(main_database, teeth_sh, "2021-12-25")
+    add_period(main_database, teeth_sh, "2021-12-26")
+    add_period(main_database, teeth_sh, "2021-12-27")
+    add_period(main_database, teeth_sh, "2021-12-29")
+    add_period(main_database, teeth_sh, "2021-12-30")
+    add_period(main_database, teeth_sh, "2021-12-31")
+    add_period(main_database, dance_sh, "2021-11-06")
+    add_period(main_database, dance_sh, "2021-11-07")
+    add_period(main_database, dance_sh, "2021-11-11")
+    add_period(main_database, dance_sh, "2021-11-13")
+    add_period(main_database, dance_sh, "2021-11-14")
+    add_period(main_database, dance_sh, "2021-11-21")
+    add_period(main_database, dance_sh, "2021-11-25")
+    add_period(main_database, dance_sh, "2021-11-27")
+    add_period(main_database, dance_sh, "2021-11-28")
+    add_period(main_database, dance_sh, "2021-12-02")
+    add_period(main_database, dance_sh, "2021-12-04")
+    add_period(main_database, dance_sh, "2021-12-05")
+    add_period(main_database, dance_sh, "2021-12-16")
+    add_period(main_database, dance_sh, "2021-12-18")
+    add_period(main_database, dance_sh, "2021-12-19")
+    add_period(main_database, dance_sh, "2021-12-30")
+    add_period(main_database, bathroom_sh, "2021-11-06")
+    add_period(main_database, bathroom_sh, "2021-11-13")
+    add_period(main_database, bathroom_sh, "2021-11-20")
+    add_period(main_database, bathroom_sh, "2021-12-04")
+    add_period(main_database, bathroom_sh, "2021-12-11")
+    add_period(main_database, bathroom_sh, "2021-12-18")
+    add_period(main_database, bathroom_sh, "2022-01-01")
+    add_period(main_database, windows_sh, "2022-11-17")
+    add_period(main_database, windows_sh, "2022-12-30")
+    add_period(main_database, dentist_sh, "2022-12-17")
+    add_period(main_database, dentist_sh, "2021-12-05")
+    add_period(main_database, teeth_sh, "2021-12-03")
+    add_period(main_database, dance_sh, "2021-12-21")
 
     # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
     # TODO: Handle Python KeyboardInterrupt
 
-    def create_new_user():
+    def create_new_user(database):
         username = qu.text("Please choose a user name: ",
                            validate=UserNameValidator(database, "create")).ask()
         app_user = UserDB(username)
         app_user.store_user(database)
-        print(f"A user with the username {username} has successfully been created. Logged in as {username}")
+        print(f"A user with the username {username} has successfully been created. Logged in as {username}.")
         return app_user
 
-    def login():
+    def login(database):
         username_existing = False
         count = 0
         while not username_existing:
             try:
                 username = qu.text("Please enter your user name.",
                                    validate=UserNameValidator(database, "login")).ask()
-                if not an.check_for_user(database, username):
-                    raise UserNameNotExisting(username)
-                app_user = UserDB(username)
+                user = UserDB(username)
+                if not an.check_for_user(database, user):
+                    raise UserNameNotExisting(user.user_name)
                 print(f"Logged in as {username}")
                 username_existing = True
-                return app_user
+                return user
             except UserNameNotExisting:
                 print("This user does not exist. Please try again")
                 count += 1
@@ -159,7 +169,7 @@ def cli():
 
     def create_habit(user, database):
         habit_name = qu.text("Which habit do you want to add?",
-                             validate=HabitNameValidator(database, user.user_name)).ask()
+                             validate=HabitNameValidator(database, user)).ask()
         periodicity = qu.select(f"Which periodicity shall {habit_name} have?",
                                 choices=["daily", "weekly", "monthly", "yearly"]).ask()
         habit = HabitDB(habit_name, periodicity, user)
@@ -168,10 +178,10 @@ def cli():
         return habit
 
     def identify_habit(habit_action, database, user):
-        tracked_habits = an.return_habits(database, user.user_name)
+        tracked_habits = an.return_habits(database, user)
         habit_name = qu.select(f"Which habit do you want to {habit_action}?",
                                choices=tracked_habits).ask()
-        habit_periodicity = an.return_periodicity(database, user.user_name, habit_name)
+        habit_periodicity = an.return_periodicity(database, user, habit_name)
         # user.user_name und habit_name könnte auch nur mit dem Argument "habit" übergeben werden
         habit = HabitDB(habit_name, habit_periodicity, user)
         return habit
@@ -195,15 +205,14 @@ def cli():
             print(f"You want to analyse {habit.name}")
 
     # Program Flow
-    database = get_db()
     start_action = qu.select(
         "What do you want to do?",
         choices=["Create new user", "Login", "Exit"]
     ).ask()
     if start_action == "Create new user":
-        user = create_new_user()
+        current_user = create_new_user(main_database)
     elif start_action == "Login":
-        user = login()
+        current_user = login(main_database)
     else:
         print("Bye")
         quit()  # ist das hier gute Praxis?
@@ -214,7 +223,7 @@ def cli():
     ).ask()
     if next_action == "Add habit":
         action = "add"
-        habit = create_habit(user, database)
+        current_habit = create_habit(current_user, main_database)
     elif next_action == "Delete habit":
         action = "delete"
         delete_habit()
@@ -225,7 +234,7 @@ def cli():
         action = "check off"
         check_off_habit()
     else:  # check_action == "Analyze habits"
-        analyze_habits(database, user)
+        analyze_habits(main_database, current_user)
 
 
 if __name__ == "__main__":

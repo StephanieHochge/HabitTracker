@@ -22,87 +22,85 @@ def create_data_frame(data_base, table):
 
 
 # return the user_id of a user
-def return_user_id(data_base, user_name):
+def return_user_id(data_base, user):
     """
     returns the user_id of a user
     :param data_base: the database which contains user data
-    :param user_name: the user's user name
+    :param user: the user
     :return: the user's user_id
     """
     user_df = create_data_frame(data_base, "HabitAppUser")
-    user_id = user_df.loc[user_df["UserName"] == user_name]
+    user_id = user_df.loc[user_df["UserName"] == user.user_name]
     return user_id.iloc[0, 0]
 
 
 # checks if user name is already existing
-def check_for_user(data_base, user_name):
+def check_for_user(data_base, user):
     """
     checks if the entered user name is already existing
     :param data_base: the database containing the data
-    :param user_name: the name of the user to be checked for
+    :param user: the user
     :return: True if the user name already exists and false if not
     """
     user_df = create_data_frame(data_base, "HabitAppUser")
     users = list(user_df["UserName"])
-    return True if user_name in users else False
+    return True if user.user_name in users else False
 
 
 # filter for data records containing the habits of a specific user
-def return_user_habits(data_base, user_name):
+def return_user_habits(data_base, user):
     """
 
     :param data_base: the database which contains the habit data
-    :param user_name: the user's user name
+    :param user: the user
     :return: a pandas data frame containing the habits of the user and other data
     """
-    user_id = return_user_id(data_base, user_name)
+    user_id = return_user_id(data_base, user)
     habit_df = create_data_frame(data_base, "Habit")
     return habit_df.loc[habit_df["FKUserID"] == user_id]
 
 
 # return the habit_id of a user's habit
-def return_habit_id(data_base, habit_name, user_name):
+def return_habit_id(data_base, habit):  # dieselbe Funktion gibt es auch schon für die Datenbank...
     """
 
+    :param habit: the habit for which the ID is to be returned
     :param data_base: the data_base which contains the data
-    :param habit_name: the name of the habit, for which the habit_id is to be found
-    :param user_name: the name of the user to which the habit belongs
     :return: the habit id (int)
     """
-    user_habits = return_user_habits(data_base, user_name)
-    habit = user_habits.loc[user_habits["Name"] == habit_name]
-    return habit.iloc[0, 0]
+    user_habits = return_user_habits(data_base, habit.user)
+    user_habit = user_habits.loc[user_habits["Name"] == habit.name]
+    return user_habit.iloc[0, 0]
 
 
 # return completions of a specific habit
-def return_habit_completions(data_base, habit_name, user_name):
+def return_habit_completions(data_base, habit):
     """
 
+    :param habit: the habit for which all completions are to be returned
     :param data_base: the data_base which contains the data
-    :param habit_name: the habit for which data is to be displayed
-    :param user_name: the habit's user name for which data is to be displayed
     :return: a data frame containing all completions of the user's habit
     """
-    habit_id = return_habit_id(data_base, habit_name, user_name)
+    habit_id = return_habit_id(data_base, habit)
     period_df = create_data_frame(data_base, "Period")
     return period_df.loc[period_df["FKHabitID"] == habit_id]
 
 
 # Return a list of all currently tracked habits of a user
-def return_habits(data_base, user_name):
+def return_habits(data_base, user):
     """
 
     :param data_base: the database which contains the habit data
-    :param user_name: the user's user name
+    :param user: the user
     :return: a pandas series containing only the habits of the user
     """
-    defined_habits = return_user_habits(data_base, user_name)
+    defined_habits = return_user_habits(data_base, user)
     return defined_habits["Name"].to_list()
 
 
 # returns the periodicity of a habit.
-def return_periodicity(data_base, user_name, habit_name):
-    defined_habits = return_user_habits(data_base, user_name)
+def return_periodicity(data_base, user, habit_name):
+    defined_habits = return_user_habits(data_base, user)
     habit = defined_habits.loc[defined_habits["Name"] == habit_name]
     periodicity_series = habit["Periodicity"]
     periodicity = periodicity_series.to_list()[0]
@@ -110,15 +108,15 @@ def return_periodicity(data_base, user_name, habit_name):
 
 
 # Filter for periodicity and return habits with said periodicity
-def return_habits_of_type(data_base, user_name, periodicity):
+def return_habits_of_type(data_base, user, periodicity):
     """
 
     :param data_base: the database which contains the habit data
-    :param user_name: the name of the user (str)
+    :param user: the user (object)
     :param periodicity: the periodicity for which the user looks (str)
     :return: a pandas series with the names of the user's habits of the specified periodicity
     """
-    defined_habits = return_user_habits(data_base, user_name)
+    defined_habits = return_user_habits(data_base, user)
     habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity]
     return habits_of_type["Name"]
 
@@ -186,15 +184,14 @@ def determine_previous_period_start(periodicity, period_start):
 
 
 # calculates for each streak the count
-def calculate_streak_counts(data_base, habit_name, user_name):
+def calculate_streak_counts(data_base, habit):
     """
 
     :param data_base: the database containing the data
-    :param habit_name: the habit for which the streak counts are to be returned (str)
-    :param user_name: the habit's user (str)
+    :param habit: the habit for which the streak count is to be calculated
     :return: a Pandas series containing the streak names as indexes and the counts
     """
-    habit_completions = return_habit_completions(data_base, habit_name, user_name)
+    habit_completions = return_habit_completions(data_base, habit)
     habit_completions = habit_completions.drop_duplicates(subset="PeriodStart")  # Pro Periode wird nur ein Habit
     # gezählt (ein Habit kann mehrmals während einer Periode durchgeführt werden, dadurch erhöht sich aber nicht der
     # Streak)
@@ -203,15 +200,14 @@ def calculate_streak_counts(data_base, habit_name, user_name):
 
 
 # return the longest habit streak of the given habit
-def return_longest_streak_for_habit(data_base, habit_name, user_name):
+def return_longest_streak_for_habit(data_base, habit):
     """
 
     :param data_base: the database containing the data
-    :param habit_name: the habit for which the longest streak is to be returned (str)
-    :param user_name: the habit's user (str)
+    :param habit: the habit for which the longest habit streak is to be calculated
     :return: the longest streak of the given habit (int)
     """
-    streaks = calculate_streak_counts(data_base, habit_name, user_name)
+    streaks = calculate_streak_counts(data_base, habit)
     return streaks.agg("max")  # returns the maximum value of the series
 
 # Return the longest habit streak of all defined habits of a user
