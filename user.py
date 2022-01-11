@@ -19,4 +19,4 @@ class User:
 class UserDB(User):
 
     def store_user(self, data_base):
-        db.add_user(data_base, self.user_name)
+        db.add_user(data_base, self)
