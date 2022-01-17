@@ -4,70 +4,106 @@ import analyze as an
 
 
 class Habit:
-    def __init__(self, name, periodicity, user):
-        self.__name = name
-        self.__periodicity = periodicity
-        self.__user = user
-        self.__current_streak = 0  # TODO: Benötigen die drei hinzugefügten Attribute noch Getter und Setter-Methoden?
-        self.__best_streak = 0
-        self.__last_completion = None  # TODO: Überprüfen, ob noch notwendig
+    def __init__(self, name, periodicity, user):  # TODO: eventuell für die Periodicity enum library verwenden
+        self._name = name
+        self._periodicity = periodicity
+        self._user = user
 
-    # Setter # TODO: Entscheidung: braucht man Setter auch für User?
-    def __setName(self, name):
-        self.__name = name
+    # Implementation der Getter– und Setter-Methoden mithilfe von @Property Decorators
+    @property
+    def name(self):
+        return self._name
 
-    def __setPeriodicity(self, periodicity):
-        self.__periodicity = periodicity
+    @name.setter
+    def name(self, name):
+        self._name = name
 
-    def __set_last_completion(self, last_completion):
-        self.__last_completion = last_completion
+    @property
+    def periodicity(self):
+        return self._periodicity
 
-    # Getter
-    def __getName(self):
-        return self.__name
+    @periodicity.setter
+    def periodicity(self, periodicity):
+        self._periodicity = periodicity
 
-    def __getPeriodicity(self):
-        return self.__periodicity
+    @property
+    def user(self):
+        return self._user
 
-    def __getUser(self):
-        return self.__user
-
-    def __get_last_completion(self):
-        return self.__last_completion
-
-    # Definition der Properties
-    name = property(__getName, __setName)
-    periodicity = property(__getPeriodicity, __setPeriodicity)
-    user = property(__getUser)
-    last_completion = property(__get_last_completion, __set_last_completion)
-
-    # Inkrementieren des Streaks
-    def increment_streak(self):  # TODO: Überprüfen, ob noch notwendig
-        self.__current_streak += 1
-
-    # Einstellen des besten Streaks
-    def determine_best_streak(self):
-        if self.__current_streak > self.__best_streak:
-            self.__best_streak = self.__current_streak
-            # wenn ein hinzugefügtes check_date vor einem bereits hinzugefügten check liegt, dann kann das best streak
-            # das auch nachträglich zum best streak werden, obwohl es niemals current streak war
-            # am besten noch Funktion schreiben, die das letzte Ausführungsdatum zurückgibt und anhand dessen
-            # den current streak berechnet
-            # TODO: Funktion überarbeiten (siehe oben)
-
+    @user.setter
+    def user(self, user):
+        self._user = user
 
 # TODO: def __str__(self) Funktion noch in die Habit-Klasse einbauen
 
 
 class HabitDB(Habit):
 
-    def store_habit(self, data_base, creation_time=None):
-        db.add_habit(data_base, self, creation_time)
+    def __init__(self, name, periodicity, user, database="main.db"):
+        Habit.__init__(self, name, periodicity, user)
+        self._current_streak = 0
+        self._best_streak = 0
+        self._last_completion = None
+        self._breaks_total = 0
+        self._breaks_last_periods = 0
+        self._database = database
 
-    def check_off_habit(self, data_base, check_date: str = None):
+    # Getter und Setter Methoden mithilfe des @property decorators
+    @property
+    def current_streak(self):
+        return self._current_streak
+
+    @current_streak.setter
+    def current_streak(self, current_streak):
+        self._current_streak = current_streak
+
+    @property
+    def best_streak(self):
+        return self._best_streak
+
+    @best_streak.setter
+    def best_streak(self, best_streak):
+        self._best_streak = best_streak
+
+    @property
+    def last_completion(self):
+        return self._last_completion
+
+    @last_completion.setter
+    def last_completion(self, last_completion):
+        self._last_completion = last_completion
+
+    @property
+    def breaks_total(self):
+        return self._breaks_total
+
+    @breaks_total.setter
+    def breaks_total(self, breaks_total):
+        self._breaks_total = breaks_total
+
+    @property
+    def breaks_last_periods(self):
+        return self._breaks_last_periods
+
+    @breaks_last_periods.setter
+    def breaks_last_periods(self, breaks_last_periods):
+        self._breaks_last_periods = breaks_last_periods
+
+    @property
+    def database(self):
+        return self._database
+
+    @database.setter
+    def database(self, database):
+        self._database = database
+
+    # die übrigen Methoden
+    def store_habit(self, creation_time=None):
+        db.add_habit(self, creation_time)
+
+    def check_off_habit(self, check_date: str = None):
         """
 
-        :param data_base:
         :param check_date:
         :type check_date: object
         """
@@ -77,5 +113,19 @@ class HabitDB(Habit):
             # last_completion wird nur geändert, wenn das aktuelle Datum von Check-Date größer ist als das last
             # completion date oder es noch keins gibt
             self.last_completion = check_date
-        db.add_period(data_base, self, check_date)
+        db.add_period(self, check_date)
+
+        # Inkrementieren des Streaks
+        def increment_streak(self):  # TODO: Überprüfen, ob noch notwendig
+            self.__current_streak += 1
+
+        # Einstellen des besten Streaks
+        def determine_best_streak(self):
+            if self.__current_streak > self.__best_streak:
+                self.__best_streak = self.__current_streak
+                # wenn ein hinzugefügtes check_date vor einem bereits hinzugefügten check liegt, dann kann das best streak
+                # das auch nachträglich zum best streak werden, obwohl es niemals current streak war
+                # am besten noch Funktion schreiben, die das letzte Ausführungsdatum zurückgibt und anhand dessen
+                # den current streak berechnet
+                # TODO: Funktion überarbeiten (siehe oben)
 

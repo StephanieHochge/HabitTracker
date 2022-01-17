@@ -27,7 +27,7 @@ def create_tables(database):
 
     cursor.execute(habit_table)
 
-    # create Period table
+    # create Period table # TODO: Tabelle noch umbenennen
     period_table = """CREATE TABLE IF NOT EXISTS Period
     (PKPeriodID INTEGER PRIMARY KEY, FKHabitID INTEGER, PeriodStart TEXT, CompletionDate TEXT, StreakName INTEGER, 
     FOREIGN KEY(FKHabitID) REFERENCES Habit(PKHabitID))"""
@@ -45,7 +45,8 @@ def add_user(db, user: object):
     # TODO: Sicherstellen, dass UserName nicht bereits existiert (möglicherweise mit sqlite3.IntegrityError?)
 
 
-def add_habit(db, habit, creation_time=None):
+def add_habit(habit, creation_time=None):
+    db = habit.database
     cursor = db.cursor()
     cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [habit.user.user_name])
     user_id = cursor.fetchone()
@@ -157,7 +158,7 @@ def rename_streaks(db, habit, check_date):
                 next_period_existing = False
 
 
-def add_period(db, habit, check_date=None):
+def add_period(habit, check_date=None):
     """
     adds a new period to the period table with the correct streak affiliation
     :param habit: the habit for which a new period is to be added
@@ -165,6 +166,7 @@ def add_period(db, habit, check_date=None):
     :param check_date: the date on which the habit was checked off
     :return: --
     """
+    db = habit.database
     cursor = db.cursor()
     if not check_date:
         check_date = str(date.today())
