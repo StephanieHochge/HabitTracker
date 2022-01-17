@@ -3,20 +3,54 @@ import db
 
 class User:
 
-    def __init__(self, user_name):
-        self.__user_name = user_name
+    def __init__(self, username):
+        self._username = username
 
-    def __set_user_name(self, user_name):
-        self.__user_name = user_name
+    @property
+    def username(self):
+        return self._username
 
-    def __get_user_name(self):
-        return self.__user_name
+    @username.setter
+    def username(self, username):
+        self._username = username
 
-    # Definition der Properties
-    user_name = property(__get_user_name, __set_user_name)
+    def __str__(self):
+        return f"{self.username}"
 
 
 class UserDB(User):
 
-    def store_user(self, data_base):
-        db.add_user(data_base, self)
+    def __init__(self, username, database=db.get_db()):
+        User.__init__(self, username)
+        self._best_habit = None
+        self._worst_habit = None
+        self._database = database
+
+    # Getter- und Setter-Methoden
+    @property
+    def best_habit(self):
+        return self._best_habit
+
+    @best_habit.setter
+    def best_habit(self, best_habit):
+        self._best_habit = best_habit
+
+    @property
+    def worst_habit(self):
+        return self._worst_habit
+
+    @worst_habit.setter
+    def worst_habit(self, worst_habit):
+        self._worst_habit = worst_habit
+
+    @property
+    def database(self):
+        return self._database
+
+    @database.setter
+    def database(self, database):
+        self._database = database
+
+    # eigentliche Klassenmethoden
+    def store_user(self):
+        db.add_user(self)

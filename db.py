@@ -38,9 +38,10 @@ def create_tables(database):
 
 
 # add data into tables
-def add_user(db, user: object):
+def add_user(user: object):
+    db = user.database
     cursor = db.cursor()
-    cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user.user_name])
+    cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user.username])
     db.commit()
     # TODO: Sicherstellen, dass UserName nicht bereits existiert (möglicherweise mit sqlite3.IntegrityError?)
 
@@ -48,7 +49,7 @@ def add_user(db, user: object):
 def add_habit(habit, creation_time=None):
     db = habit.database
     cursor = db.cursor()
-    cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [habit.user.user_name])
+    cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [habit.user.username])
     user_id = cursor.fetchone()
     if not creation_time:
         creation_time = str(datetime.now())
@@ -66,7 +67,7 @@ def return_habit_id(db, habit):
     :return: the habit's id (int)
     """
     cursor = db.cursor()
-    cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [habit.user.user_name])
+    cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [habit.user.username])
     user_id = cursor.fetchone()
     cursor.execute("SELECT PKHabitID FROM Habit WHERE Name = ? AND FKUserID = ?",
                    (habit.name, user_id[0]))  # sucht nach der HabitID des gesuchten Habits von dem User
