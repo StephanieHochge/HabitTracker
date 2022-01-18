@@ -54,3 +54,6 @@ class UserDB(User):
     # eigentliche Klassenmethoden
     def store_user(self):
         db.add_user(self)
+
+    def analyze_habits(self, periodicity: str = None):
+        pass

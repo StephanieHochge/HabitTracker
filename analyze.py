@@ -30,7 +30,7 @@ def return_user_id(data_base, user):
     :return: the user's user_id
     """
     user_df = create_data_frame(data_base, "HabitAppUser")
-    user_id = user_df.loc[user_df["UserName"] == user.user_name]
+    user_id = user_df.loc[user_df["UserName"] == user.username]
     return user_id.iloc[0, 0]
 
 
@@ -44,7 +44,7 @@ def check_for_user(data_base, user):
     """
     user_df = create_data_frame(data_base, "HabitAppUser")
     users = list(user_df["UserName"])
-    return True if user.user_name in users else False
+    return True if user.username in users else False
 
 
 # filter for data records containing the habits of a specific user
