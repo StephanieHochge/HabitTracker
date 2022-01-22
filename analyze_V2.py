@@ -55,6 +55,7 @@ def calculate_one_period_start(periodicity, check_date):
 
 # calculate the period start for each completion in a list, return list of period starts
 def calculate_period_starts(periodicity, check_dates):
+    # TODO: formuliere das noch als Dictionary um
     if isinstance(check_dates[0], str):
         check_dates = to_date_format(check_dates)
     if periodicity == "daily":
@@ -84,31 +85,36 @@ def check_in_time(periodicity):
     return timeliness[periodicity]
 
 
-# generate list of streak names
-def streak_names(tidy_periods, periodicity):
-    # TODO: check whether this also works for habits when they have not been checked off yet
-    streaks = [1]
-    diffs = [t - s for s, t in zip(tidy_periods, tidy_periods[1:])]
+# add current period to list to correctly calculated streaks and breaks
+def add_current_period(tidy_period_starts):
+    period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
+    cur_period = calculate_one_period_start("yearly", date.today())  # Berechnung der aktuellen Periode
+    if period_starts[-1] != cur_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
+        # wird sie hinzufügt zur Berechnung der Breaks
+        period_starts.append(cur_period)
+    return period_starts
+
+
+# calculate the difference of two consecutive elements in a list
+def diffs_list_elements(period_starts):
+    return [t - s for s, t in zip(period_starts, period_starts[1:])]
+
+
+# generate list of streak lengths of one habit
+def calculate_streak_lengths(periodicity, tidy_period_starts):
+    # TODO: get this to work for habits which have not been checked off yet
+    period_starts = add_current_period(tidy_period_starts)
+    diffs = diffs_list_elements(period_starts)
     in_time = check_in_time(periodicity)
-    for count, value in enumerate(tidy_periods[1:]):  # skips the first element, as the first element of
-        # the list has already been added
-        if diffs[count] <= in_time:
-            streaks.append(streaks[-1])
-        else:
-            streaks.append(streaks[-1]+1)
-    return streaks
+    break_indices_wo_first_streak = [index for index, value in enumerate(diffs) if value > in_time]
+    break_indices = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
+    break_indices[1:] = break_indices_wo_first_streak  # anhängen der restlichen Break Indizes
+    return diffs_list_elements(break_indices)
 
 
-# zip list of streak names together with list of period_starts and create a data_frame
-def calculate_longest_streak(streaks):
-    streak_durations = collections.Counter(streaks)
-    # hier auch bedenken, dass es mehrere Streaks mit der gleichen Länge geben kann
-    streak_name = max(streak_durations, key=streak_durations.get)
-    longest_streak = streak_durations[streak_name]
-    list_of_keys = [key for (key, value) in streak_durations.items() if value == longest_streak]
-    return longest_streak, list_of_keys  # die erste Zahl ist der longest streak, die zweite Liste sind die keys des
-    # longest streak
-    # diese Keys könnten verwendet werden, um die zugehörigen Daten rauszufinden
+# calculate the longest streak of one habit
+def calculate_longest_streak(streak_lenghts):
+    return max(streak_lenghts)
 
 
 # get the len of each streak list, returns a list of the lengths
@@ -130,11 +136,7 @@ def calculate_breaks(periodicity, tidy_period_starts):
     :param tidy_period_starts:
     :return:
     """
-    period_starts = tidy_period_starts
-    cur_period = calculate_one_period_start("yearly", date.today())  # Berechnung der aktuellen Periode
-    if period_starts[-1] != cur_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
-        # wird sie hinzufügt zur Berechnung der Breaks
-        period_starts.append(cur_period)
-    diffs = [t - s for s, t in zip(period_starts, period_starts[1:])]
+    period_starts = add_current_period(tidy_period_starts)
+    diffs = diffs_list_elements(period_starts)
     in_time = check_in_time(periodicity)
     return len([x for x in diffs if x > in_time])
