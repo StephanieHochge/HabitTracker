@@ -202,6 +202,11 @@ def return_period_starts_curr(habit):
     return add_future_period(tidy_periods, habit.periodicity)
 
 
+def check_current_period(period_starts_curr, periodicity):
+    cur_period = calculate_one_period_start(periodicity, date.today())
+    return True if cur_period in period_starts_curr else False
+
+
 # funktioniert auch
 def calculate_break_indices(period_starts_curr, periodicity):
     diffs = diffs_list_elements(period_starts_curr)
@@ -265,17 +270,18 @@ def calculate_longest_streak_of_all(habit_list):
 
 
 # calculate the number of breaks within a list of dates
+# funktioniert
 def calculate_breaks(habit):
     """
-    diese Funktion zählt die Breaks immer ab dem ersten Mal, an dem das Habit ausgeführt wurde, wenn der Habit in der
-    letzten Periode ausgeführt wurde, aber noch nicht in der aktuellen Periode, wird dies nicht als Break gewertet
+    diese Funktion gibt die Anzahl an breaks aus
     :param habit:
     :return:
     """
-    # TODO: nochmal überprüfen, ich meine bei teeth_sh hätte das nicht ganz gestimmt
     period_starts_curr = return_period_starts_curr(habit)
     break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
-    return len(break_indices)
+    if check_current_period(period_starts_curr, habit.periodicity):
+        return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
+        # eine Break weniger als break_indices ausrechnet (weil ja die zukünftige Periode mit berücksichtigt wird)
+    else:
+        return len(break_indices)
 
-### TODO: alles überprüfen!
-# ich hab jetzt so viel geändert, das muss alles dringend noch überprüft werden!
