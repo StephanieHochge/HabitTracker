@@ -1,15 +1,18 @@
 import pandas as pd
 import db
 from datetime import date, timedelta
+import habit as hb
 import dateutil.relativedelta
 import collections
 
 
-# Create a pandas dataframe from database tables
-def create_data_frame(data_base, table):
+# TODO: vielleicht kann man die ganzen Funktionen, wo einfach nur Daten zurückgegeben werden in ein separates File
+#  auslagern (außerhalb der Analyse, vielleicht in db?)
+# create a pandas data fram from tables
+def create_data_frame(database, table):
     """
     creates a pandas dataframe from database tables
-    :param data_base: the database which contains the desired table
+    :param database: the database which contains the desired table
     :param table: the table to be created - either "Habit", "HabitAppUser" or "Period"
     :return: dataframe from the table
     """
@@ -18,13 +21,99 @@ def create_data_frame(data_base, table):
     user_columns = ["PKUserID", "UserName"]
     period_columns = ["PKPeriodID", "FKHabitID", "PeriodStart", "CompletionDate", "StreakName"]
     column_names = {"Habit": habit_columns, "HabitAppUser": user_columns, "Period": period_columns}
-    sql_query = pd.read_sql_query(f'''SELECT * FROM {table}''', data_base)
+    sql_query = pd.read_sql_query(f'''SELECT * FROM {table}''', database)
     return pd.DataFrame(sql_query, columns=column_names[table])
 
 
-# return all data of a specific habit
-def return_habit_completions():
-    pass
+# return the user_id of a user
+def return_user_id(user):
+    """
+    returns the user_id of a user
+    :param user: the user
+    :return: the user's user_id
+    """
+    user_df = create_data_frame(user.database, "HabitAppUser")
+    user_id = user_df.loc[user_df["UserName"] == user.username]
+    return user_id.iloc[0, 0]
+
+
+# checks if user name is already existing
+def check_for_user(user):
+    """
+    checks if the entered user name is already existing
+    :param user: the user
+    :return: True if the user name already exists and false if not
+    """
+    user_df = create_data_frame(user.database, "HabitAppUser")
+    users = list(user_df["UserName"])
+    return True if user.username in users else False
+
+
+# return the habits of a user with their periodicity
+def return_user_habits(user):
+    """
+    :param user: the user
+    :return: a pandas data frame containing the habits of the user and other data
+    """
+    user_id = return_user_id(user)
+    habit_df = create_data_frame(user.database, "Habit")
+    return habit_df.loc[habit_df["FKUserID"] == user_id]
+
+
+# return the habit_id of a user's habit
+def return_habit_id(habit):  # dieselbe Funktion gibt es auch schon für die Datenbank...
+    """
+
+    :param habit: the habit for which the ID is to be returned
+    :return: the habit id (int)
+    """
+    user_habits = return_user_habits(habit.user)
+    user_habit = user_habits.loc[user_habits["Name"] == habit.name]
+    return user_habit.iloc[0, 0]
+
+
+# return completions of a specific habit
+def return_habit_completions(habit):
+    """
+
+    :param habit: the habit for which all completions are to be returned
+    :return: a data frame containing all completions of the user's habit
+    """
+    habit_id = return_habit_id(habit)
+    period_df = create_data_frame(habit.database, "Period")
+    habit_data = period_df.loc[period_df["FKHabitID"] == habit_id]
+    return habit_data["CompletionDate"].to_list()
+
+
+# Return a list of all currently tracked habits of a user
+def return_habits_only(user):
+    """
+    :param user: the user
+    :return: a list containing only the habits of the user
+    """
+    defined_habits = return_user_habits(user)
+    return defined_habits["Name"].to_list()
+
+
+# return the periodicity of a habit.
+def return_periodicity(habit):  # can be used to load habit
+    user_habits = return_user_habits(habit.user)
+    habit_data = user_habits.loc[user_habits["Name"] == habit.habit_name]
+    periodicity_series = habit_data["Periodicity"]
+    return periodicity_series.to_list()[0]
+
+
+# Filter for periodicity and return habits with said periodicity
+def return_habits_of_type(user, periodicity):
+    """
+
+    :param user: the user (object)
+    :param periodicity: the periodicity for which the user looks (str)
+    :return: a pandas series with the names of the user's habits of the specified periodicity
+    """
+    defined_habits = return_user_habits(user)
+    habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity]
+    return habits_of_type["Name"]
 
 
 # change a list of dates as strings into a list of dates as datetime objects
@@ -55,17 +144,15 @@ def calculate_one_period_start(periodicity, check_date):
 
 # calculate the period start for each completion in a list, return list of period starts
 def calculate_period_starts(periodicity, check_dates):
-    # TODO: formuliere das noch als Dictionary um
-    if isinstance(check_dates[0], str):
+    if isinstance(check_dates[0], str):  # wandelt das nur ins Datumsformat um, wenn es noch nicht in diesem ist
         check_dates = to_date_format(check_dates)
-    if periodicity == "daily":
-        period_start_func = lambda x: x  # warum ist das grün unterkringelt?!
-    elif periodicity == "weekly":
-        period_start_func = weekly_start
-    elif periodicity == "monthly":
-        period_start_func = monthly_start
-    else:  # periodicity == "yearly"
-        period_start_func = yearly_start  # könnte man das Ganze nicht auch mit einem Dictionary machen?
+    period_start_funcs = {
+        "daily": (lambda x: x),
+        "weekly": weekly_start,
+        "monthly": monthly_start,
+        "yearly": yearly_start
+    }
+    period_start_func = period_start_funcs[periodicity]
     return list(map(period_start_func, check_dates))
 
 
@@ -74,7 +161,7 @@ def tidy_starts(period_starts):
     return sorted(list(set(period_starts)))
 
 
-# checks whether time difference is allowed
+# checks what time difference between two completions is allowed
 def check_in_time(periodicity):
     timeliness = {"daily": timedelta(days=1),
                   "weekly": timedelta(days=7),
@@ -85,10 +172,10 @@ def check_in_time(periodicity):
     return timeliness[periodicity]
 
 
-# add current period to list to correctly calculated streaks and breaks
-def add_current_period(tidy_period_starts):
+# add current period to list to correctly calculate streaks and breaks
+def add_current_period(tidy_period_starts, periodicity):
     period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
-    cur_period = calculate_one_period_start("yearly", date.today())  # Berechnung der aktuellen Periode
+    cur_period = calculate_one_period_start(periodicity, date.today())  # Berechnung der aktuellen Periode
     if period_starts[-1] != cur_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
         # wird sie hinzufügt zur Berechnung der Breaks
         period_starts.append(cur_period)
@@ -100,43 +187,94 @@ def diffs_list_elements(period_starts):
     return [t - s for s, t in zip(period_starts, period_starts[1:])]
 
 
-# generate list of streak lengths of one habit
-def calculate_streak_lengths(periodicity, tidy_period_starts):
-    # TODO: get this to work for habits which have not been checked off yet
-    period_starts = add_current_period(tidy_period_starts)
-    diffs = diffs_list_elements(period_starts)
+# prepare for streak and break analysis
+# funktioniert
+def return_period_starts_curr(habit):
+    """
+
+    :return: returns
+    """
+    check_dates = return_habit_completions(habit)
+    period_starts = calculate_period_starts(habit.periodicity, check_dates)
+    tidy_periods = tidy_starts(period_starts)
+    return add_current_period(tidy_periods, habit.periodicity)
+
+
+# funktioniert auch
+def calculate_break_indices(period_starts_curr, periodicity):
+    diffs = diffs_list_elements(period_starts_curr)
     in_time = check_in_time(periodicity)
-    break_indices_wo_first_streak = [index for index, value in enumerate(diffs) if value > in_time]
-    break_indices = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
-    break_indices[1:] = break_indices_wo_first_streak  # anhängen der restlichen Break Indizes
-    return diffs_list_elements(break_indices)
+    return [index for index, value in enumerate(diffs) if value > in_time]
+
+
+# generate list of streak lengths of one habit
+def calculate_streak_lengths(habit):
+    # TODO: get this to work for habits which have not been checked off yet
+    # TODO: Berechnung der letzten Streak Length ohne Break ist noch fehlerhaft
+    period_starts_curr = return_period_starts_curr(habit)
+    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
+    if not break_indices:
+        return [len(period_starts_curr)]  # muss eine list returnen, weil es sonst kein max Argument hat
+    else:
+        streak_lengths = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
+        streak_lengths[1:] = break_indices  # anhängen der restlichen Break Indizes
+        return diffs_list_elements(streak_lengths)
 
 
 # calculate the longest streak of one habit
-def calculate_longest_streak(streak_lenghts):
-    return max(streak_lenghts)
+def calculate_longest_streak(habit):
+    check_dates = return_habit_completions(habit)  # kann schon null sein, wenn es keine completions gibt
+    if not check_dates:
+        return 0
+    else:
+        streak_lengths = calculate_streak_lengths(habit)
+        return max(streak_lengths)
 
 
-# get the len of each streak list, returns a list of the lengths
-def get_streak_length():
-    pass
+# create a list of the user's habits
+def habit_creator(user):
+    # TODO: Was passiert, wenn der User noch keine Habits angelegt hat?
+    habit_list = return_habits_only(user)
+    periodicities = return_user_habits(user)["Periodicity"].to_list()
+    combined = list(zip(habit_list, periodicities))
+    return list(map(lambda x: hb.HabitDB(x[0], x[1], user, user.database), combined))
 
 
-# find the maximum length
-def find_longest_streak():
-    pass
+def calculate_longest_streak_per_habit(habit_list):
+    habit_names = [(habit.name, habit.periodicity) for habit in habit_list]  # funktioniert
+    longest_streaks = map(calculate_longest_streak, habit_list)
+    return dict(zip(habit_names, longest_streaks))
+
+
+# calculate the longest streak of all habits
+def calculate_longest_streak_of_all(habit_list):
+    """
+    the habit with the longest streak is defined as the habit which was performed the most periods in a row
+    :return:
+    """
+    # TODO: Testen, was passiert, wenn mehrere Habits dieselbe Streak Length haben (müsste funktionieren)
+    longest_streaks = calculate_longest_streak_per_habit(habit_list)
+    if not longest_streaks:  # wenn noch kein Habit completed wurde
+        return None, None
+    else:
+        longest_streak_of_all = longest_streaks[max(longest_streaks, key=longest_streaks.get)]
+        best_habits = [key for (key, value) in longest_streaks.items() if value == longest_streak_of_all]  # it is
+        # possible that two habits have the same streak lengths, this way they would both be returned
+        return longest_streak_of_all, best_habits
 
 
 # calculate the number of breaks within a list of dates
-def calculate_breaks(periodicity, tidy_period_starts):
+def calculate_breaks(habit):
     """
     diese Funktion zählt die Breaks immer ab dem ersten Mal, an dem das Habit ausgeführt wurde, wenn der Habit in der
     letzten Periode ausgeführt wurde, aber noch nicht in der aktuellen Periode, wird dies nicht als Break gewertet
-    :param periodicity:
-    :param tidy_period_starts:
+    :param habit:
     :return:
     """
-    period_starts = add_current_period(tidy_period_starts)
-    diffs = diffs_list_elements(period_starts)
-    in_time = check_in_time(periodicity)
-    return len([x for x in diffs if x > in_time])
+    # TODO: nochmal überprüfen, ich meine bei teeth_sh hätte das nicht ganz gestimmt
+    period_starts_curr = return_period_starts_curr(habit)
+    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
+    return len(break_indices)
+
+### TODO: alles überprüfen!
+# ich hab jetzt so viel geändert, das muss alles dringend noch überprüft werden!
