@@ -172,13 +172,15 @@ def check_in_time(periodicity):
     return timeliness[periodicity]
 
 
-# add current period to list to correctly calculate streaks and breaks
-def add_current_period(tidy_period_starts, periodicity):
+# add future period to list to correctly calculate streaks and breaks
+def add_future_period(tidy_period_starts, periodicity):
     period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
-    cur_period = calculate_one_period_start(periodicity, date.today())  # Berechnung der aktuellen Periode
-    if period_starts[-1] != cur_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
+    duration = check_in_time(periodicity)  # ungefähre Dauer einer Periode
+    future_period = calculate_one_period_start(periodicity, date.today() + 2*duration)  # Berechnung einer
+    # zukünftigen Periode
+    if period_starts[-1] != future_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
         # wird sie hinzufügt zur Berechnung der Breaks
-        period_starts.append(cur_period)
+        period_starts.append(future_period)
     return period_starts
 
 
@@ -197,7 +199,7 @@ def return_period_starts_curr(habit):
     check_dates = return_habit_completions(habit)
     period_starts = calculate_period_starts(habit.periodicity, check_dates)
     tidy_periods = tidy_starts(period_starts)
-    return add_current_period(tidy_periods, habit.periodicity)
+    return add_future_period(tidy_periods, habit.periodicity)
 
 
 # funktioniert auch
@@ -208,17 +210,16 @@ def calculate_break_indices(period_starts_curr, periodicity):
 
 
 # generate list of streak lengths of one habit
+# funktioniert für die vier getesteten Habits
 def calculate_streak_lengths(habit):
-    # TODO: get this to work for habits which have not been checked off yet
-    # TODO: Berechnung der letzten Streak Length ohne Break ist noch fehlerhaft
+    # TODO: wird diese Funktion auch so verwendet? Wenn ja, dann get this to work for habits which have not been
+    #  checked off yet
     period_starts_curr = return_period_starts_curr(habit)
-    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
-    if not break_indices:
-        return [len(period_starts_curr)]  # muss eine list returnen, weil es sonst kein max Argument hat
-    else:
-        streak_lengths = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
-        streak_lengths[1:] = break_indices  # anhängen der restlichen Break Indizes
-        return diffs_list_elements(streak_lengths)
+    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)  # es muss immer break indices
+    # geben, weil ja die zukünftige Periode hinzugefügt wird
+    streak_lengths = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
+    streak_lengths[1:] = break_indices  # anhängen der restlichen Break Indizes
+    return diffs_list_elements(streak_lengths)
 
 
 # calculate the longest streak of one habit
