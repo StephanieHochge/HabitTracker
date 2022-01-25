@@ -219,27 +219,16 @@ def add_future_period(tidy_period_starts, periodicity):
     period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
     duration = check_in_time(periodicity)  # ungefähre Dauer einer Periode
     future_period = calculate_one_period_start(periodicity, date.today() + 2*duration)  # Berechnung einer
-    # zukünftigen Periode
+    # zukünftigen Periode mit mindestens einer Periode Abstand zu der aktuellen Periode
     if period_starts[-1] != future_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
         # wird sie hinzufügt zur Berechnung der Breaks
         period_starts.append(future_period)
     return period_starts
 
 
-# calculate the difference of two consecutive elements in a list
-def diffs_list_elements(period_starts):
-    """
-    calculates the differences of two consecutive elements in a list
-    :param period_starts: list of dates that correspond to the periods in which the habit was checked off, cleaned
-    (duplicates removed and sorted), the future period was already added (type: list of date objects)
-    :return: a list of differences between two consecutive dates (type: list of timedelta objects)
-    """
-    return [t - s for s, t in zip(period_starts, period_starts[1:])]
-
-
 # prepare for streak and break analysis
 # funktioniert
-def return_period_starts_curr(habit):
+def return_final_period_starts(habit):
     """
     returns a clean list of periods, in which the habit was performed at least once
     :param habit: the habit which is to be analyzed (type: instance of type HabitDB)
@@ -251,16 +240,15 @@ def return_period_starts_curr(habit):
     return add_future_period(tidy_periods, habit.periodicity)
 
 
-def check_current_period(tidy_period_starts, periodicity):
+# calculate the difference of two consecutive elements in a list
+def diffs_list_elements(period_starts):
     """
-    checks whether a habit was performed in the current period
-    :param tidy_period_starts: a list of the periods in which the habit was checked off at least once
-    (type: list of date objects)
-    :param periodicity: the habit's periodicity (type: str)
-    :return: True if the current period is contained in the list of periods, False if not
+    calculates the differences of two consecutive elements in a list
+    :param period_starts: list of dates that correspond to the periods in which the habit was checked off, cleaned
+    (duplicates removed and sorted), the future period was already added (type: list of date objects)
+    :return: a list of differences between two consecutive dates (type: list of timedelta objects)
     """
-    cur_period = calculate_one_period_start(periodicity, date.today())
-    return True if cur_period in tidy_period_starts else False
+    return [t - s for s, t in zip(period_starts, period_starts[1:])]
 
 
 # funktioniert auch
@@ -287,7 +275,7 @@ def calculate_streak_lengths(habit):
     """
     # TODO: wird diese Funktion auch so verwendet? Wenn ja, dann get this to work for habits which have not been
     #  checked off yet
-    period_starts_curr = return_period_starts_curr(habit)
+    period_starts_curr = return_final_period_starts(habit)
     break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)  # es muss immer break indices
     # geben, weil ja die zukünftige Periode hinzugefügt wird
     streak_lengths = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
@@ -356,6 +344,18 @@ def calculate_longest_streak_of_all(habit_list):
         return longest_streak_of_all, best_habits
 
 
+def check_current_period(tidy_period_starts, periodicity):
+    """
+    checks whether a habit was performed in the current period
+    :param tidy_period_starts: a list of the periods in which the habit was checked off at least once
+    (type: list of date objects)
+    :param periodicity: the habit's periodicity (type: str)
+    :return: True if the current period is contained in the list of periods, False if not
+    """
+    cur_period = calculate_one_period_start(periodicity, date.today())
+    return True if cur_period in tidy_period_starts else False
+
+
 # calculate the number of breaks within a list of dates
 # funktioniert
 def calculate_breaks(habit):
@@ -364,7 +364,7 @@ def calculate_breaks(habit):
     :param habit: the habit which is to be analyzed (type: instance of HabitDB class)
     :return: the number of breaks (type: int)
     """
-    period_starts_curr = return_period_starts_curr(habit)
+    period_starts_curr = return_final_period_starts(habit)
     break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
     if check_current_period(period_starts_curr, habit.periodicity):
         return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
