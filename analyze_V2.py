@@ -333,9 +333,8 @@ def calculate_longest_streak_of_all(habit_list):
     :return: the value of the longest streak of all habits as well as the corresponding habit name (or habit names,
     since it is possible that several habits have the same longest streak)
     """
-    # TODO: Testen, was passiert, wenn mehrere Habits dieselbe Streak Length haben (müsste funktionieren)
     longest_streaks = calculate_longest_streak_per_habit(habit_list)
-    if not longest_streaks:  # wenn noch kein Habit completed wurde
+    if len(longest_streaks) == 0:  # wenn noch kein Habit completed wurde
         return None, None
     else:
         longest_streak_of_all = longest_streaks[max(longest_streaks, key=longest_streaks.get)]
