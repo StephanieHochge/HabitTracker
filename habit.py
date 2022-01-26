@@ -1,6 +1,6 @@
 import db
 from datetime import date, datetime
-import analyze as an
+import analyze_V2 as ana
 
 
 class Habit:
@@ -33,11 +33,6 @@ class Habit:
     @user.setter
     def user(self, user):
         self._user = user
-
-    def __str__(self):
-        pass
-
-# TODO: def __str__(self) Funktion noch in die Habit-Klasse einbauen
 
 
 class HabitDB(Habit):
@@ -100,6 +95,11 @@ class HabitDB(Habit):
     def database(self, database):
         self._database = database
 
+    def __str__(self):
+        return f"{self.name} with {self.periodicity} periodicity from {self.user} saved in {self.database}"
+
+    # TODO: def __str__(self) Funktion noch in die Habit-Klasse einbauen
+
     # die übrigen Methoden
     def store_habit(self, creation_time=None):
         db.add_habit(self, creation_time)
@@ -123,6 +123,17 @@ class HabitDB(Habit):
 
     def modify_habit(self):
         pass
+
+    def calculate_best_streak(self):
+        self.best_streak = ana.calculate_longest_streak(self)
+        return self.best_streak
+
+    def calculate_breaks_total(self):
+        check_dates = ana.return_habit_completions(self)
+        period_starts = ana.calculate_period_starts(self.periodicity, check_dates)
+        tidy_periods = ana.tidy_starts(period_starts)
+        self.breaks_total = ana.calculate_breaks_total(self.periodicity, tidy_periods)
+        return self.breaks_total
 
     def analyze_habit(self):
         pass

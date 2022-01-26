@@ -1,4 +1,5 @@
 import db
+import analyze_V2 as ana
 
 
 class User:
@@ -54,6 +55,11 @@ class UserDB(User):
     # eigentliche Klassenmethoden
     def store_user(self):
         db.add_user(self)
+
+    def calculate_best_habit(self):
+        habit_list = ana.habit_creator(self)
+        longest_streak_of_all, best_habits = ana.calculate_longest_streak_of_all(habit_list)
+        return longest_streak_of_all, best_habits
 
     def analyze_habits(self, periodicity: str = None):
         pass

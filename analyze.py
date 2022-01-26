@@ -98,7 +98,7 @@ def return_habits(data_base, user):
     return defined_habits["Name"].to_list()
 
 
-# returns the periodicity of a habit.
+# return the periodicity of a habit.
 def return_periodicity(data_base, user, habit_name):
     defined_habits = return_user_habits(data_base, user)
     habit = defined_habits.loc[defined_habits["Name"] == habit_name]
@@ -217,3 +217,10 @@ def return_longest_streak_for_habit(data_base, habit):
 
 
 # Return the number of habit breaks during the last month
+
+# TODO: incorporate functional programming into this module using lambda functions, map(), filter() and functions as
+#  arguments
+# itertools.count(start, step) könnte für die Berechnung der Periods auch interessant sein und vielleicht auch
+# für die Berechnung der Streaks
+# da ich ja eigentlich fast immer mein Habit übergebe, könnte ich das über curried functions lösen, aber macht glaube
+# ich doch nicht so viel Sinn...

@@ -214,6 +214,8 @@ def cli():
     else:  # check_action == "Analyze habits"
         analyze_habits(main_database, current_user)
 
+    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
+
 
 if __name__ == "__main__":
     cli()
