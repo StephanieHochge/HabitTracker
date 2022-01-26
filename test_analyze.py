@@ -4,6 +4,7 @@ from habit import HabitDB
 from datetime import date, datetime, timedelta
 import os
 import analyze_V2 as ana
+from unittest.mock import patch
 
 
 class TestHabitAnalysis:
@@ -141,8 +142,11 @@ class TestHabitAnalysis:
 
         # test add_future_period function
         # wird nur einmal getestet, weil calculate_one_period_start schon getestet wurde
+        future_period = ana.calculate_one_period_start("weekly", date.today() + timedelta(weeks=2))  # damit Tests
+        # trotz der Verwendung des aktuellen Datums in der Berechnung noch funktionieren
         assert ana.add_future_period(tidy_starts_weekly, "weekly") == [date(2022, 1, 17), date(2022, 1, 24),
-                                                                       date(2022, 2, 7)]
+                                                                       future_period]
+        # hier muss man auch irgendwie mit aktuellen Daten arbeiten
 
         # test return_final_period_starts function
         final_periods_teeth = ana.return_final_period_starts(self.teeth_sh)
@@ -207,7 +211,9 @@ class TestHabitAnalysis:
         longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le)
         assert longest_streak_all_le == (None, None)
 
-    def test_calculate_breaks(self):
+    @patch('analyze_V2.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
+    # aktuellen Datums weiterhin funktionieren
+    def test_calculate_breaks(self, mock_last_month):
         # test check_curr_period function
         period_starts_curr_teeth = ana.return_final_period_starts(self.teeth_sh)
         assert ana.check_current_period(period_starts_curr_teeth, "daily") is False
@@ -215,11 +221,16 @@ class TestHabitAnalysis:
         assert ana.check_current_period(period_starts_curr_dance, "weekly") is True
 
         # test calulate_breaks function
-        assert ana.calculate_breaks(self.teeth_sh) == 3
-        assert ana.calculate_breaks(self.dance_sh) == 2
-        assert ana.calculate_breaks(self.windows_sh) == 1
-        assert ana.calculate_breaks(self.dentist_sh) == 0
+        assert ana.calculate_breaks_total(self.teeth_sh) == 3
+        assert ana.calculate_breaks_total(self.dance_sh) == 2
+        assert ana.calculate_breaks_total(self.windows_sh) == 1
+        assert ana.calculate_breaks_total(self.dentist_sh) == 0
+        assert ana.calculate_breaks_total(self.dance_sh, last_month=True) == 0
+        assert ana.calculate_breaks_total(self.teeth_sh, last_month=True) == 2
 
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
+
+# TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
+#  berücksichtigen

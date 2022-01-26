@@ -218,7 +218,7 @@ def add_future_period(tidy_period_starts, periodicity):
     """
     period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
     duration = check_in_time(periodicity)  # ungefähre Dauer einer Periode
-    future_period = calculate_one_period_start(periodicity, date.today() + 2*duration)  # Berechnung einer
+    future_period = calculate_one_period_start(periodicity, date.today() + 2 * duration)  # Berechnung einer
     # zukünftigen Periode mit mindestens einer Periode Abstand zu der aktuellen Periode
     if period_starts[-1] != future_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
         # wird sie hinzufügt zur Berechnung der Breaks
@@ -355,22 +355,35 @@ def check_current_period(tidy_period_starts, periodicity):
     return True if cur_period in tidy_period_starts else False
 
 
+# calculate last month
+def return_last_month():
+    """
+    calculates the last month (i.e., if today is the 15 of Februar, the last month would be January)
+    :return: the number of the last month (type: int)
+    """
+    last_month = (date.today() - timedelta(days=date.today().day))
+    return last_month.month, last_month.year
+
+
 # calculate the number of breaks within a list of dates
 # funktioniert
-def calculate_breaks(habit):
+def calculate_breaks_total(habit, last_month=False):
     """
     calculates the number of breaks a habit has experienced
+    :param last_month: specifies whether all breaks or only the breaks from last month (= True) should be analyzed
+    (type: bool)
     :param habit: the habit which is to be analyzed (type: instance of HabitDB class)
     :return: the number of breaks (type: int)
     """
-    period_starts_curr = return_final_period_starts(habit)
-    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)
-    if check_current_period(period_starts_curr, habit.periodicity):
+    final_periods = return_final_period_starts(habit)
+    if last_month:
+        month, year = return_last_month()
+        final_periods = list(filter(lambda x: x.month == month and x.year == year, final_periods))
+        # TODO: irgendwo noch einbauen, dass last_month true nur für daily oder weekly habits angegeben werden kann
+    break_indices = calculate_break_indices(final_periods, habit.periodicity)
+    if check_current_period(final_periods, habit.periodicity):
         return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
         # eine Break weniger als break_indices ausrechnet (weil ja die zukünftige Periode mit berücksichtigt wird)
     else:
         return len(break_indices)
-
-
-# TODO: Breaks der letzten Monate doch am besten mit Filter berechnen
 
