@@ -8,107 +8,11 @@ from datetime import date
 from unittest.mock import patch
 from io import StringIO
 import main
+from test_app import TestData
 from exceptions import UserNameNotExisting
 
 
-class TestHabit:
-
-    def setup_method(self):
-        self.database = db.get_db("test.db")
-        user_sh = UserDB("StephanieHochge", self.database)
-        user_rb = UserDB("RajaBe", self.database)
-        user_le = UserDB("LibertyEvans", self.database)
-        db.add_user(user_sh)
-        db.add_user(user_rb)
-        db.add_user(user_le)
-        teeth_rb = HabitDB("Brush teeth", "daily", user_rb, self.database)
-        teeth_sh = HabitDB("Brush teeth", "daily", user_sh, self.database)
-        dance_sh = HabitDB("Dance", "weekly", user_sh, self.database)
-        windows_sh = HabitDB("Clean windows", "monthly", user_sh, self.database)
-        bathroom_sh = HabitDB("Clean bathroom", "weekly", user_sh, self.database)
-        dentist_sh = HabitDB("Go to dentist", "yearly", user_sh, self.database)
-        db.add_habit(teeth_rb)
-        db.add_habit(teeth_sh, "2021-11-30 07:54:24.999098")
-        db.add_habit(dance_sh, "2021-10-31 07:54:24.999098")
-        db.add_habit(windows_sh, "2021-10-31 07:54:24.999098")
-        db.add_habit(bathroom_sh, "2022-10-31 07:56:24.999098")
-        db.add_habit(dentist_sh, "2022-10-31 07:56:24.999098")
-        db.add_period(teeth_rb)
-        db.add_period(teeth_sh, "2021-12-01")
-        db.add_period(teeth_sh, "2021-12-01")
-        db.add_period(teeth_sh, "2021-12-02")
-        db.add_period(teeth_sh, "2021-12-04")
-        db.add_period(teeth_sh, "2021-12-05")
-        db.add_period(teeth_sh, "2021-12-07")
-        db.add_period(teeth_sh, "2021-12-08")
-        db.add_period(teeth_sh, "2021-12-09")
-        db.add_period(teeth_sh, "2021-12-10")
-        db.add_period(teeth_sh, "2021-12-11")
-        db.add_period(teeth_sh, "2021-12-12")
-        db.add_period(teeth_sh, "2021-12-13")
-        db.add_period(teeth_sh, "2021-12-14")
-        db.add_period(teeth_sh, "2021-12-15")
-        db.add_period(teeth_sh, "2021-12-16")
-        db.add_period(teeth_sh, "2021-12-17")
-        db.add_period(teeth_sh, "2021-12-18")
-        db.add_period(teeth_sh, "2021-12-19")
-        db.add_period(teeth_sh, "2021-12-20")
-        db.add_period(teeth_sh, "2021-12-21")
-        db.add_period(teeth_sh, "2021-12-22")
-        db.add_period(teeth_sh, "2021-12-23")
-        db.add_period(teeth_sh, "2021-12-24")
-        db.add_period(teeth_sh, "2021-12-25")
-        db.add_period(teeth_sh, "2021-12-26")
-        db.add_period(teeth_sh, "2021-12-27")
-        db.add_period(teeth_sh, "2021-12-29")
-        db.add_period(teeth_sh, "2021-12-30")
-        db.add_period(teeth_sh, "2021-12-31")
-        db.add_period(dance_sh, "2021-11-06")
-        db.add_period(dance_sh, "2021-11-07")
-        db.add_period(dance_sh, "2021-11-11")
-        db.add_period(dance_sh, "2021-11-13")
-        db.add_period(dance_sh, "2021-11-14")
-        db.add_period(dance_sh, "2021-11-21")
-        db.add_period(dance_sh, "2021-11-25")
-        db.add_period(dance_sh, "2021-11-27")
-        db.add_period(dance_sh, "2021-11-28")
-        db.add_period(dance_sh, "2021-12-02")
-        db.add_period(dance_sh, "2021-12-04")
-        db.add_period(dance_sh, "2021-12-05")
-        db.add_period(dance_sh, "2021-12-16")
-        db.add_period(dance_sh, "2021-12-18")
-        db.add_period(dance_sh, "2021-12-19")
-        db.add_period(dance_sh, "2021-12-30")
-        db.add_period(bathroom_sh, "2021-11-06")
-        db.add_period(bathroom_sh, "2021-11-13")
-        db.add_period(bathroom_sh, "2021-11-20")
-        db.add_period(bathroom_sh, "2021-12-04")
-        db.add_period(bathroom_sh, "2021-12-11")
-        db.add_period(bathroom_sh, "2021-12-18")
-        db.add_period(bathroom_sh, "2022-01-01")
-        db.add_period(windows_sh, "2022-11-17")
-        db.add_period(windows_sh, "2022-12-30")
-        db.add_period(dentist_sh, "2022-12-17")
-        db.add_period(dentist_sh, "2021-12-05")
-        db.add_period(teeth_sh, "2021-12-03")
-        db.add_period(dance_sh, "2021-12-21")
-
-    def test_habit(self):
-        """
-        tests whether a habit object is correctly created
-        """
-        habit = Habit("Brush teeth", "weekly", "StephanieHochge")
-        assert habit.name == "Brush teeth"
-        assert habit.periodicity == "weekly"
-        assert habit.user == "StephanieHochge"
-        # TODO: Entscheidung: muss ich das überhaupt testen?
-
-    def test_user(self):
-        """
-        tests whether a user object is correctly created
-        """
-        user = UserDB("StephanieHochge")
-        assert user.username == "StephanieHochge"
+class TestDB(TestData):
 
     def test_user_table_db(self):
         """
@@ -129,38 +33,39 @@ class TestHabit:
         results = cursor.fetchall()
         assert len(results) == 6
 
-    def test_period_table_db(self):
-        """
-        tests whether data can be added to the period table and whether the streak names are correctly assigned for
-        each habit periodicity
-        """
-        cursor = self.database.cursor()
-        cursor.execute("SELECT * FROM Period")
-        results = cursor.fetchall()
-        assert len(results) == 59  # test whether all records have been added successfully
-
-        def return_streak_name(check_date, habit_id):
-            cursor.execute("SELECT StreakName FROM Period WHERE CompletionDate = ? AND FKHabitID = ?",
-                           (check_date, habit_id))
-            return cursor.fetchone()[0]
-
-        streak_name_daily_1 = return_streak_name("2021-12-05", 2)
-        assert streak_name_daily_1 == 1
-        streak_name_daily_2 = return_streak_name("2021-12-07", 2)
-        assert streak_name_daily_2 == 3  # Name des Streaks gibt nicht die Anzahl der Streaks an -> es existieren
-        # zwei unterschiedliche Streaks und der zweite ist mit 3 benannt
-
-        cursor.execute("SELECT DISTINCT StreakName From Period WHERE FKHabitID = ?", [3])
-        count_streaks = cursor.fetchall()
-        assert len(count_streaks) == 2
-        streak_name_weekly = return_streak_name("2021-12-30", 3)  # habit_id = 3 is Dance - a weekly habit
-        assert streak_name_weekly == 2
-
-        streak_name_monthly = return_streak_name("2022-12-30", 4)  # habit_id = 4 is Clean windows - a monthly habit
-        assert streak_name_monthly == 1
-
-        streak_name_yearly = return_streak_name("2022-12-17", 6)  # habit_id = 6 is Go to dentist - a yearly habit
-        assert streak_name_yearly == 1
+    # def test_period_table_db(self):
+    #     """
+    #     tests whether data can be added to the period table and whether the streak names are correctly assigned for
+    #     each habit periodicity
+    #     """
+    #     # TODO: schauen, welche Tests ich überhaupt noch benötige
+    #     cursor = self.database.cursor()
+    #     cursor.execute("SELECT * FROM Period")
+    #     results = cursor.fetchall()
+    #     assert len(results) == 65  # test whether all records have been added successfully
+    #
+    #     def return_streak_name(check_date, habit_id):
+    #         cursor.execute("SELECT StreakName FROM Period WHERE CompletionDate = ? AND FKHabitID = ?",
+    #                        (check_date, habit_id))
+    #         return cursor.fetchone()[0]
+    #
+    #     streak_name_daily_1 = return_streak_name("2021-12-05", 2)
+    #     assert streak_name_daily_1 == 1
+    #     streak_name_daily_2 = return_streak_name("2021-12-07", 2)
+    #     assert streak_name_daily_2 == 3  # Name des Streaks gibt nicht die Anzahl der Streaks an -> es existieren
+    #     # zwei unterschiedliche Streaks und der zweite ist mit 3 benannt
+    #
+    #     cursor.execute("SELECT DISTINCT StreakName From Period WHERE FKHabitID = ?", [3])
+    #     count_streaks = cursor.fetchall()
+    #     assert len(count_streaks) == 3
+    #     streak_name_weekly = return_streak_name("2021-12-30", 3)  # habit_id = 3 is Dance - a weekly habit
+    #     assert streak_name_weekly == 2
+    #
+    #     streak_name_monthly = return_streak_name("2022-12-30", 4)  # habit_id = 4 is Clean windows - a monthly habit
+    #     assert streak_name_monthly == 1
+    #
+    #     streak_name_yearly = return_streak_name("2022-12-17", 6)  # habit_id = 6 is Go to dentist - a yearly habit
+    #     assert streak_name_yearly == 1
 
     def test_habitDB(self):
         """
@@ -191,6 +96,7 @@ class TestHabit:
         """
         tests whether data_frames can be created from data base tables
         """
+        # TODO: hier zusehen, dass das neue Analysis Dataset referenziert wird
         habit_df = an.create_data_frame(self.database, "Habit")
         user_df = an.create_data_frame(self.database, "HabitAppUser")
         period_df = an.create_data_frame(self.database, "Period")
@@ -244,7 +150,7 @@ class TestHabit:
 
         # test if return_habit_completions returns the correct table
         habit_completions = an.return_habit_completions(self.database, dance_sh)
-        assert len(habit_completions) == 17
+        assert len(habit_completions) == 18
 
         # test if period start is correctly calculated
         period_start = an.determine_period_start("weekly", "2021-12-30")
@@ -283,6 +189,14 @@ class TestHabit:
         teeth_sh = HabitDB("Brush teeth", "daily", user_sh, self.database)
         max_streak_for_habit = an.return_longest_streak_for_habit(self.database, teeth_sh)
         assert max_streak_for_habit == 21
+
+        # new habit generation method
+        # test, if this works for habits for which no completion was added
+        running = HabitDB("Running", "daily", user_sh, self.database)
+        running.store_habit()
+        print(running.calculate_best_streak())
+
+        # test if this works for habits, for which only one completion was added
 
 
     ## Tests der CLI
@@ -333,6 +247,3 @@ class TestHabit:
     # test that it is not possible to store an empty value as user name
     # test that it is not possible to store a user name containing a space
     # ist nach Max nicht unbedingt notwendig, weil die eigentliche Programmlogik schon durch die Tests abgedeckt wird
-
-    def teardown_method(self):
-        os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
