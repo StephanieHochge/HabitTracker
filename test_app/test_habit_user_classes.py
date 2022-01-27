@@ -55,6 +55,12 @@ class TestHabitUser(TestData):
         with pytest.raises(IndexError):  # test if corresponding data in completions was also deleted
             ana.return_habit_completions(self.teeth_rb)
 
+    def test_modify_habit(self):
+        assert self.dance_rb.modify_habit(name="Ballet", periodicity="daily") is True
+        assert self.dance_rb.periodicity == "daily"
+        assert self.dance_rb.name == "Ballet"
+        assert self.bathroom_sh.modify_habit(name="Flat") is True
+        assert "Flat" in ana.return_habits_only(self.user_sh)
 
     def test_userDB(self):
         """

@@ -126,8 +126,13 @@ class HabitDB(Habit):
         db.delete_habit(self)
         return True
 
-    def modify_habit(self):
-        pass
+    def modify_habit(self, name=None, periodicity=None):
+        db.modify_habit(self, name, periodicity)
+        if periodicity:
+            self.periodicity = periodicity
+        if name:
+            self.name = name
+        return True
 
     def calculate_best_streak(self):
         self.best_streak = ana.calculate_longest_streak(self)
