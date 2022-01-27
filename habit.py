@@ -121,7 +121,8 @@ class HabitDB(Habit):
         db.add_completion(self, check_date)
 
     def delete_habit(self):
-        pass
+        db.delete_habit(self)
+        return True
 
     def modify_habit(self):
         pass

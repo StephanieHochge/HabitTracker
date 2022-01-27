@@ -5,6 +5,7 @@ from datetime import datetime
 # TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
 def get_db(name="main.db"):
     database = sqlite3.connect(name)
+    # database.execute("PRAGMA foreign_keys = ON")
     create_tables(database)
     return database
 
@@ -21,14 +22,14 @@ def create_tables(database):
     # create Habit table
     habit_table = """CREATE TABLE IF NOT EXISTS Habit
     (PKHabitID INTEGER PRIMARY KEY, FKUserID INTEGER, Name TEXT, Periodicity TEXT, CreationTime TEXT,
-    FOREIGN KEY(FKUserID) REFERENCES HabitAppUser(PKUserID))"""
+    FOREIGN KEY(FKUserID) REFERENCES HabitAppUser(PKUserID) ON DELETE CASCADE ON UPDATE CASCADE)"""
 
     cursor.execute(habit_table)
 
     # create Period table # TODO: Tabelle noch umbenennen
     completions_table = """CREATE TABLE IF NOT EXISTS Completions
     (PKCompletionsID INTEGER PRIMARY KEY, FKHabitID INTEGER, CompletionDate TEXT, CompletionTime TEXT, 
-    FOREIGN KEY(FKHabitID) REFERENCES Habit(PKHabitID))"""
+    FOREIGN KEY(FKHabitID) REFERENCES Habit(PKHabitID) ON DELETE CASCADE ON UPDATE CASCADE)"""
 
     cursor.execute(completions_table)
 
@@ -64,14 +65,13 @@ def add_habit(habit, creation_time=None):
     # TODO: Sicherstellen, dass User nicht schon ein Habit mit demselben Namen hat
 
 
-def find_habit_id(db, habit):
+def find_habit_id(habit):
     """
     returns the habit id of a user's habit
     :param habit: the habit for which the id is to be returned
-    :param db: the database containing the data
     :return: the habit's id (int)
     """
-    cursor = db.cursor()
+    cursor = habit.database.cursor()
     user_id = find_user_id(habit.user)
     cursor.execute("SELECT PKHabitID FROM Habit WHERE Name = ? AND FKUserID = ?",
                    (habit.name, user_id))  # sucht nach der HabitID des gesuchten Habits von dem User
@@ -91,11 +91,17 @@ def add_completion(habit, check_date=None):
     if not check_date:
         check_date = str(datetime.now())
     dates, time = check_date.split(" ")
-    habit_id = find_habit_id(db, habit)
+    habit_id = find_habit_id(habit)
     cursor.execute("INSERT INTO Completions(FKHabitID, CompletionDate, CompletionTime) VALUES (?, ?, ?)",
                    (habit_id, dates, time))
     db.commit()
 
+
+# delete habit and the corresponding habit data
+def delete_habit(habit):
+    habit_id = find_habit_id(habit)
+    cursor = habit.database.cursor()
+    cursor.execute("DELETE FROM Habit WHERE PKHabitID == ?", [habit_id])
 
 # TODO: Muss die Datenbank auch noch geschlossen werden? Dafür kann auch ein Context Manager eingesetzt werden:
 # https://www.youtube.com/watch?v=ZsvftkbbrR0 (ab 12:43 Min)

@@ -1,7 +1,9 @@
+import db
 from test_app import TestData
 from habit import HabitDB
 from user import UserDB
 from datetime import date
+import pytest
 
 
 class TestHabitUser(TestData):
@@ -43,6 +45,13 @@ class TestHabitUser(TestData):
         habit_2.check_off_habit("2021-12-05 12:54:24.999098")
         last_completion_date_2, _ = habit_2.last_completion.split(" ")
         assert last_completion_date_2 == "2021-12-05"
+
+    def test_delete_habit(self):
+        assert db.find_habit_id(self.teeth_rb) == 1
+        assert self.teeth_rb.delete_habit() is True
+        with pytest.raises(TypeError):
+            db.find_habit_id(self.teeth_rb)
+
 
     def test_userDB(self):
         """

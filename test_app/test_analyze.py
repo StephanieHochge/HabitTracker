@@ -11,7 +11,7 @@ class TestHabitAnalysis(TestData):
 
     def test_create_data_frame(self):
         """
-        tests whether data_frames can be created from data base tables
+        tests whether data_frames can be created from database tables
         """
         habit_df = ana.create_data_frame(self.database, "Habit")
         user_df = ana.create_data_frame(self.database, "HabitAppUser")
