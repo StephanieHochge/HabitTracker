@@ -1,6 +1,7 @@
 from test_app import TestData
 from habit import HabitDB
 from user import UserDB
+from datetime import date
 
 
 class TestHabitUser(TestData):
@@ -22,3 +23,30 @@ class TestHabitUser(TestData):
         """
         user = UserDB("StephanieHochge")
         assert user.username == "StephanieHochge"
+
+    def test_habitDB(self):
+        """
+        tests whether habits can be stored and checked off
+        """
+        user = UserDB("Hansi", self.database)
+        user.store_user()
+        habit = HabitDB("Brush teeth", "weekly", user, self.database)
+        habit.store_habit()
+        habit.check_off_habit()
+        habit.check_off_habit("2021-12-05 12:54:24.999098")
+        last_completion_date, _ = habit.last_completion.split(" ")
+        assert last_completion_date == str(date.today())
+        user2 = UserDB("Mausi", self.database)
+        user2.store_user()
+        habit_2 = HabitDB("Clean window", "weekly", user2, self.database)
+        habit_2.store_habit()
+        habit_2.check_off_habit("2021-12-05 12:54:24.999098")
+        last_completion_date_2, _ = habit_2.last_completion.split(" ")
+        assert last_completion_date_2 == "2021-12-05"
+
+    def test_userDB(self):
+        """
+        tests whether users can be stored
+        """
+        user = UserDB("HansJ", self.database)
+        user.store_user()

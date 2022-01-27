@@ -1,5 +1,5 @@
 import db
-import analyze_V2 as ana
+import analyze as ana
 
 
 class User:

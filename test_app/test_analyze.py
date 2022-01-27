@@ -1,16 +1,67 @@
-import db
-from user import UserDB
-from habit import HabitDB
-from datetime import date, datetime, timedelta
-import os
-import analyze_V2 as ana
+from datetime import date, timedelta
 from unittest.mock import patch
+
+import analyze as ana
+from habit import HabitDB
 from test_app import TestData
+from user import UserDB
 
 
 class TestHabitAnalysis(TestData):
 
-    # TODO: die Datenbank noch in einer Überklasse speichern, damit die von den Unterklassen auch verwendet werden kann
+    def test_create_data_frame(self):
+        """
+        tests whether data_frames can be created from data base tables
+        """
+        habit_df = ana.create_data_frame(self.database, "Habit")
+        user_df = ana.create_data_frame(self.database, "HabitAppUser")
+        completions_df = ana.create_data_frame(self.database, "Completions")
+
+    def test_check_for_user(self):
+        """
+        tests whether the function to identify whether a user name already exists works or not
+        :return:
+        """
+        user_existing = ana.check_for_user(self.user_sh)
+        assert user_existing is True
+        user_sh_2 = UserDB("StephanieH", self.database)
+        user_existing_2 = ana.check_for_user(user_sh_2)
+        assert user_existing_2 is False
+
+    def test_return_habits(self):
+        """
+        tests whether user_habits are correctly returned
+        """
+        defined_habits = ana.return_user_habits(self.user_sh)
+        assert len(defined_habits) == 5
+
+    def test_return_periodicity(self):
+        """
+        tests whether the periodicity of the habit is correctly returned
+        """
+        periodicity = ana.return_periodicity(self.teeth_sh)
+        assert periodicity == "daily"
+        periodicity = ana.return_periodicity(self.dance_sh)
+        assert periodicity == "weekly"
+
+    def test_return_habits_of_type(self):
+        """
+        tests whether user_habits of a specific type are correctly returned
+        """
+        weekly_habits = ana.return_habits_of_type(self.user_sh, "weekly")
+        assert len(weekly_habits) == 2
+        quaterly_habits = ana.return_habits_of_type(self.user_sh, "quarterly")
+        assert len(quaterly_habits) == 0
+
+    def test_return_habit_id(self):
+        # test if return_habit_id returns the correct habit_id
+        habit_id = ana.return_habit_id(self.dance_sh)
+        assert habit_id == 4
+
+    def test_return_habit_completions(self):
+        # test if return_habit_completions returns the correct table
+        habit_completions = ana.return_habit_completions(self.dance_sh)
+        assert len(habit_completions) == 18
 
     def test_calculate_period_starts(self):
         """
@@ -119,7 +170,7 @@ class TestHabitAnalysis(TestData):
         longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le)
         assert longest_streak_all_le == (None, None)
 
-    @patch('analyze_V2.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
+    @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
     def test_calculate_breaks(self, mock_last_month):
         # test check_curr_period function
@@ -139,3 +190,11 @@ class TestHabitAnalysis(TestData):
 
 # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
 #  berücksichtigen
+
+        # new habit generation method
+        # TODO: test, if this works for habits for which no completion was added
+        running = HabitDB("Running", "daily", self.user_sh, self.database)
+        running.store_habit()
+        print(running.calculate_best_streak())
+
+        # test if this works for habits, for which only one completion was added

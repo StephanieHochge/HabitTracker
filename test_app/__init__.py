@@ -8,3 +8,4 @@ from .test_data import *
 from .test_analyze import *
 from .test_db import *
 from .test_habit_user_classes import *
+from .test_cli import *
