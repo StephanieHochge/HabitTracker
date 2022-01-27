@@ -104,6 +104,7 @@ class HabitDB(Habit):
     # die übrigen Methoden
     def store_habit(self, creation_time=None):
         db.add_habit(self, creation_time)
+        return True  # TODO: Chris fragen, ob das so gemeint war
 
     def check_off_habit(self, check_date: str = None):
         """
@@ -119,6 +120,7 @@ class HabitDB(Habit):
             # completion date oder es noch keins gibt
             self.last_completion = check_date
         db.add_completion(self, check_date)
+        return True
 
     def delete_habit(self):
         db.delete_habit(self)

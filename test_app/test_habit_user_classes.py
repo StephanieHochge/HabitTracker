@@ -1,3 +1,4 @@
+import analyze as ana
 import db
 from test_app import TestData
 from habit import HabitDB
@@ -51,6 +52,8 @@ class TestHabitUser(TestData):
         assert self.teeth_rb.delete_habit() is True
         with pytest.raises(TypeError):
             db.find_habit_id(self.teeth_rb)
+        with pytest.raises(IndexError):  # test if corresponding data in completions was also deleted
+            ana.return_habit_completions(self.teeth_rb)
 
 
     def test_userDB(self):
