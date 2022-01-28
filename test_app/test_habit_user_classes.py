@@ -47,6 +47,9 @@ class TestHabitUser(TestData):
         last_completion_date_2, _ = habit_2.last_completion.split(" ")
         assert last_completion_date_2 == "2021-12-05"
 
+    def test_find_last_check(self):
+        assert self.teeth_sh.find_last_check() == "2021-12-31"
+
     def test_delete_habit(self):
         assert db.find_habit_id(self.teeth_rb) == 1
         assert self.teeth_rb.delete_habit() is True
@@ -61,6 +64,10 @@ class TestHabitUser(TestData):
         assert self.dance_rb.name == "Ballet"
         assert self.bathroom_sh.modify_habit(name="Flat") is True
         assert "Flat" in ana.return_habits_only(self.user_sh)
+
+    def test_analyze_habit(self):
+        analysis_teeth = self.teeth_sh.analyze_habit()
+        assert len(analysis_teeth) == 6
 
     def test_userDB(self):
         """

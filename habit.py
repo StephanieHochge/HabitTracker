@@ -122,6 +122,14 @@ class HabitDB(Habit):
         db.add_completion(self, check_date)
         return True
 
+    def find_last_check(self):
+        completions = ana.return_habit_completions(self)
+        if not completions:
+            self.last_completion = None
+        else:
+            self.last_completion = max(completions)
+        return self.last_completion
+
     def delete_habit(self):
         db.delete_habit(self)
         return True
@@ -139,8 +147,8 @@ class HabitDB(Habit):
         return self.best_streak
 
     def calculate_current_streak(self):
-        # TODO: Funktion noch programmieren
-        pass
+        self.current_streak = ana.calculate_curr_streak(self)
+        return self.current_streak
 
     def calculate_breaks(self, last_month: bool = False):
         if last_month:
@@ -153,12 +161,14 @@ class HabitDB(Habit):
     def analyze_habit(self):
         self.calculate_breaks()
         self.calculate_best_streak()
-        analysis = ["longest streak: ", "current streak: ", "last completion: ", "breaks total: "]
-        data = [self._best_streak, self.current_streak, self.last_completion, self.breaks_total]
+        self.calculate_current_streak()
+        self.find_last_check()
+        analysis = ["periodicity: ", "last completion: ", "longest streak: ", "current streak: ", "breaks total: "]
+        data = [self.periodicity, self.last_completion, f"{self.best_streak} periods",
+                f"{self.current_streak} periods", self.breaks_total]
         if self.periodicity in ["daily", "weekly"]:
             self.calculate_breaks(last_month=True)
             analysis.append("breaks last month: ")
             data.append(self.breaks_last_month)
-        ana.list_to_df(analysis, data)
-        # TODO: diese Funktion muss noch getestet werden
+        return ana.list_to_df(analysis, data)
 
