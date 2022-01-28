@@ -44,7 +44,7 @@ class HabitDB(Habit):
         self._best_streak = 0
         self._last_completion = None
         self._breaks_total = 0
-        self._breaks_last_periods = 0
+        self._breaks_last_month = 0
         self._database = database
 
     # Getter und Setter Methoden mithilfe des @property decorators
@@ -81,12 +81,12 @@ class HabitDB(Habit):
         self._breaks_total = breaks_total
 
     @property
-    def breaks_last_periods(self):
-        return self._breaks_last_periods
+    def breaks_last_month(self):
+        return self._breaks_last_month
 
-    @breaks_last_periods.setter
-    def breaks_last_periods(self, breaks_last_periods):
-        self._breaks_last_periods = breaks_last_periods
+    @breaks_last_month.setter
+    def breaks_last_month(self, breaks_last_month):
+        self._breaks_last_month = breaks_last_month
 
     @property
     def database(self):
@@ -138,12 +138,27 @@ class HabitDB(Habit):
         self.best_streak = ana.calculate_longest_streak(self)
         return self.best_streak
 
-    def calculate_breaks_total(self):
-        check_dates = ana.return_habit_completions(self)
-        period_starts = ana.calculate_period_starts(self.periodicity, check_dates)
-        tidy_periods = ana.tidy_starts(period_starts)
-        self.breaks_total = ana.calculate_breaks_total(self.periodicity, tidy_periods)
-        return self.breaks_total
+    def calculate_current_streak(self):
+        # TODO: Funktion noch programmieren
+        pass
+
+    def calculate_breaks(self, last_month: bool = False):
+        if last_month:
+            self._breaks_last_month = ana.calculate_breaks(self)
+            return self.breaks_last_month
+        else:
+            self.breaks_total = ana.calculate_breaks(self)
+            return self.breaks_total
 
     def analyze_habit(self):
-        pass
+        self.calculate_breaks()
+        self.calculate_best_streak()
+        analysis = ["longest streak: ", "current streak: ", "last completion: ", "breaks total: "]
+        data = [self._best_streak, self.current_streak, self.last_completion, self.breaks_total]
+        if self.periodicity in ["daily", "weekly"]:
+            self.calculate_breaks(last_month=True)
+            analysis.append("breaks last month: ")
+            data.append(self.breaks_last_month)
+        ana.list_to_df(analysis, data)
+        # TODO: diese Funktion muss noch getestet werden
+

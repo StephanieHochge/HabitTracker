@@ -342,6 +342,22 @@ def calculate_longest_streak_of_all(habit_list):
         return longest_streak_of_all, best_habits
 
 
+def check_previous_period(tidy_period_starts, periodicity):
+    # TODO: Test and add documentation
+    cur_period = calculate_one_period_start(periodicity, date.today())
+    prev_period = calculate_one_period_start(periodicity, cur_period - timedelta(days=1))
+    return True if prev_period in tidy_period_starts else False
+
+
+def calculate_curr_streak(habit):
+    final_periods = return_final_period_starts(habit)
+    if not check_previous_period(final_periods, habit.periodicity):
+        return 0 if not check_current_period(final_periods, habit.periodicity) else 1
+    else:
+        streak_lengths = calculate_streak_lengths(habit)
+        return streak_lengths[-1]
+
+
 def check_current_period(tidy_period_starts, periodicity):
     """
     checks whether a habit was performed in the current period
@@ -366,7 +382,7 @@ def return_last_month():
 
 # calculate the number of breaks within a list of dates
 # funktioniert
-def calculate_breaks_total(habit, last_month=False):
+def calculate_breaks(habit, last_month=False):
     """
     calculates the number of breaks a habit has experienced
     :param last_month: specifies whether all breaks or only the breaks from last month (= True) should be analyzed
@@ -386,3 +402,6 @@ def calculate_breaks_total(habit, last_month=False):
     else:
         return len(break_indices)
 
+
+def list_to_df(analysis, data):
+    return pd.DataFrame({'Analysis': analysis, 'data': data})

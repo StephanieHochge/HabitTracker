@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from unittest.mock import patch
 
 import analyze as ana
@@ -170,6 +170,14 @@ class TestHabitAnalysis(TestData):
         longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le)
         assert longest_streak_all_le == (None, None)
 
+    def test_calculate_curr_streak(self):
+        assert ana.calculate_curr_streak(self.teeth_sh) == 0
+        assert ana.calculate_curr_streak(self.dance_sh) == 1
+        self.dance_rb.check_off_habit(check_date=str(datetime.now()))
+        self.dance_rb.check_off_habit(check_date=str(datetime.now() - timedelta(weeks=1)))
+        self.dance_rb.check_off_habit(check_date=str(datetime.now() - timedelta(weeks=2)))
+        assert ana.calculate_curr_streak(self.dance_rb) == 3
+
     @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
     def test_calculate_breaks(self, mock_last_month):
@@ -180,12 +188,13 @@ class TestHabitAnalysis(TestData):
         assert ana.check_current_period(period_starts_curr_dance, "weekly") is True
 
         # test calulate_breaks function
-        assert ana.calculate_breaks_total(self.teeth_sh) == 3
-        assert ana.calculate_breaks_total(self.dance_sh) == 2
-        assert ana.calculate_breaks_total(self.windows_sh) == 1
-        assert ana.calculate_breaks_total(self.dentist_sh) == 0
-        assert ana.calculate_breaks_total(self.dance_sh, last_month=True) == 0
-        assert ana.calculate_breaks_total(self.teeth_sh, last_month=True) == 2
+        assert ana.calculate_breaks(self.teeth_sh) == 3
+        assert ana.calculate_breaks(self.dance_sh) == 2
+        assert ana.calculate_breaks(self.windows_sh) == 1
+        assert ana.calculate_breaks(self.dentist_sh) == 0
+        assert ana.calculate_breaks(self.dance_sh, last_month=True) == 0
+        assert ana.calculate_breaks(self.teeth_sh, last_month=True) == 2
+
 
 
 # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
