@@ -155,7 +155,7 @@ class HabitDB(Habit):
         return self.breaks_total
 
     def calculate_completion_rate(self):
-        self.completion_rate = ana.calculate_completion_rate(self)
+        self.completion_rate = round((ana.calculate_completion_rate(self))*100)
 
     def analyze_habit(self):
         self.calculate_breaks()
@@ -168,6 +168,6 @@ class HabitDB(Habit):
         if self.periodicity in ["daily", "weekly"]:
             self.calculate_completion_rate()
             analysis.append("completion rate: ")
-            data.append(self.completion_rate)
+            data.append(f"{self.completion_rate} %")
         return ana.list_to_df(analysis, data)
 

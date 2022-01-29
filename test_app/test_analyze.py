@@ -176,6 +176,10 @@ class TestHabitAnalysis(TestData):
         self.dance_rb.check_off_habit(check_date=str(datetime.now()))
         assert ana.calculate_curr_streak(self.dance_rb) == 1
 
+    def test_calculate_completion_rate(self):
+        assert ana.calculate_completion_rate(self.teeth_sh) == 6/28
+        assert ana.calculate_completion_rate(self.dance_sh) == 2/4
+
     @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
     def test_calculate_breaks(self, mock_last_month):
