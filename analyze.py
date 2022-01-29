@@ -323,16 +323,16 @@ def calculate_longest_streak_per_habit(habit_list):
 
 
 # calculate the longest streak of all habits
-def calculate_longest_streak_of_all(habit_list):
+def calculate_longest_streak_of_all(habits_with_data):
     """
     calculates the longest streak of all tracked habits
     the habit with the longest streak is defined as the habit which was performed the most periods in a row (i.e., a
     daily habit has a better chance of becoming the best habit than a yearly habit)
-    :param habit_list: a list of habits (type: list of instances of the HabitDB class)
+    :param habits_with_data: a list of habits (type: list of instances of the HabitDB class)
     :return: the value of the longest streak of all habits as well as the corresponding habit name (or habit names,
     since it is possible that several habits have the same longest streak)
     """
-    longest_streaks = calculate_longest_streak_per_habit(habit_list)
+    longest_streaks = calculate_longest_streak_per_habit(habits_with_data)
     if len(longest_streaks) == 0:  # wenn noch kein Habit completed wurde
         return None, None
     else:
@@ -418,9 +418,9 @@ def calculate_completion_rate_per_habit(habits_with_data):
     return dict(zip(habit_names, completion_rates))
 
 
-def calculate_worst_of_all(habit_with_data):
+def calculate_worst_completion_rate_of_all(habits_with_data):
     # man muss es schaffen, dass in dieser Habit-Liste nur Habits mit Daten ausgegeben werden
-    completion_rates = calculate_completion_rate_per_habit(habit_with_data)
+    completion_rates = calculate_completion_rate_per_habit(habits_with_data)
     lowest_completion_rate = completion_rates[min(completion_rates, key=completion_rates.get)]
     worst_habits = [key for (key, value) in completion_rates.items() if value == lowest_completion_rate]  # it is
     # possible that two habits have the same streak lengths, this way they would both be returned

@@ -75,3 +75,8 @@ class TestHabitUser(TestData):
         """
         user = UserDB("HansJ", self.database)
         user.store_user()
+
+    def test_analyze_habits(self):
+        analysis_user_sh = self.user_sh.analyze_habits()
+        assert len(analysis_user_sh) == 4
+        # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat

@@ -204,7 +204,7 @@ class TestHabitAnalysis(TestData):
         habits_with_data = ana.find_habits_with_data(habit_list)
         completion_rates = ana.calculate_completion_rate_per_habit(habits_with_data)
         assert list(completion_rates.values()) == [6/28, 2/4, 0/4]
-        lowest_completion_rate, worst_habit = ana.calculate_worst_of_all(habits_with_data)
+        lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
         assert round(lowest_completion_rate) == 0
         assert worst_habit == [("Clean bathroom", "weekly")]
 

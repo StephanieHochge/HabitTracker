@@ -70,16 +70,26 @@ class UserDB(User):
         return self.habit_list
 
     def determine_best_habit(self):
-        longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(self.habit_list)
+        habits_with_data = ana.find_habits_with_data(self.return_habit_list())
+        longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(habits_with_data)
         self.best_habit = best_habit  # ist möglicherweise auch eine Liste oder?
-        return longest_streak_of_all, best_habit  # TODO: generell bei Klassenmethoden überlegen, ob ich die returns
+        return longest_streak_of_all  # TODO: generell bei Klassenmethoden überlegen, ob ich die returns
         # brauche
 
     def determine_worst_habit(self):
         """the worst habit is the one with which the user struggled the most last month, i.e., the habit with the lowest
          completion rate (ein worst habit gibt es nur, wenn der Nutzer mindestens ein daily oder weekly habit hat)"""
         habits_with_data = ana.find_habits_with_data(self.return_habit_list())
-        pass
+        lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
+        self.worst_habit = worst_habit
+        return lowest_completion_rate
 
-    def analyze_habits(self, periodicity: str = None):
-        pass
+    def analyze_habits(self):
+        # TODO: möglicherweise hier die Daten aller Habits nebeneinander packen zum Vergleich
+        # TODO: möglicherweise die Liste der Habits noch aufhübschen
+        analysis = ["Habit(s) with the longest streak(s): ", "longest streak: ",
+                    "Habit(s) with the lowest completion rates: ", "lowest completion rate: "]
+        longest_streak = self.determine_best_habit()
+        lowest_completion_rate = self.determine_worst_habit()
+        data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]
+        return ana.list_to_df(analysis, data)
