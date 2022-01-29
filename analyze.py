@@ -401,6 +401,7 @@ def calculate_completion_rate(habit):
     # only possible for daily and weekly habits
     # completion rate is the number of periods in which the habit was completed divided by the number of periods in
     # which the habit was not completed during the last four weeks
+    # TODO: was passiert hier, wenn Habit noch nicht completed wurde?
     no_possible_periods = 28 if habit.periodicity == "daily" else 4
     final_periods = return_final_period_starts(habit)
     time_diff = timedelta(days=28) if habit.periodicity == "daily" else timedelta(weeks=4)
@@ -410,5 +411,35 @@ def calculate_completion_rate(habit):
     return len(completed_periods_4_weeks)/no_possible_periods
 
 
+def calculate_completion_rate_per_habit(habits_with_data):
+    frequent_habits = [habit for habit in habits_with_data if habit.periodicity in ("daily", "weekly")]
+    habit_names = [(habit.name, habit.periodicity) for habit in frequent_habits]
+    completion_rates = list(map(calculate_completion_rate, frequent_habits))
+    return dict(zip(habit_names, completion_rates))
+
+
+def calculate_worst_of_all(habit_with_data):
+    # man muss es schaffen, dass in dieser Habit-Liste nur Habits mit Daten ausgegeben werden
+    completion_rates = calculate_completion_rate_per_habit(habit_with_data)
+    lowest_completion_rate = completion_rates[min(completion_rates, key=completion_rates.get)]
+    worst_habits = [key for (key, value) in completion_rates.items() if value == lowest_completion_rate]  # it is
+    # possible that two habits have the same streak lengths, this way they would both be returned
+    return lowest_completion_rate, worst_habits
+
+
+def find_habits_with_data(habit_list):
+    """
+    returns only habits that contain data
+    :param habit_list:
+    :return:
+    """
+    check_dates = list(map(return_habit_completions, habit_list))
+    habit_indices = [index for index, value in enumerate(check_dates) if len(value) > 0]
+    return [habit for index, habit in enumerate(habit_list) if index in habit_indices]
+
+
 def list_to_df(analysis, data):
     return pd.DataFrame({'Analysis': analysis, 'data': data})
+
+
+# TODO: Überprüfen, dass ich überall "pass" gelöscht hab

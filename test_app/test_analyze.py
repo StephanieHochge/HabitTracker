@@ -33,7 +33,7 @@ class TestHabitAnalysis(TestData):
         tests whether user_habits are correctly returned
         """
         defined_habits = ana.return_user_habits(self.user_sh)
-        assert len(defined_habits) == 5
+        assert len(defined_habits) == 6
 
     def test_return_periodicity(self):
         """
@@ -140,15 +140,13 @@ class TestHabitAnalysis(TestData):
         assert ana.calculate_streak_lengths(self.dentist_sh) == [2]
 
         # test calculate_longest_streak function
-        sleep_sh = HabitDB("sleep", "daily", self.user_sh, self.database)
-        sleep_sh.store_habit()
-        assert ana.calculate_longest_streak(sleep_sh) == 0
+        assert ana.calculate_longest_streak(self.sleep_sh) == 0
         assert ana.calculate_longest_streak(self.teeth_sh) == 21
 
     def test_calculate_longest_streak_of_all(self):
         # test habit creator function
         habits_sh = ana.habit_creator(self.user_sh)
-        assert len(habits_sh) == 5
+        assert len(habits_sh) == 6
         habits_rb = ana.habit_creator(self.user_rb)
         assert len(habits_rb) == 2
         habits_le = ana.habit_creator(self.user_le)
@@ -195,6 +193,21 @@ class TestHabitAnalysis(TestData):
         assert ana.calculate_breaks(self.windows_sh) == 1
         assert ana.calculate_breaks(self.dentist_sh) == 0
 
+    def test_find_habits_with_data(self):
+        habit_list = ana.habit_creator(self.user_sh)
+        assert len(habit_list) == 6
+        habits_with_data = ana.find_habits_with_data(habit_list)
+        assert len(habits_with_data) == 5
+
+    def test_calculate_worst_of_all(self):
+        habit_list = self.user_sh.return_habit_list()
+        habits_with_data = ana.find_habits_with_data(habit_list)
+        completion_rates = ana.calculate_completion_rate_per_habit(habits_with_data)
+        assert list(completion_rates.values()) == [6/28, 2/4, 0/4]
+        lowest_completion_rate, worst_habit = ana.calculate_worst_of_all(habits_with_data)
+        assert round(lowest_completion_rate) == 0
+        assert worst_habit == [("Clean bathroom", "weekly")]
+
 
 
 # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
@@ -207,3 +220,5 @@ class TestHabitAnalysis(TestData):
         print(running.calculate_best_streak())
 
         # test if this works for habits, for which only one completion was added
+
+# TODO: bei jeder Funktion überprüfen, ob die auch geht, wenn das Habit noch keine Daten hat

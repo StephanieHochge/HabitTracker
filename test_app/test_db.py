@@ -20,7 +20,7 @@ class TestDB(TestData):
         cursor = self.database.cursor()
         cursor.execute("SELECT * FROM Habit")
         results = cursor.fetchall()
-        assert len(results) == 7
+        assert len(results) == 8
 
     def test_completions_table_db(self):
         """
