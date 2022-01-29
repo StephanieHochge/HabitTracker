@@ -3,6 +3,7 @@ import os
 import db
 from habit import HabitDB
 from user import UserDB
+from datetime import date, timedelta, datetime
 
 
 class TestData:
@@ -65,6 +66,12 @@ class TestData:
         db.add_completion(self.teeth_sh, "2021-12-29 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-30 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-31 07:56:24.999098")
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=2, days=2)))
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=1)))
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1)))
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=3)))
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=4)))
+        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=5)))
         db.add_completion(self.dance_sh, "2021-11-06 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-11-07 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-11-11 07:56:24.999098")
@@ -81,6 +88,8 @@ class TestData:
         db.add_completion(self.dance_sh, "2021-12-18 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-12-19 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-12-30 07:56:24.999098")
+        db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=1)))
+        db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=2)))
         db.add_completion(self.bathroom_sh, "2021-11-06 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2021-11-13 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2021-11-20 07:56:24.999098")
@@ -100,6 +109,8 @@ class TestData:
         db.add_completion(self.teeth_sh, "2021-12-03 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-12-21 07:56:24.999098")
         db.add_completion(self.dance_sh)
+        # Todo: am besten noch ein paar Daten mehr einfügen, die mit timedelta und now berechnet werden, damit die Tests
+        #  immer stimmen und die App auch später noch gut getestet werden kann
 
     def teardown_method(self):
         os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde

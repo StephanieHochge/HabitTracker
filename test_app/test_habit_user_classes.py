@@ -3,7 +3,7 @@ import db
 from test_app import TestData
 from habit import HabitDB
 from user import UserDB
-from datetime import date
+from datetime import date, datetime, timedelta
 import pytest
 
 
@@ -48,7 +48,7 @@ class TestHabitUser(TestData):
         assert last_completion_date_2 == "2021-12-05"
 
     def test_find_last_check(self):
-        assert self.teeth_sh.find_last_check() == "2021-12-31"
+        assert self.teeth_sh.find_last_check() == str(date.today() - timedelta(weeks=1))
 
     def test_delete_habit(self):
         assert db.find_habit_id(self.teeth_rb) == 1

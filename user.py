@@ -56,10 +56,16 @@ class UserDB(User):
     def store_user(self):
         db.add_user(self)
 
-    def calculate_best_habit(self):
+    def determine_best_habit(self):
         habit_list = ana.habit_creator(self)
-        longest_streak_of_all, best_habits = ana.calculate_longest_streak_of_all(habit_list)
-        return longest_streak_of_all, best_habits
+        longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(habit_list)
+        return longest_streak_of_all, best_habit  # TODO: generell bei Klassenmethoden überlegen, ob ich die returns
+        # brauche
+
+    def determine_worst_habit(self):
+        """the worst habit is the one with which the user struggled the most last month, i.e., where one had the most
+        breaks, möglicherweise das Habit, was am seltensten in der Periode durchgeführt wurde """
+        pass
 
     def analyze_habits(self, periodicity: str = None):
         pass

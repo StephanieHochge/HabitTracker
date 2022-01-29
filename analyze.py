@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 import pandas as pd
 
@@ -382,25 +382,32 @@ def return_last_month():
 
 # calculate the number of breaks within a list of dates
 # funktioniert
-def calculate_breaks(habit, last_month=False):
+def calculate_breaks(habit):
     """
     calculates the number of breaks a habit has experienced
-    :param last_month: specifies whether all breaks or only the breaks from last month (= True) should be analyzed
-    (type: bool)
     :param habit: the habit which is to be analyzed (type: instance of HabitDB class)
     :return: the number of breaks (type: int)
     """
     final_periods = return_final_period_starts(habit)
-    if last_month:
-        month, year = return_last_month()
-        final_periods = list(filter(lambda x: x.month == month and x.year == year, final_periods))
-        # TODO: irgendwo noch einbauen, dass last_month true nur für daily oder weekly habits angegeben werden kann
     break_indices = calculate_break_indices(final_periods, habit.periodicity)
     if check_current_period(final_periods, habit.periodicity):
         return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
         # eine Break weniger als break_indices ausrechnet (weil ja die zukünftige Periode mit berücksichtigt wird)
     else:
         return len(break_indices)
+
+
+def calculate_completion_rate(habit):
+    # only possible for daily and weekly habits
+    # completion rate is the number of periods in which the habit was completed divided by the number of periods in
+    # which the habit was not completed during the last four weeks
+    no_possible_periods = 28 if habit.periodicity == "daily" else 4
+    final_periods = return_final_period_starts(habit)
+    time_diff = timedelta(days=28) if habit.periodicity == "daily" else timedelta(weeks=4)
+    period_4_weeks_ago = calculate_one_period_start(habit.periodicity, (date.today() - time_diff))
+    cur_period = calculate_one_period_start(habit.periodicity, date.today())
+    completed_periods_4_weeks = list(filter(lambda x: period_4_weeks_ago < x < cur_period, final_periods))
+    return len(completed_periods_4_weeks)/no_possible_periods
 
 
 def list_to_df(analysis, data):

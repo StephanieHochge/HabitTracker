@@ -31,4 +31,4 @@ class TestDB(TestData):
         cursor = self.database.cursor()
         cursor.execute("SELECT * FROM Completions")
         results = cursor.fetchall()
-        assert len(results) == 70
+        assert len(results) == 78

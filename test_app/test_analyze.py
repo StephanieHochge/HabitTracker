@@ -61,7 +61,7 @@ class TestHabitAnalysis(TestData):
     def test_return_habit_completions(self):
         # test if return_habit_completions returns the correct table
         habit_completions = ana.return_habit_completions(self.dance_sh)
-        assert len(habit_completions) == 18
+        assert len(habit_completions) == 20
 
     def test_calculate_period_starts(self):
         """
@@ -112,8 +112,8 @@ class TestHabitAnalysis(TestData):
         final_periods_dance = ana.return_final_period_starts(self.dance_sh)
         final_periods_windows = ana.return_final_period_starts(self.windows_sh)
         final_periods_dentist = ana.return_final_period_starts(self.dentist_sh)
-        assert len(final_periods_teeth) == 30
-        assert len(final_periods_dance) == 10
+        assert len(final_periods_teeth) == 36
+        assert len(final_periods_dance) == 12
         assert len(final_periods_windows) == 8
         assert len(final_periods_dentist) == 3
 
@@ -127,15 +127,15 @@ class TestHabitAnalysis(TestData):
         final_periods_dance = ana.return_final_period_starts(self.dance_sh)
         final_periods_windows = ana.return_final_period_starts(self.windows_sh)
         final_periods_dentist = ana.return_final_period_starts(self.dentist_sh)
-        assert ana.calculate_break_indices(final_periods_teeth, "daily") == [4, 25, 28]
-        assert ana.calculate_break_indices(final_periods_dance, "weekly") == [4, 7, 8]
+        assert ana.calculate_break_indices(final_periods_teeth, "daily") == [4, 25, 28, 29, 32, 34]
+        assert ana.calculate_break_indices(final_periods_dance, "weekly") == [4, 7, 10]
         assert ana.calculate_break_indices(final_periods_windows, "monthly") == [1, 6]
         assert ana.calculate_break_indices(final_periods_dentist, "yearly") == [1]
 
     def test_calculate_longest_streak(self):
         # test calculate_streak_lengths function
-        assert ana.calculate_streak_lengths(self.teeth_sh) == [5, 21, 3]
-        assert ana.calculate_streak_lengths(self.dance_sh) == [5, 3, 1]
+        assert ana.calculate_streak_lengths(self.teeth_sh) == [5, 21, 3, 1, 3, 2]
+        assert ana.calculate_streak_lengths(self.dance_sh) == [5, 3, 3]
         assert ana.calculate_streak_lengths(self.windows_sh) == [2, 5]
         assert ana.calculate_streak_lengths(self.dentist_sh) == [2]
 
@@ -172,11 +172,9 @@ class TestHabitAnalysis(TestData):
 
     def test_calculate_curr_streak(self):
         assert ana.calculate_curr_streak(self.teeth_sh) == 0
-        assert ana.calculate_curr_streak(self.dance_sh) == 1
+        assert ana.calculate_curr_streak(self.dance_sh) == 3
         self.dance_rb.check_off_habit(check_date=str(datetime.now()))
-        self.dance_rb.check_off_habit(check_date=str(datetime.now() - timedelta(weeks=1)))
-        self.dance_rb.check_off_habit(check_date=str(datetime.now() - timedelta(weeks=2)))
-        assert ana.calculate_curr_streak(self.dance_rb) == 3
+        assert ana.calculate_curr_streak(self.dance_rb) == 1
 
     @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
@@ -188,12 +186,10 @@ class TestHabitAnalysis(TestData):
         assert ana.check_current_period(period_starts_curr_dance, "weekly") is True
 
         # test calulate_breaks function
-        assert ana.calculate_breaks(self.teeth_sh) == 3
+        assert ana.calculate_breaks(self.teeth_sh) == 6
         assert ana.calculate_breaks(self.dance_sh) == 2
         assert ana.calculate_breaks(self.windows_sh) == 1
         assert ana.calculate_breaks(self.dentist_sh) == 0
-        assert ana.calculate_breaks(self.dance_sh, last_month=True) == 0
-        assert ana.calculate_breaks(self.teeth_sh, last_month=True) == 2
 
 
 
