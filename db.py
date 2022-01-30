@@ -114,5 +114,12 @@ def modify_habit(habit, name, periodicity):
         cursor.execute("UPDATE Habit SET Periodicity = ? WHERE PKHabitID == ?", (periodicity, habit_id))
 
 
+# check if data was already entered to the user table
+def user_data_existing(database):
+    cursor = database.cursor()
+    cursor.execute("SELECT * From HabitAppUser")
+    return cursor.fetchall()
+
+
 # TODO: Muss die Datenbank auch noch geschlossen werden? Dafür kann auch ein Context Manager eingesetzt werden:
 # https://www.youtube.com/watch?v=ZsvftkbbrR0 (ab 12:43 Min)

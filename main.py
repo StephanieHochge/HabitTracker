@@ -1,3 +1,4 @@
+import db
 from db import get_db, add_user, add_completion, add_habit
 from habit import HabitDB
 from user import UserDB
@@ -17,9 +18,9 @@ def input_username(database, action):
     return username
 
 
-def input_new_habit(user, database):
+def input_new_habit(user):
     habit_name = qu.text("Which habit do you want to add?",
-                         validate=HabitNameValidator(database, user)).ask()
+                         validate=HabitNameValidator(user)).ask()
     periodicity = qu.select(f"Which periodicity shall {habit_name} have?",
                             choices=["daily", "weekly", "monthly", "yearly"]).ask()
     return habit_name, periodicity
@@ -71,25 +72,27 @@ def start(database):
         start(database)
 
 
-def create_habit(user, database):
-    habit_name, periodicity = input_new_habit(user, database)
-    habit = HabitDB(habit_name, periodicity, user, database)
+def create_habit(user):
+    habit_name, periodicity = input_new_habit(user)
+    habit = HabitDB(habit_name, periodicity, user, user.database)
     habit.store_habit()
     print(f"The habit \"{habit_name}\" with the periodicity \"{periodicity}\" was created.")
     return habit
 
 
-def identify_habit(habit_action, database, user):
+def identify_habit(habit_action, user):
     tracked_habits = an.return_habits_only(user)
     habit_name = qu.select(f"Which habit do you want to {habit_action}?",
                            choices=tracked_habits).ask()
     habit_periodicity = an.return_periodicity(user, habit_name)
-    habit = HabitDB(habit_name, habit_periodicity, user, database)
+    habit = HabitDB(habit_name, habit_periodicity, user, user.database)
     return habit
 
 
-def delete_habit():
-    pass
+def delete_habit(user):
+    habit = identify_habit("delete", user)
+    if habit.delete_habit():
+        print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" successfully deleted.")
 
 
 def modify_habit():
@@ -100,19 +103,28 @@ def check_off_habit():
     pass
 
 
-def analyze_habits(database, user):
+def analyze_habits(user):
     type_of_analysis = qu.select("Do you want to analyse all habits or just one?",
                                  choices=["All habits", "Just one"]).ask()
     if type_of_analysis == "All habits":
         pass
     else:  # type_of_analysis == "Just one"
-        habit = identify_habit("analyze", database, user)
+        habit = identify_habit("analyze", user)
         print(f"You want to analyse {habit.name}")
+
+
+def test_data_existing(database):
+    """
+    checks if the test data has already been entered or not
+    :return:
+    """
+    return db.user_data_existing(database)
 
 
 def cli():
     main_database = get_db()
-    habit_data = test_data.DataCli("main.db")
+    if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
+        test_data.DataCli("main.db")
     # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
     # TODO: Handle Python KeyboardInterrupt
 
@@ -124,10 +136,10 @@ def cli():
     ).ask()
     if next_action == "Add habit":
         action = "add"
-        current_habit = create_habit(current_user, main_database)
+        current_habit = create_habit(current_user)
     elif next_action == "Delete habit":
         action = "delete"
-        delete_habit()
+        delete_habit(current_user)
     elif next_action == "Modify habit":
         action = "modify"
         modify_habit()
@@ -135,7 +147,7 @@ def cli():
         action = "check off"
         check_off_habit()
     else:  # check_action == "Analyze habits"
-        analyze_habits(main_database, current_user)
+        analyze_habits(current_user)
 
     # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
 

@@ -33,8 +33,8 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
 
 class HabitNameValidator(Validator):
 
-    def __init__(self, database, user):
-        self.database = database
+    def __init__(self, user):
+        self.database = user.database
         self.user = user
 
     def validate(self, document):

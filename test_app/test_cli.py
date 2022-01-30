@@ -45,7 +45,7 @@ class TestCli(test_data.TestDataPytest):
         """
         user = UserDB("Fritz", self.database)
         user.store_user()
-        new_habit = main.create_habit(user, self.database)
+        new_habit = main.create_habit(user)
         assert new_habit.name == "sleeping"
         assert new_habit.periodicity == "daily"
 
