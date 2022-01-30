@@ -8,8 +8,6 @@ from user import UserDB
 
 class TestCli(TestData):
 
-
-    ## Tests der CLI
     @patch('main.input_username', return_value="Fritz")
     def test_create_new_user(self, mock_input):
         """

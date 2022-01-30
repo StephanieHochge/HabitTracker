@@ -95,9 +95,9 @@ def return_habits_only(user):
 
 
 # return the periodicity of a habit.
-def return_periodicity(habit):  # can be used to load habit
-    user_habits = return_user_habits(habit.user)
-    habit_data = user_habits.loc[user_habits["Name"] == habit.name]
+def return_periodicity(user, habit_name):  # can be used to load habit
+    user_habits = return_user_habits(user)
+    habit_data = user_habits.loc[user_habits["Name"] == habit_name]
     periodicity_series = habit_data["Periodicity"]
     return periodicity_series.to_list()[0]
 

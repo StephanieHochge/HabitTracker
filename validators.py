@@ -12,7 +12,7 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
 
     def validate(self, document):
         user = UserDB(document.text)
-        user_existing = an.check_for_user(self.database, user)
+        user_existing = an.check_for_user(user)
         if len(document.text) == 0:  # mindestens ein Zeichen muss eingegeben werden
             raise ValidationError(
                 message="Please enter at least one character",  # error message that is displayed
@@ -38,7 +38,7 @@ class HabitNameValidator(Validator):
         self.user = user
 
     def validate(self, document):
-        habits_of_user = an.return_habits(self.database, self.user)
+        habits_of_user = an.return_habits_only(self.user)
         if len(document.text) == 0:  # TODO: Vererbung!
             raise ValidationError(
                 message="Please enter at least one character",  # error message that is displayed

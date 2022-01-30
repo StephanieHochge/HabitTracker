@@ -9,6 +9,7 @@ import os
 
 
 # Auslagern der Input-Befehle in eigene Funktionen zum einfachen Testen des Inputs
+# TODO: vielleicht macht es Sinn, die main.db als Default-Datenbank zu verwenden? Dann muss man sie nicht mehr übergeben
 def input_username(database, action):
     text = "Please choose a username: " if action == "create" else "Please enter your username: "
     username = qu.text(text, validate=UserNameValidator(database, action)).ask()
@@ -78,11 +79,10 @@ def create_habit(user, database):
 
 
 def identify_habit(habit_action, database, user):
-    tracked_habits = an.return_habits(database, user)
+    tracked_habits = an.return_habits_only(user)
     habit_name = qu.select(f"Which habit do you want to {habit_action}?",
                            choices=tracked_habits).ask()
-    habit_periodicity = an.return_periodicity(database, user, habit_name)
-    # user.username und habit_name könnte auch nur mit dem Argument "habit" übergeben werden
+    habit_periodicity = an.return_periodicity(user, habit_name)
     habit = HabitDB(habit_name, habit_periodicity, user, database)
     return habit
 
@@ -111,85 +111,6 @@ def analyze_habits(database, user):
 
 def cli():
     main_database = get_db()
-    #  just for testing purposes, test data is inserted
-    user_sh = UserDB("StephanieHochge", main_database)
-    user_rb = UserDB("RajaBe", main_database)
-    user_le = UserDB("LibertyEvans", main_database)
-    add_user(user_sh)
-    add_user(user_rb)
-    add_user(user_le)
-    teeth_rb = HabitDB("Brush teeth", "daily", user_rb, main_database)
-    teeth_sh = HabitDB("Brush teeth", "daily", user_sh, main_database)
-    dance_sh = HabitDB("Dance", "weekly", user_sh, main_database)
-    windows_sh = HabitDB("Clean windows", "monthly", user_sh, main_database)
-    bathroom_sh = HabitDB("Clean bathroom", "weekly", user_sh, main_database)
-    dentist_sh = HabitDB("Go to dentist", "yearly", user_sh, main_database)
-    add_habit(teeth_rb)
-    add_habit(teeth_sh, "2021-11-30 07:54:24.999098")
-    add_habit(dance_sh, "2021-10-31 07:54:24.999098")
-    add_habit(windows_sh, "2021-10-31 07:54:24.999098")
-    add_habit(bathroom_sh, "2022-10-31 07:56:24.999098")
-    add_habit(dentist_sh, "2022-10-31 07:56:24.999098")
-    add_completion(teeth_rb)
-    add_completion(teeth_sh, "2021-12-01")
-    add_completion(teeth_sh, "2021-12-01")
-    add_completion(teeth_sh, "2021-12-02")
-    add_completion(teeth_sh, "2021-12-04")
-    add_completion(teeth_sh, "2021-12-05")
-    add_completion(teeth_sh, "2021-12-07")
-    add_completion(teeth_sh, "2021-12-08")
-    add_completion(teeth_sh, "2021-12-09")
-    add_completion(teeth_sh, "2021-12-10")
-    add_completion(teeth_sh, "2021-12-11")
-    add_completion(teeth_sh, "2021-12-12")
-    add_completion(teeth_sh, "2021-12-13")
-    add_completion(teeth_sh, "2021-12-14")
-    add_completion(teeth_sh, "2021-12-15")
-    add_completion(teeth_sh, "2021-12-16")
-    add_completion(teeth_sh, "2021-12-17")
-    add_completion(teeth_sh, "2021-12-18")
-    add_completion(teeth_sh, "2021-12-19")
-    add_completion(teeth_sh, "2021-12-20")
-    add_completion(teeth_sh, "2021-12-21")
-    add_completion(teeth_sh, "2021-12-22")
-    add_completion(teeth_sh, "2021-12-23")
-    add_completion(teeth_sh, "2021-12-24")
-    add_completion(teeth_sh, "2021-12-25")
-    add_completion(teeth_sh, "2021-12-26")
-    add_completion(teeth_sh, "2021-12-27")
-    add_completion(teeth_sh, "2021-12-29")
-    add_completion(teeth_sh, "2021-12-30")
-    add_completion(teeth_sh, "2021-12-31")
-    add_completion(dance_sh, "2021-11-06")
-    add_completion(dance_sh, "2021-11-07")
-    add_completion(dance_sh, "2021-11-11")
-    add_completion(dance_sh, "2021-11-13")
-    add_completion(dance_sh, "2021-11-14")
-    add_completion(dance_sh, "2021-11-21")
-    add_completion(dance_sh, "2021-11-25")
-    add_completion(dance_sh, "2021-11-27")
-    add_completion(dance_sh, "2021-11-28")
-    add_completion(dance_sh, "2021-12-02")
-    add_completion(dance_sh, "2021-12-04")
-    add_completion(dance_sh, "2021-12-05")
-    add_completion(dance_sh, "2021-12-16")
-    add_completion(dance_sh, "2021-12-18")
-    add_completion(dance_sh, "2021-12-19")
-    add_completion(dance_sh, "2021-12-30")
-    add_completion(bathroom_sh, "2021-11-06")
-    add_completion(bathroom_sh, "2021-11-13")
-    add_completion(bathroom_sh, "2021-11-20")
-    add_completion(bathroom_sh, "2021-12-04")
-    add_completion(bathroom_sh, "2021-12-11")
-    add_completion(bathroom_sh, "2021-12-18")
-    add_completion(bathroom_sh, "2022-01-01")
-    add_completion(windows_sh, "2022-11-17")
-    add_completion(windows_sh, "2022-12-30")
-    add_completion(dentist_sh, "2022-12-17")
-    add_completion(dentist_sh, "2021-12-05")
-    add_completion(teeth_sh, "2021-12-03")
-    add_completion(dance_sh, "2021-12-21")
-
     # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
     # TODO: Handle Python KeyboardInterrupt
 

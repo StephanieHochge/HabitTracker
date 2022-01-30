@@ -39,9 +39,9 @@ class TestHabitAnalysis(TestData):
         """
         tests whether the periodicity of the habit is correctly returned
         """
-        periodicity = ana.return_periodicity(self.teeth_sh)
+        periodicity = ana.return_periodicity(self.user_sh, "Brush teeth")
         assert periodicity == "daily"
-        periodicity = ana.return_periodicity(self.dance_sh)
+        periodicity = ana.return_periodicity(self.user_sh, "Dance")
         assert periodicity == "weekly"
 
     def test_return_habits_of_type(self):
