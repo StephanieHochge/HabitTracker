@@ -112,6 +112,7 @@ def analyze_habits(database, user):
 
 def cli():
     main_database = get_db()
+    habit_data = test_data.DataCli("main.db")
     # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
     # TODO: Handle Python KeyboardInterrupt
 
