@@ -3,11 +3,11 @@ from unittest.mock import patch
 
 import analyze as ana
 from habit import HabitDB
-from test_app import TestData
+import test_data
 from user import UserDB
 
 
-class TestHabitAnalysis(TestData):
+class TestHabitAnalysis(test_data.TestDataPytest):
 
     def test_create_data_frame(self):
         """

@@ -5,6 +5,7 @@ import analyze as an
 import questionary as qu
 from validators import HabitNameValidator, UserNameValidator
 from exceptions import UserNameNotExisting
+import test_data
 import os
 
 

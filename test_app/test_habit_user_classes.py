@@ -1,13 +1,13 @@
 import analyze as ana
 import db
-from test_app import TestData
+import test_data
 from habit import HabitDB
 from user import UserDB
 from datetime import date, datetime, timedelta
 import pytest
 
 
-class TestHabitUser(TestData):
+class TestHabitUser(test_data.TestDataPytest):
 
     def test_habit(self):
         """

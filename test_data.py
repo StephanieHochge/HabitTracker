@@ -8,23 +8,27 @@ from datetime import date, timedelta, datetime
 
 class TestData:
 
+    def create_users(self, database):
+        self.user_sh = UserDB("StephanieHochge", database)
+        self.user_rb = UserDB("RajaBe", database)
+        self.user_le = UserDB("LibertyEvans", database)
 
-    def setup_method(self):
-        self.database = db.get_db("test.db")
-        self.user_sh = UserDB("StephanieHochge", self.database)
-        self.user_rb = UserDB("RajaBe", self.database)
-        self.user_le = UserDB("LibertyEvans", self.database)
+    def store_users(self):
         db.add_user(self.user_sh)
         db.add_user(self.user_rb)
         db.add_user(self.user_le)
-        self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb, self.database)
-        self.dance_rb = HabitDB("Dance", "weekly", self.user_rb, self.database)
-        self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh, self.database)
-        self.dance_sh = HabitDB("Dance", "weekly", self.user_sh, self.database)
-        self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh, self.database)
-        self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh, self.database)
-        self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh, self.database)
-        self.sleep_sh = HabitDB("sleep", "daily", self.user_sh, self.database)
+
+    def create_habits(self):
+        self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb, self.user_rb.database)
+        self.dance_rb = HabitDB("Dance", "weekly", self.user_rb, self.user_rb.database)
+        self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh, self.user_sh.database)
+        self.dance_sh = HabitDB("Dance", "weekly", self.user_sh, self.user_sh.database)
+        self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh, self.user_sh.database)
+        self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh, self.user_sh.database)
+        self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh, self.user_sh.database)
+        self.sleep_sh = HabitDB("sleep", "daily", self.user_sh, self.user_sh.database)
+
+    def store_habits(self):
         db.add_habit(self.teeth_rb)
         db.add_habit(self.dance_rb)
         db.add_habit(self.teeth_sh, "2021-11-30 07:54:24.999098")
@@ -33,6 +37,8 @@ class TestData:
         db.add_habit(self.bathroom_sh, "2022-10-31 07:56:24.999098")
         db.add_habit(self.dentist_sh, "2022-10-31 07:56:24.999098")
         db.add_habit(self.sleep_sh)
+
+    def store_habit_completions(self):
         db.add_completion(self.teeth_rb)
         db.add_completion(self.teeth_rb, "2022-12-02 07:56:24.999098")
         db.add_completion(self.dance_rb, "2021-12-02 07:56:24.999098")
@@ -114,5 +120,24 @@ class TestData:
         # Todo: am besten noch ein paar Daten mehr einfügen, die mit timedelta und now berechnet werden, damit die Tests
         #  immer stimmen und die App auch später noch gut getestet werden kann
 
+    def create_test_data(self, database):
+        self.create_users(database)
+        self.store_users()
+        self.create_habits()
+        self.store_habits()
+        self.store_habit_completions()
+
+
+class TestDataPytest(TestData):
+    def setup_method(self):
+        self.database = db.get_db("test.db")
+        self.create_test_data(self.database)
+
     def teardown_method(self):
-        os.remove("test.db")  # löscht die Testdatenbank, die beim setup erstellt wurde
+        os.remove("test.db")  # löscht die Datenbank
+
+
+class DataCli(TestData):
+    def __init__(self, database):
+        self.database = db.get_db(database)
+        self.create_test_data(self.database)

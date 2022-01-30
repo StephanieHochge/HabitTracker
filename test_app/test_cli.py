@@ -2,11 +2,11 @@ from io import StringIO
 from unittest.mock import patch
 
 import main
-from test_app import TestData
+import test_data
 from user import UserDB
 
 
-class TestCli(TestData):
+class TestCli(test_data.TestDataPytest):
 
     @patch('main.input_username', return_value="Fritz")
     def test_create_new_user(self, mock_input):

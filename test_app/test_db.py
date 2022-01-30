@@ -1,7 +1,7 @@
-from test_app import TestData
+import test_data
 
 
-class TestDB(TestData):
+class TestDB(test_data.TestDataPytest):
 
     def test_user_table_db(self):
         """

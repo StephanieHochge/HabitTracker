@@ -4,7 +4,6 @@
 # from ."module" import * --> now we can just say from package import function
 # logging could be initialized here
 
-from .test_data import *
 from .test_analyze import *
 from .test_db import *
 from .test_habit_user_classes import *
