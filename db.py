@@ -102,6 +102,7 @@ def delete_habit(habit):
     habit_id = find_habit_id(habit)
     cursor = habit.database.cursor()
     cursor.execute("DELETE FROM Habit WHERE PKHabitID == ?", [habit_id])
+    habit.database.commit()
 
 
 # modify the habit's name, periodicity oder both
@@ -112,6 +113,7 @@ def modify_habit(habit, name, periodicity):
         cursor.execute("UPDATE Habit SET Name = ? WHERE PKHabitID == ?", (name, habit_id))
     if periodicity:
         cursor.execute("UPDATE Habit SET Periodicity = ? WHERE PKHabitID == ?", (periodicity, habit_id))
+    habit.database.commit()
 
 
 # check if data was already entered to the user table

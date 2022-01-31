@@ -4,6 +4,7 @@ from unittest.mock import patch
 import main
 import test_data
 from user import UserDB
+import analyze as ana
 
 
 class TestCli(test_data.TestDataPytest):
@@ -48,6 +49,42 @@ class TestCli(test_data.TestDataPytest):
         new_habit = main.create_habit(user)
         assert new_habit.name == "sleeping"
         assert new_habit.periodicity == "daily"
+
+    @patch('main.input_chosen_habit', return_value="sleep")
+    def test_identify_habit(self, mock_input):
+        """
+        tests the identify habit function
+        :return:
+        """
+        habit = main.identify_habit("delete", self.user_sh)
+        assert habit.periodicity == "daily"
+        assert habit.user == self.user_sh
+
+    @patch('main.input_chosen_habit', return_value="sleep")
+    def test_delete_habit(self, mock_input):
+        """
+        tests if the habit was successfully deleted
+        :param mock_input:
+        :return:
+        """
+        main.delete_habit(self.user_sh)
+        assert "sleep" not in ana.return_habits_only(self.user_sh)
+
+    @patch('main.input_habit_modify_target', return_value="name")
+    @patch('main.input_new_habit_name', return_value="Clean flat")
+    @patch('main.input_chosen_habit', return_value="Clean bathroom")
+    def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
+        main.modify_habit(self.user_sh)
+        assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
+
+    @patch('main.input_habit_modify_target', return_value="both")
+    @patch('main.input_periodicity', return_value="monthly")
+    @patch('main.input_new_habit_name', return_value="Clean flat")
+    @patch('main.input_chosen_habit', return_value="Clean bathroom")
+    def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
+        main.modify_habit(self.user_sh)
+        assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
+        assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     # TODO: test user input (see main.py)
     ## Tests der CLI
