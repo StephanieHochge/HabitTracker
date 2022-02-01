@@ -21,7 +21,7 @@ def input_username(database, action):
 
 
 def input_new_habit(user):
-    habit_name = qu.text("Which habit do you want to add?", validate=HabitNameValidator(user)).ask()
+    habit_name = qu.text("Which habit do you want to create?", validate=HabitNameValidator(user)).ask()
     periodicity = input_periodicity(habit_name)
     return habit_name, periodicity
 
@@ -201,14 +201,27 @@ def cli():
             qu.text("Press \"enter\" to proceed to the main menu.").ask()
         next_action = qu.select(
             "What do you want to do next?",
-            choices=["Add habit", "Delete habit", "Modify habit", "Check off habit", "Analyze habits", "Exit"]
+            choices=["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
         ).ask()
-        if next_action == "Add habit":
-            create_habit(current_user)
-        elif next_action == "Delete habit":
-            delete_habit(current_user)
-        elif next_action == "Modify habit":
-            modify_habit(current_user)
+
+        if next_action == "Manage habits":
+            manage_action = qu.select("What do you want to do with your habits?",
+                                      choices=["Create habit", "Delete habit", "Modify habit"]).ask()
+            if manage_action == "Create habit":
+                create_habit(current_user)
+            elif manage_action == "Delete habit":
+                delete_habit(current_user)
+            else:  # manage_action == "Modify habit"
+                modify_habit(current_user)
+        elif next_action == "Look at habits":
+            habits_to_see = qu.select("Which habits do you want to look at?",
+                                      choices=["All habits", "Habits with a certain periodicity"]).ask()
+            if habits_to_see == "All habits":
+                print(current_user.return_habit_information())
+            else:
+                periodicity = qu.select("Which periodicity are you interested in?",
+                                        choices=["daily", "weekly", "monthly", "yearly"]).ask()
+                print(current_user.return_habits_of_type(periodicity))
         elif next_action == "Check off habit":
             check_off_habit(current_user)
         elif next_action == "Analyze habits":
@@ -217,8 +230,9 @@ def cli():
             stop = True
             print("See you later, Bye!")
 
-    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
-    # TODO: Help-Funktion implementieren und damit Streak, Break und sowas erklären?
+    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden! TODO: Help-Funktion implementieren und damit Streak,
+    #  Break und sowas erklären?
+    # TODO: ggf. noch eigene Funktionen für Manage und Inspect Habit schreiben
 
 
 if __name__ == "__main__":

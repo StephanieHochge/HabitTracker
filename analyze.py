@@ -111,8 +111,8 @@ def return_habits_of_type(user, periodicity):
     :return: a pandas series with the names of the user's habits of the specified periodicity
     """
     defined_habits = return_user_habits(user)
-    habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity]
-    return habits_of_type["Name"]
+    habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity].reset_index()
+    return habits_of_type[["Name", "CreationTime"]]
 
 
 # change a list of dates as strings into a list of dates as datetime objects

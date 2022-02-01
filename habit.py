@@ -169,5 +169,6 @@ class HabitDB(Habit):
             self.calculate_completion_rate()
             analysis.append("completion rate: ")
             data.append(f"{self.completion_rate} %")
-        return ana.list_to_df(analysis, data)
+        analysis_df = ana.list_to_df(analysis, data)
+        return analysis_df.to_string(index=False)
 

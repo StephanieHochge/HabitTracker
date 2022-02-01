@@ -69,6 +69,15 @@ class UserDB(User):
         self.habit_list = ana.habit_creator(self)
         return self.habit_list
 
+    def return_habit_information(self):
+        habit_info_df = ana.return_user_habits(self)[["Name", "Periodicity", "CreationTime"]]
+        sorted_habits = habit_info_df.sort_values("Periodicity")
+        return sorted_habits.to_string(index=False)
+
+    def return_habits_of_type(self, periodicity):
+        habits_of_type = ana.return_habits_of_type(self, periodicity)
+        return habits_of_type.to_string(index=False)
+
     def determine_best_habit(self):
         habits_with_data = ana.find_habits_with_data(self.return_habit_list())
         longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(habits_with_data)
@@ -87,9 +96,11 @@ class UserDB(User):
     def analyze_habits(self):
         # TODO: möglicherweise hier die Daten aller Habits nebeneinander packen zum Vergleich
         # TODO: möglicherweise die Liste der Habits noch aufhübschen
+        # TODO: hier am besten noch anbieten, nur Habits eines bestimmten Typs zu analysieren
         analysis = ["Habit(s) with the longest streak: ", "longest streak: ",
                     "Habit(s) with the lowest completion rate during the last four weeks: ", "lowest completion rate: "]
         longest_streak = self.determine_best_habit()
         lowest_completion_rate = self.determine_worst_habit()
         data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]
-        return ana.list_to_df(analysis, data)
+        analysis_df = ana.list_to_df(analysis, data)
+        return analysis_df.to_string(index=False)
