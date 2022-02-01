@@ -21,8 +21,7 @@ def input_username(database, action):
 
 
 def input_new_habit(user):
-    habit_name = qu.text("Which habit do you want to add?",
-                         validate=HabitNameValidator(user)).ask()
+    habit_name = qu.text("Which habit do you want to add?", validate=HabitNameValidator(user)).ask()
     periodicity = input_periodicity(habit_name)
     return habit_name, periodicity
 
@@ -135,28 +134,37 @@ def return_past_days(no_days):
     return str(datetime.date.today() - datetime.timedelta(days=no_days))
 
 
+def check_now():
+    return qu.confirm("Did you complete your habit just now?", default=True).ask()
+
+
+def input_past_check_date():
+    # es werden nur die letzten Tage zur Auswahl angeboten
+    return qu.select("When did you complete your habit?",
+                     choices=[f"today", f"yesterday", return_past_days(2), return_past_days(3),
+                              return_past_days(4), return_past_days(5)]).ask()
+
+
 def check_off_habit(user):
     habit = identify_habit("check off", user)
-    current_time = qu.confirm("Did you complete your habit just now?", default=True).ask()
-    if current_time:
+    if check_now():
         habit.check_off_habit()
         print("Habit successfully completed (today).")
     else:
-        check_day = qu.select("When did you complete your habit?",
-                              choices=[f"today", f"yesterday", return_past_days(2), return_past_days(3),
-                                       return_past_days(4), return_past_days(5)]).ask()
+        check_day = input_past_check_date()
         if check_day == "today":
             manual_date = datetime.date.today()
         elif check_day == "yesterday":
             manual_date = return_past_days(1)
         else:
             manual_date = check_day
-        check_date = (" ".join([str(manual_date), "12:00:00"]))
+        check_date = (" ".join([str(manual_date), "12:00:00"]))  # es wird einfach die Mittagszeit genommen
         habit.check_off_habit(check_date)
         print(f"Habit successfully completed ({check_day}).")
 
 
 def analyze_habits(user):
+    # Funktion brauche ich meiner Meinung nach nicht zu testen
     type_of_analysis = qu.select("Do you want to analyse all habits or just one?",
                                  choices=["All habits", "Just one"]).ask()
     if type_of_analysis == "All habits":
@@ -190,7 +198,7 @@ def cli():
     while not stop:
         counter += 1  # zur Verbesserung der Usability
         if counter > 1:
-            time.sleep(1)  # damit sich die nächste Frage ein bisschen verzögert und man nicht aus Versehen etwas drückt
+            qu.text("Press \"enter\" to proceed to the main menu.").ask()
         next_action = qu.select(
             "What do you want to do next?",
             choices=["Add habit", "Delete habit", "Modify habit", "Check off habit", "Analyze habits", "Exit"]

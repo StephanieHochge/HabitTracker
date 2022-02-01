@@ -37,15 +37,13 @@ class TestHabitUser(test_data.TestDataPytest):
         habit.store_habit()
         habit.check_off_habit()
         habit.check_off_habit("2021-12-05 12:54:24.999098")
-        last_completion_date, _ = habit.last_completion.split(" ")
-        assert last_completion_date == str(date.today())
+        assert habit.last_completion == str(date.today())
         user2 = UserDB("Mausi", self.database)
         user2.store_user()
         habit_2 = HabitDB("Clean window", "weekly", user2, self.database)
         habit_2.store_habit()
         habit_2.check_off_habit("2021-12-05 12:54:24.999098")
-        last_completion_date_2, _ = habit_2.last_completion.split(" ")
-        assert last_completion_date_2 == "2021-12-05"
+        assert habit_2.last_completion == "2021-12-05"
 
     def test_find_last_check(self):
         assert self.teeth_sh.find_last_check() == str(date.today() - timedelta(weeks=1))

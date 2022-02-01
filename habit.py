@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 import analyze as ana
 import db
@@ -113,12 +113,12 @@ class HabitDB(Habit):
         :type check_date: object
         """
         if not check_date:
-            self.last_completion = str(datetime.now())
+            self.last_completion = str(date.today())
         elif not self.last_completion or datetime.fromisoformat(check_date) > \
                 datetime.fromisoformat(self.last_completion):
             # last_completion wird nur geändert, wenn das aktuelle Datum von Check-Date größer ist als das last
             # completion date oder es noch keins gibt
-            self.last_completion = check_date
+            self.last_completion, _ = check_date.split(" ")
         db.add_completion(self, check_date)
         return True
 

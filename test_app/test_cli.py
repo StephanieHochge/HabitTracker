@@ -1,3 +1,4 @@
+import datetime
 from io import StringIO
 from unittest.mock import patch
 
@@ -85,6 +86,21 @@ class TestCli(test_data.TestDataPytest):
         main.modify_habit(self.user_sh)
         assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
         assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
+
+    @patch('main.input_chosen_habit', return_value="Dance")
+    @patch('main.check_now', return_value=True)
+    def test_check_off_habit_now(self, mock_now, mock_habit):
+        main.check_off_habit(self.user_sh)
+        self.dance_sh.find_last_check()
+        assert self.dance_sh.last_completion == str(datetime.date.today())
+
+    @patch('main.input_chosen_habit', return_value="Brush teeth")
+    @patch('main.check_now', return_value=False)
+    @patch('main.input_past_check_date', return_value="yesterday")
+    def test_check_off_habit_past(self, mock_check_date, mock_past, mock_habit):
+        main.check_off_habit(self.user_sh)
+        self.teeth_sh.find_last_check()
+        assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
 
     # TODO: test user input (see main.py)
     ## Tests der CLI
