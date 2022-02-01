@@ -4,9 +4,10 @@ from habit import HabitDB
 from user import UserDB
 import analyze as an
 import questionary as qu
-from validators import HabitNameValidator, UserNameValidator
+from validators import HabitNameValidator, UserNameValidator, DateFormatValidator
 from exceptions import UserNameNotExisting
 import test_data
+import datetime
 import os
 
 
@@ -112,7 +113,6 @@ def delete_habit(user):
     habit = identify_habit("delete", user)
     if habit.delete_habit():
         print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" successfully deleted.")
-        # TODO: muss ich jetzt auch nochmal testen, ob das geklappt hat?
 
 
 def modify_habit(user):
@@ -130,8 +130,29 @@ def modify_habit(user):
             print(f"The habit's periodicity was successfully changed to {new_periodicity}.")
 
 
-def check_off_habit():
-    pass
+def return_past_days(no_days):
+    return str(datetime.date.today() - datetime.timedelta(days=no_days))
+
+
+def check_off_habit(user):
+    habit = identify_habit("check off", user)
+    current_time = qu.confirm("Did you complete your habit just now?", default=True).ask()
+    if current_time:
+        habit.check_off_habit()
+        print("Habit successfully completed (today).")
+    else:
+        check_day = qu.select("When did you complete your habit?",
+                              choices=[f"today", f"yesterday", return_past_days(2), return_past_days(3),
+                                       return_past_days(4), return_past_days(5)]).ask()
+        if check_day == "today":
+            manual_date = datetime.date.today()
+        elif check_day == "yesterday":
+            manual_date = return_past_days(1)
+        else:
+            manual_date = check_day
+        check_date = (" ".join([str(manual_date), "12:24:00"]))
+        habit.check_off_habit(check_date)
+        print(f"Habit successfully completed ({check_day}).")
 
 
 def analyze_habits(user):
@@ -174,7 +195,7 @@ def cli():
     elif next_action == "Modify habit":
         modify_habit(current_user)
     elif next_action == "Check off habit":
-        check_off_habit()
+        check_off_habit(current_user)
     else:  # check_action == "Analyze habits"
         analyze_habits(current_user)
 
