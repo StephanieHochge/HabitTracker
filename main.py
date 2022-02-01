@@ -8,6 +8,7 @@ from validators import HabitNameValidator, UserNameValidator, DateFormatValidato
 from exceptions import UserNameNotExisting
 import test_data
 import datetime
+import time
 import os
 
 
@@ -112,7 +113,7 @@ def identify_habit(habit_action, user):
 def delete_habit(user):
     habit = identify_habit("delete", user)
     if habit.delete_habit():
-        print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" successfully deleted.")
+        print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" was successfully deleted.")
 
 
 def modify_habit(user):
@@ -150,7 +151,7 @@ def check_off_habit(user):
             manual_date = return_past_days(1)
         else:
             manual_date = check_day
-        check_date = (" ".join([str(manual_date), "12:24:00"]))
+        check_date = (" ".join([str(manual_date), "12:00:00"]))
         habit.check_off_habit(check_date)
         print(f"Habit successfully completed ({check_day}).")
 
@@ -159,10 +160,10 @@ def analyze_habits(user):
     type_of_analysis = qu.select("Do you want to analyse all habits or just one?",
                                  choices=["All habits", "Just one"]).ask()
     if type_of_analysis == "All habits":
-        pass
+        print(user.analyze_habits())
     else:  # type_of_analysis == "Just one"
         habit = identify_habit("analyze", user)
-        print(f"You want to analyse {habit.name}")
+        print(habit.analyze_habit())
 
 
 def test_data_existing(database):
@@ -184,22 +185,32 @@ def cli():
 
     # Program Flow
     current_user = start(main_database)
-    next_action = qu.select(
-        "What do you want to do next?",
-        choices=["Add habit", "Delete habit", "Modify habit", "Check off habit", "Analyze habits"]
-    ).ask()
-    if next_action == "Add habit":
-        create_habit(current_user)
-    elif next_action == "Delete habit":
-        delete_habit(current_user)
-    elif next_action == "Modify habit":
-        modify_habit(current_user)
-    elif next_action == "Check off habit":
-        check_off_habit(current_user)
-    else:  # check_action == "Analyze habits"
-        analyze_habits(current_user)
+    stop = False
+    counter = 0
+    while not stop:
+        counter += 1  # zur Verbesserung der Usability
+        if counter > 1:
+            time.sleep(1)  # damit sich die nächste Frage ein bisschen verzögert und man nicht aus Versehen etwas drückt
+        next_action = qu.select(
+            "What do you want to do next?",
+            choices=["Add habit", "Delete habit", "Modify habit", "Check off habit", "Analyze habits", "Exit"]
+        ).ask()
+        if next_action == "Add habit":
+            create_habit(current_user)
+        elif next_action == "Delete habit":
+            delete_habit(current_user)
+        elif next_action == "Modify habit":
+            modify_habit(current_user)
+        elif next_action == "Check off habit":
+            check_off_habit(current_user)
+        elif next_action == "Analyze habits":
+            analyze_habits(current_user)
+        else:  # next_action == "Exit"
+            stop = True
+            print("See you later, Bye!")
 
     # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
+    # TODO: Help-Funktion implementieren und damit Streak, Break und sowas erklären?
 
 
 if __name__ == "__main__":

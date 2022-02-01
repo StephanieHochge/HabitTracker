@@ -87,8 +87,8 @@ class UserDB(User):
     def analyze_habits(self):
         # TODO: möglicherweise hier die Daten aller Habits nebeneinander packen zum Vergleich
         # TODO: möglicherweise die Liste der Habits noch aufhübschen
-        analysis = ["Habit(s) with the longest streak(s): ", "longest streak: ",
-                    "Habit(s) with the lowest completion rates: ", "lowest completion rate: "]
+        analysis = ["Habit(s) with the longest streak: ", "longest streak: ",
+                    "Habit(s) with the lowest completion rate during the last four weeks: ", "lowest completion rate: "]
         longest_streak = self.determine_best_habit()
         lowest_completion_rate = self.determine_worst_habit()
         data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]

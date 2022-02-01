@@ -163,8 +163,8 @@ class HabitDB(Habit):
         self.calculate_current_streak()
         self.find_last_check()
         analysis = ["periodicity: ", "last completion: ", "longest streak: ", "current streak: ", "breaks total: "]
-        data = [self.periodicity, self.last_completion, f"{self.best_streak} periods",
-                f"{self.current_streak} periods", self.breaks_total]
+        data = [self.periodicity, self.last_completion, f"{self.best_streak} period(s)",
+                f"{self.current_streak} period(s)", self.breaks_total]
         if self.periodicity in ["daily", "weekly"]:
             self.calculate_completion_rate()
             analysis.append("completion rate: ")
