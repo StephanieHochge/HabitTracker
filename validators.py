@@ -2,7 +2,6 @@ from questionary import Validator, ValidationError, prompt
 from user import UserDB
 import re
 import analyze as an
-import datetime
 
 
 # Questionary validators
@@ -27,7 +26,7 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
         elif user_existing and self.action_type == "create":  # User Name schon in der Datenbank vorhanden?
             # ist aber nur relevant, wenn man einen neuen User anlegt
             raise ValidationError(
-                message="User name already existing. Please try another one.",
+                message="User name already existing. Please choose another one.",
                 cursor_position=len(document.text),
             )
 
@@ -40,9 +39,9 @@ class HabitNameValidator(Validator):
 
     def validate(self, document):
         habits_of_user = an.return_habits_only(self.user)
-        if len(document.text) == 0:  # TODO: Vererbung!
+        if len(document.text.strip()) == 0:  # Habit enthält kein Zeichen oder nur Leerzeichen
             raise ValidationError(
-                message="Please enter at least one character.",  # error message that is displayed
+                message="Please enter at least one character that is not a space.",  # error message that is displayed
                 cursor_position=len(document.text),
             )
         elif document.text in habits_of_user:  # Habit wird schon von dem Nutzer genutzt?
@@ -51,18 +50,4 @@ class HabitNameValidator(Validator):
                 cursor_position=len(document.text),
             )
 
-
-class DateFormatValidator(Validator):
-
-    def validate(self, document):
-        if document.text != datetime.date.fromisoformat(document.text):
-            raise ValidationError(
-                message="Please use the format YYYY-MM-DD.",
-                cursor_position=len(document.text),
-            )
-        elif datetime.datetime.strptime(document.text, "%Y-%m-%d") > datetime.date.today():
-            raise ValidationError(
-                message="You cannot enter a date in the future. Please enter a past date.",
-                cursor_position=len(document.text),
-            )
 

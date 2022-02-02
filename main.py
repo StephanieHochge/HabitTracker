@@ -4,7 +4,7 @@ from habit import HabitDB
 from user import UserDB
 import analyze as an
 import questionary as qu
-from validators import HabitNameValidator, UserNameValidator, DateFormatValidator
+from validators import HabitNameValidator, UserNameValidator
 from exceptions import UserNameNotExisting
 import test_data
 import datetime
@@ -22,8 +22,8 @@ def input_username(database, action):
 
 def input_new_habit(user):
     habit_name = qu.text("Which habit do you want to create?", validate=HabitNameValidator(user)).ask()
-    periodicity = input_periodicity(habit_name)
-    return habit_name, periodicity
+    periodicity = input_periodicity(habit_name.strip())  # strip, um leading und ending spaces zu deleten
+    return habit_name.strip(), periodicity
 
 
 def input_periodicity(habit_name):
@@ -60,34 +60,38 @@ def login(database):
     username_existing = False
     count = 0
     while not username_existing:
+        if count == 3:  # wenn man drei Mal den Nutzernamen falsch eingegeben hat, wird das Programm unterbrochen
+            print("Login failed three times.")
+            return False
         try:
             username = input_username(database, "login")
             user = UserDB(username, database)
             if not an.check_for_user(user):
                 raise UserNameNotExisting(user.username)
+        except UserNameNotExisting:
+            print("This user does not exist. Please enter a username that does.")
+            count += 1
+        else:
             print(f"Logged in as {username}")
             username_existing = True
             return user
-        except UserNameNotExisting:
-            print("This user does not exist. Please enter a username that does.")
-            if count == 2:  # wenn man drei Mal den Nutzernamen falsch eingegeben hat, wird das Programm unterbrochen
-                print("Login failed three times.")
-                return False
-            count += 1
-            # TODO: nach zwei Fehlversuchen, sich einzuloggen, fragen, ob man neuen User anlegen oder gehen möchte
-            # TODO: Was tun, wenn man den eigenen Nutzernamen vergessen hat? Liste an Nutzernamen anzeigen? Pech?
 
 
 def start(database):
     start_action = qu.select(
         "What do you want to do?",
-        choices=["Create new user", "Login"]
+        choices=["Create new user", "Login", "Exit"]
     ).ask()
     if start_action == "Create new user":
         current_user = create_new_user(database)
-    else:
+    elif start_action == "Login":
         current_user = login(database)
-    if current_user:
+    else:
+        print("See you later, Bye!")
+        quit()
+    if current_user:  # ist nur None, wenn man nicht "Exit" gewählt hat und drei mal einen falschen Nutzernamen
+        # eingegeben hat, dann wird nochmal die einleitende Frage gestellt
+        # wenn man den Nutzernamen vergessen hat, hat man Pech
         return current_user
     else:
         start(database)
@@ -205,7 +209,7 @@ def inspect_habits(user):
 
 
 def cli():
-    main_database = get_db()
+    main_database = get_db()  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
     if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
         test_data.DataCli("main.db")
     # TODO: wäre es vielleicht nicht doch besser, auf eine separate Testdatenbank zurückzugreifen, wo bei jedem
@@ -215,9 +219,8 @@ def cli():
 
     # Program Flow
     current_user = start(main_database)
-    stop = False
     counter = 0
-    while not stop:
+    while True:
         counter += 1  # zur Verbesserung der Usability
         if counter > 1:
             qu.text("Press \"enter\" to proceed to the main menu.").ask()
@@ -235,11 +238,11 @@ def cli():
         elif next_action == "Analyze habits":
             analyze_habits(current_user)
         else:  # next_action == "Exit"
-            stop = True
             print("See you later, Bye!")
+            break
 
-    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
     #  TODO: Help-Funktion implementieren und damit Streak, Break und sowas erklären?
+    #   (geht möglicherweise bei der Enter Frage, indem man help eingibt)
 
 
 if __name__ == "__main__":

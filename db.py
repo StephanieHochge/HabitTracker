@@ -1,13 +1,17 @@
 import sqlite3
+from sqlite3 import Error
 from datetime import datetime
 
 
 # TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
 def get_db(name="main.db"):
-    database = sqlite3.connect(name)
-    # database.execute("PRAGMA foreign_keys = ON")
-    create_tables(database)
-    return database
+    try:
+        database = sqlite3.connect(name)
+    except Error as e:
+        print(e)
+    else:
+        create_tables(database)
+        return database
 
 
 def create_tables(database):
