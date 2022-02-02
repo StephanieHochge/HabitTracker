@@ -182,6 +182,28 @@ def test_data_existing(database):
     return db.user_data_existing(database)
 
 
+def manage_habits(user):
+    manage_action = qu.select("What do you want to do with your habits?",
+                              choices=["Create habit", "Delete habit", "Modify habit"]).ask()
+    if manage_action == "Create habit":
+        create_habit(user)
+    elif manage_action == "Delete habit":
+        delete_habit(user)
+    else:  # manage_action == "Modify habit"
+        modify_habit(user)
+
+
+def inspect_habits(user):
+    habits_to_see = qu.select("Which habits do you want to look at?",
+                              choices=["All habits", "Habits with a certain periodicity"]).ask()
+    if habits_to_see == "All habits":
+        print(user.return_habit_information())
+    else:
+        periodicity = qu.select("Which periodicity are you interested in?",
+                                choices=["daily", "weekly", "monthly", "yearly"]).ask()
+        print(user.return_habits_of_type(periodicity))
+
+
 def cli():
     main_database = get_db()
     if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
@@ -205,23 +227,9 @@ def cli():
         ).ask()
 
         if next_action == "Manage habits":
-            manage_action = qu.select("What do you want to do with your habits?",
-                                      choices=["Create habit", "Delete habit", "Modify habit"]).ask()
-            if manage_action == "Create habit":
-                create_habit(current_user)
-            elif manage_action == "Delete habit":
-                delete_habit(current_user)
-            else:  # manage_action == "Modify habit"
-                modify_habit(current_user)
+            manage_habits(current_user)
         elif next_action == "Look at habits":
-            habits_to_see = qu.select("Which habits do you want to look at?",
-                                      choices=["All habits", "Habits with a certain periodicity"]).ask()
-            if habits_to_see == "All habits":
-                print(current_user.return_habit_information())
-            else:
-                periodicity = qu.select("Which periodicity are you interested in?",
-                                        choices=["daily", "weekly", "monthly", "yearly"]).ask()
-                print(current_user.return_habits_of_type(periodicity))
+            inspect_habits(current_user)
         elif next_action == "Check off habit":
             check_off_habit(current_user)
         elif next_action == "Analyze habits":
@@ -230,9 +238,8 @@ def cli():
             stop = True
             print("See you later, Bye!")
 
-    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden! TODO: Help-Funktion implementieren und damit Streak,
-    #  Break und sowas erklären?
-    # TODO: ggf. noch eigene Funktionen für Manage und Inspect Habit schreiben
+    # TODO: Daten in der Zukunft dürfen nicht eingegeben werden!
+    #  TODO: Help-Funktion implementieren und damit Streak, Break und sowas erklären?
 
 
 if __name__ == "__main__":
