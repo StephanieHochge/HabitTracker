@@ -63,6 +63,15 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         habit_completions = ana.return_habit_completions(self.dance_sh)
         assert len(habit_completions) == 20
 
+    def test_check_for_habit_data(self):
+        completions_sh = ana.return_all_user_completions(self.user_sh)
+        completions_le = ana.return_all_user_completions(self.user_le)
+        assert len(completions_sh) == 6
+        assert len(completions_le) == 0
+        assert ana.check_for_habit_data(self.user_sh) is True
+        assert ana.check_for_habit_data(self.user_le) is False
+
+
     def test_calculate_period_starts(self):
         """
         tests if the period starts are correctly calculated

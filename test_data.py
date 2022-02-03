@@ -12,11 +12,13 @@ class TestData:
         self.user_sh = UserDB("StephanieHochge", database)
         self.user_rb = UserDB("RajaBe", database)
         self.user_le = UserDB("LibertyEvans", database)
+        self.user_hp = UserDB("HarryPotter", database)
 
     def store_users(self):
         db.add_user(self.user_sh)
         db.add_user(self.user_rb)
         db.add_user(self.user_le)
+        db.add_user(self.user_hp)
 
     def create_habits(self):
         self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb, self.user_rb.database)
@@ -27,6 +29,7 @@ class TestData:
         self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh, self.user_sh.database)
         self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh, self.user_sh.database)
         self.sleep_sh = HabitDB("sleep", "daily", self.user_sh, self.user_sh.database)
+        self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp, self.user_sh.database)
 
     def store_habits(self):
         db.add_habit(self.teeth_rb)
@@ -37,6 +40,7 @@ class TestData:
         db.add_habit(self.bathroom_sh, "2022-10-31 07:56:24.999098")
         db.add_habit(self.dentist_sh, "2022-10-31 07:56:24.999098")
         db.add_habit(self.sleep_sh)
+        db.add_habit(self.conjure_hp)
 
     def store_habit_completions(self):
         db.add_completion(self.teeth_rb)

@@ -33,7 +33,8 @@ def return_user_id(user):
     """
     user_df = create_data_frame(user.database, "HabitAppUser")
     user_id = user_df.loc[user_df["UserName"] == user.username]
-    return user_id.iloc[0, 0]
+    return user_id.iloc[0, 0]  # gibt einen Fehler aus, wenn es den User in der Datenbank nicht gibt - dies wird
+    # allerdings nicht der Fall sein # TODO: trotzdem exception handling?
 
 
 # checks if user name is already existing
@@ -56,7 +57,8 @@ def return_user_habits(user):
     """
     user_id = return_user_id(user)
     habit_df = create_data_frame(user.database, "Habit")
-    return habit_df.loc[habit_df["FKUserID"] == user_id]
+    return habit_df.loc[habit_df["FKUserID"] == user_id]  # wenn der User noch keine Habits hat, gibt dieser Befehl
+    # ein empty Dataframe zurück
 
 
 # return the habit_id of a user's habit
@@ -82,6 +84,30 @@ def return_habit_completions(habit):
     completions_df = create_data_frame(habit.database, "Completions")
     habit_data = completions_df.loc[completions_df["FKHabitID"] == habit_id]
     return habit_data["CompletionDate"].to_list()
+
+
+# return all completions of a user
+def return_all_user_completions(user):
+    """
+    returns all completions for all habits of a user
+    # TODO: test this function using pytest
+    :param user:
+    :return: a list of lists of all habit completions
+    """
+    habit_list = habit_creator(user)
+    return list(map(return_habit_completions, habit_list))  # Problem: eine leere list of lists hat die Länge 1
+
+
+def check_for_habit_data(user):
+    """
+    checks if any one habit of a user contains data
+    :param user: the user in question
+    :return: True/false (type: bool)
+    """
+    user_completions = return_all_user_completions(user)
+    data_existing = [True for x in user_completions if len(x) > 0]
+    return True if True in data_existing else False
+
 
 
 # Return a list of all currently tracked habits of a user

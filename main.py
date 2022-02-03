@@ -5,7 +5,7 @@ from user import UserDB
 import analyze as an
 import questionary as qu
 from validators import HabitNameValidator, UserNameValidator
-from exceptions import UserNameNotExisting
+from exceptions import UserNameNotExisting, UserHasNoHabits
 import test_data
 import datetime
 import time
@@ -208,6 +208,23 @@ def inspect_habits(user):
         print(user.return_habits_of_type(periodicity))
 
 
+def determine_possible_actions(user):  # tested
+    actions = {
+        "no habits": ["Create habit", "Exit"],
+        "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
+        "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
+    }  # um Fehler zu vermeiden, stehen User nur die Handlungen zur Verfügung, die sie ausführen können
+    habits = an.return_habits_only(user)
+    habit_data_existing = an.check_for_habit_data(user)
+    if len(habits) == 0:
+        category = "no habits"
+    elif not habit_data_existing:
+        category = "habit without data"
+    else:
+        category = "habit with data"
+    return actions[category]
+
+
 def cli():
     main_database = get_db()  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
     if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
@@ -222,14 +239,13 @@ def cli():
     counter = 0
     while True:
         counter += 1  # zur Verbesserung der Usability
+        possible_actions = determine_possible_actions(current_user)
         if counter > 1:
             qu.text("Press \"enter\" to proceed to the main menu.").ask()
-        next_action = qu.select(
-            "What do you want to do next?",
-            choices=["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
-        ).ask()
-
-        if next_action == "Manage habits":
+        next_action = qu.select("What do you want to do next?", choices=possible_actions).ask()
+        if next_action == "Create habit":
+            create_habit(current_user)
+        elif next_action == "Manage habits":
             manage_habits(current_user)
         elif next_action == "Look at habits":
             inspect_habits(current_user)

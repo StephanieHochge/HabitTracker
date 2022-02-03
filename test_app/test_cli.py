@@ -102,6 +102,18 @@ class TestCli(test_data.TestDataPytest):
         self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
 
+    def test_determine_possible_actions(self):
+        actions = {
+            "no habits": ["Create habit", "Exit"],
+            "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
+            "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
+        }
+        assert main.determine_possible_actions(self.user_sh) == actions["habit with data"]
+        assert main.determine_possible_actions(self.user_le) == actions["no habits"]
+        assert main.determine_possible_actions(self.user_hp) == actions["habit without data"]
+
+    # TODO: aus irgendeinem Grund wird, wenn man das Skript ausführt die main.db erstellt
+
     # TODO: test user input (see main.py)
     ## Tests der CLI
     # Creating a new user:
