@@ -198,15 +198,13 @@ def manage_habits(user):
 
 
 def inspect_habits(user):
-    habits_to_see = qu.select("Which habits do you want to look at?",
-                              choices=["All habits", "Habits with a certain periodicity"]).ask()
-    if habits_to_see == "All habits":
+    user_periodicities = an.return_ordered_periodicites(user)
+    periodicity = qu.select("Which habits do you want to look at?",
+                            choices=["All habits"] + [(x + " habits only") for x in user_periodicities]).ask()
+    if periodicity == "All habits":
         print(user.return_habit_information())
     else:
-        user_periodicities = an.return_ordered_periodicites(user)
-        periodicity = qu.select("Which periodicity are you interested in?",
-                                choices=user_periodicities).ask()
-        print(user.return_habits_of_type(periodicity))
+        print(user.return_habits_of_type(periodicity.replace(" habits only", "")))
 
 
 def determine_possible_actions(user):  # tested
