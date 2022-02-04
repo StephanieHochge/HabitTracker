@@ -47,6 +47,11 @@ def input_chosen_habit(habit_action, tracked_habits):
     return habit_name
 
 
+def confirm_delete(habit_name):
+    return qu.confirm(f"Are you sure that you want to delete \"{habit_name}\" and all corresponding data?",
+                      default=False).ask()
+
+
 # Programmlogik
 def create_new_user(database):
     username = input_username(database, "create")
@@ -115,8 +120,9 @@ def identify_habit(habit_action, user):
 
 def delete_habit(user):
     habit = identify_habit("delete", user)
-    if habit.delete_habit():
-        print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" was successfully deleted.")
+    if confirm_delete(habit.name):
+        if habit.delete_habit():
+            print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" was successfully deleted.")
 
 
 def modify_habit(user):

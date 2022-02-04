@@ -61,8 +61,9 @@ class TestCli(test_data.TestDataPytest):
         assert habit.periodicity == "daily"
         assert habit.user == self.user_sh
 
+    @patch('main.confirm_delete', return_value=True)
     @patch('main.input_chosen_habit', return_value="sleep")
-    def test_delete_habit(self, mock_input):
+    def test_delete_habit(self, mock_habit, mock_confirm):
         """
         tests if the habit was successfully deleted
         :param mock_input:
