@@ -109,7 +109,6 @@ def check_for_habit_data(user):
     return True if True in data_existing else False
 
 
-
 # Return a list of all currently tracked habits of a user
 def return_habits_only(user):
     """
@@ -121,11 +120,20 @@ def return_habits_only(user):
 
 
 # return the periodicity of a habit.
-def return_periodicity(user, habit_name):  # can be used to load habit
+def return_habit_periodicity(user, habit_name):  # can be used to load habit
     user_habits = return_user_habits(user)
     habit_data = user_habits.loc[user_habits["Name"] == habit_name]
     periodicity_series = habit_data["Periodicity"]
     return periodicity_series.to_list()[0]
+
+
+# return a user's periodicities
+def return_ordered_periodicites(user):
+    defined_habits = return_user_habits(user)
+    user_periodicities = (set(defined_habits["Periodicity"]))
+    possible_periodicities = ["daily", "weekly", "monthly", "yearly"]
+    return [x for x in possible_periodicities if x in user_periodicities]  # so that periodicities are in the correct
+    # (ascending) order
 
 
 # Filter for periodicity and return habits with said periodicity

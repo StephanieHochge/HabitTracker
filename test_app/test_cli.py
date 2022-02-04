@@ -85,7 +85,7 @@ class TestCli(test_data.TestDataPytest):
     def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
         main.modify_habit(self.user_sh)
         assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
-        assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
+        assert ana.return_habit_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Dance")
     @patch('main.check_now', return_value=True)

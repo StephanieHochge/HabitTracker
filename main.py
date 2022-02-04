@@ -108,7 +108,7 @@ def create_habit(user):
 def identify_habit(habit_action, user):
     tracked_habits = an.return_habits_only(user)
     habit_name = input_chosen_habit(habit_action, tracked_habits)
-    habit_periodicity = an.return_periodicity(user, habit_name)
+    habit_periodicity = an.return_habit_periodicity(user, habit_name)
     habit = HabitDB(habit_name, habit_periodicity, user, user.database)
     return habit
 
@@ -203,8 +203,9 @@ def inspect_habits(user):
     if habits_to_see == "All habits":
         print(user.return_habit_information())
     else:
+        user_periodicities = an.return_ordered_periodicites(user)
         periodicity = qu.select("Which periodicity are you interested in?",
-                                choices=["daily", "weekly", "monthly", "yearly"]).ask()
+                                choices=user_periodicities).ask()
         print(user.return_habits_of_type(periodicity))
 
 

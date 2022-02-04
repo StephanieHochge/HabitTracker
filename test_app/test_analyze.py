@@ -35,14 +35,24 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         defined_habits = ana.return_user_habits(self.user_sh)
         assert len(defined_habits) == 6
 
-    def test_return_periodicity(self):
+    def test_return_habit_periodicity(self):
         """
         tests whether the periodicity of the habit is correctly returned
         """
-        periodicity = ana.return_periodicity(self.user_sh, "Brush teeth")
+        periodicity = ana.return_habit_periodicity(self.user_sh, "Brush teeth")
         assert periodicity == "daily"
-        periodicity = ana.return_periodicity(self.user_sh, "Dance")
+        periodicity = ana.return_habit_periodicity(self.user_sh, "Dance")
         assert periodicity == "weekly"
+
+    def test_return_ordered_periodicities(self):
+        """
+        tests whether the periodicities of a user's habits are returned in the correct order
+        :return:
+        """
+        assert ana.return_ordered_periodicites(self.user_sh) == ["daily", "weekly", "monthly", "yearly"]
+        assert ana.return_ordered_periodicites(self.user_rb) == ["daily", "weekly"]
+        assert ana.return_ordered_periodicites(self.user_le) == []
+        assert ana.return_ordered_periodicites(self.user_hp) == ["daily"]
 
     def test_return_habits_of_type(self):
         """
