@@ -75,6 +75,7 @@ class TestHabitUser(test_data.TestDataPytest):
         user.store_user()
 
     def test_analyze_habits(self):
-        analysis_user_sh = self.user_sh.analyze_habits()
-        assert len(analysis_user_sh) == 4
+        habit_comparison, statistics = self.user_sh.analyze_habits()
+        assert len(habit_comparison.columns) == 5
+        assert "Clean bathroom" in statistics
         # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat

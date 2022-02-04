@@ -78,9 +78,8 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         completions_le = ana.return_all_user_completions(self.user_le)
         assert len(completions_sh) == 6
         assert len(completions_le) == 0
-        assert ana.check_for_habit_data(self.user_sh) is True
-        assert ana.check_for_habit_data(self.user_le) is False
-
+        assert ana.check_any_habit_data(self.user_sh) is True
+        assert ana.check_any_habit_data(self.user_le) is False
 
     def test_calculate_period_starts(self):
         """
@@ -173,17 +172,17 @@ class TestHabitAnalysis(test_data.TestDataPytest):
 
         # test calculate_longest_streak_per_habit function
         longest_streaks_sh = ana.calculate_longest_streak_per_habit(habits_sh)
-        assert longest_streaks_sh[("Dance", "weekly")] == 5
+        assert longest_streaks_sh["Dance"] == 5
         longest_streak_rb = ana.calculate_longest_streak_per_habit(habits_rb)
-        assert longest_streak_rb[("Brush teeth", "daily")] == 1
+        assert longest_streak_rb["Brush teeth"] == 1
         longest_streak_le = ana.calculate_longest_streak_per_habit(habits_le)
         assert len(longest_streak_le) == 0
 
-        # test calculate longest_streak_of_all function
+        # test calculate_longest_streak_of_all function
         longest_streak_all_sh = ana.calculate_longest_streak_of_all(habits_sh)
-        assert longest_streak_all_sh == (21, [("Brush teeth", "daily")])
+        assert longest_streak_all_sh == (21, ["Brush teeth"])
         longest_streak_all_rb = ana.calculate_longest_streak_of_all(habits_rb)
-        assert longest_streak_all_rb == (1, [("Brush teeth", "daily"), ("Dance", "weekly")])
+        assert longest_streak_all_rb == (1, ["Brush teeth", "Dance"])
         longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le)
         assert longest_streak_all_le == (None, None)
 
@@ -194,8 +193,8 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         assert ana.calculate_curr_streak(self.dance_rb) == 1
 
     def test_calculate_completion_rate(self):
-        assert ana.calculate_completion_rate(self.teeth_sh) == 6/28
-        assert ana.calculate_completion_rate(self.dance_sh) == 2/4
+        assert ana.calculate_completion_rate(self.teeth_sh) == 6 / 28
+        assert ana.calculate_completion_rate(self.dance_sh) == 2 / 4
 
     @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
@@ -222,15 +221,22 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         habit_list = self.user_sh.return_habit_list()
         habits_with_data = ana.find_habits_with_data(habit_list)
         completion_rates = ana.calculate_completion_rate_per_habit(habits_with_data)
-        assert list(completion_rates.values()) == [6/28, 2/4, 0/4]
+        assert list(completion_rates.values()) == [6 / 28, 2 / 4, 0 / 4]
         lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
         assert round(lowest_completion_rate) == 0
-        assert worst_habit == [("Clean bathroom", "weekly")]
+        assert worst_habit == ["Clean bathroom"]
 
+    def test_detailed_analysis_of_all_habits(self):
+        habit_list_sh = self.user_sh.return_habit_list()
+        comparison_data_sh = ana.detailed_analysis_of_all_habits(habit_list_sh)
+        assert list(comparison_data_sh.columns) == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom",
+                                                    "Go to dentist"]
+        habit_list_rb = self.user_rb.return_habit_list()
+        comparison_data_rb = ana.detailed_analysis_of_all_habits(habit_list_rb)
+        assert list(comparison_data_rb) == ["Brush teeth", "Dance"]
 
-
-# TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
-#  berücksichtigen
+        # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
+        #  berücksichtigen
 
         # new habit generation method
         # TODO: test, if this works for habits for which no completion was added

@@ -178,10 +178,15 @@ def analyze_habits(user):
     type_of_analysis = qu.select("Do you want to analyse all habits or just one?",
                                  choices=["All habits", "Just one"]).ask()
     if type_of_analysis == "All habits":
-        print(user.analyze_habits())
+        habit_comparison, analysis = user.analyze_habits()
+        print("Summary statistics:")
+        print(analysis)
+        print("\nA detailed comparison of all habits:")
+        print(habit_comparison)
     else:  # type_of_analysis == "Just one"
         habit = identify_habit("analyze", user)
-        print(habit.analyze_habit())
+        data = habit.analyze_habit()
+        print(an.analysis_one_habit(data, habit.name))
 
 
 def test_data_existing(database):
@@ -220,7 +225,7 @@ def determine_possible_actions(user):  # tested
         "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
     }  # um Fehler zu vermeiden, stehen User nur die Handlungen zur Verfügung, die sie ausführen können
     habits = an.return_habits_only(user)
-    habit_data_existing = an.check_for_habit_data(user)
+    habit_data_existing = an.check_any_habit_data(user)
     if len(habits) == 0:
         category = "no habits"
     elif not habit_data_existing:

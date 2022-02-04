@@ -28,7 +28,7 @@ class TestData:
         self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh, self.user_sh.database)
         self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh, self.user_sh.database)
         self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh, self.user_sh.database)
-        self.sleep_sh = HabitDB("sleep", "daily", self.user_sh, self.user_sh.database)
+        self.sleep_sh = HabitDB("Sleep", "daily", self.user_sh, self.user_sh.database)
         self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp, self.user_sh.database)
 
     def store_habits(self):

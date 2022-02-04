@@ -98,7 +98,7 @@ def return_all_user_completions(user):
     return list(map(return_habit_completions, habit_list))  # Problem: eine leere list of lists hat die Länge 1
 
 
-def check_for_habit_data(user):
+def check_any_habit_data(user):
     """
     checks if any one habit of a user contains data
     :param user: the user in question
@@ -351,7 +351,7 @@ def calculate_longest_streak_per_habit(habit_list):
     :param habit_list: a list of habits (type: list of instances of the HabitDB class)
     :return: a dictionary with the habit names as keys and their longest streaks as values
     """
-    habit_names = [(habit.name, habit.periodicity) for habit in habit_list]  # funktioniert
+    habit_names = [habit.name for habit in habit_list]  # verwende ich an einer anderen Stelle nochmal
     longest_streaks = map(calculate_longest_streak, habit_list)
     return dict(zip(habit_names, longest_streaks))
 
@@ -367,7 +367,7 @@ def calculate_longest_streak_of_all(habits_with_data):
     since it is possible that several habits have the same longest streak)
     """
     longest_streaks = calculate_longest_streak_per_habit(habits_with_data)
-    if len(longest_streaks) == 0:  # wenn noch kein Habit completed wurde
+    if len(longest_streaks) == 0:  # wenn noch kein Habit completed wurde  # TODO: brauche ich das überhaupt noch?
         return None, None
     else:
         longest_streak_of_all = longest_streaks[max(longest_streaks, key=longest_streaks.get)]
@@ -447,7 +447,7 @@ def calculate_completion_rate(habit):
 
 def calculate_completion_rate_per_habit(habits_with_data):
     frequent_habits = [habit for habit in habits_with_data if habit.periodicity in ("daily", "weekly")]
-    habit_names = [(habit.name, habit.periodicity) for habit in frequent_habits]
+    habit_names = [habit.name for habit in frequent_habits]
     completion_rates = list(map(calculate_completion_rate, frequent_habits))
     return dict(zip(habit_names, completion_rates))
 
@@ -472,8 +472,27 @@ def find_habits_with_data(habit_list):
     return [habit for index, habit in enumerate(habit_list) if index in habit_indices]
 
 
+def analysis_index():
+    return ["periodicity: ", "last completion: ", "longest streak: ", "current streak: ",
+             "breaks total: ", "completion rate (last 4 weeks): "]
+
+
+def detailed_analysis_of_all_habits(habit_list):
+    habits_with_data = find_habits_with_data(habit_list)
+    habit_names = [habit.name for habit in habits_with_data]
+    analysis_data = [habit.analyze_habit() for habit in habits_with_data]
+    analysis_dict = dict(zip(habit_names, analysis_data))
+    pd.set_option("display.max_columns", None)
+    return pd.DataFrame(analysis_dict, index=analysis_index())
+
+
+def analysis_one_habit(data, habit_name):
+    return pd.DataFrame(data, index=analysis_index(), columns=[habit_name])
+
+
 def list_to_df(analysis, data):
     return pd.DataFrame({'Analysis': analysis, 'data': data})
+
 
 
 # TODO: Überprüfen, dass ich überall "pass" gelöscht hab

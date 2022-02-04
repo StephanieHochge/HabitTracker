@@ -12,7 +12,7 @@ class TestDB(test_data.TestDataPytest):
         # Syntax wiederholt sich)
         cursor.execute("SELECT * FROM HabitAppUser")
         results = cursor.fetchall()
-        assert len(results) == 3
+        assert len(results) == 4
 
     def test_habit_table_db(self):
         """
@@ -21,7 +21,7 @@ class TestDB(test_data.TestDataPytest):
         cursor = self.database.cursor()
         cursor.execute("SELECT * FROM Habit")
         results = cursor.fetchall()
-        assert len(results) == 8
+        assert len(results) == 9
 
     def test_completions_table_db(self):
         """

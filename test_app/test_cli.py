@@ -51,7 +51,7 @@ class TestCli(test_data.TestDataPytest):
         assert new_habit.name == "sleeping"
         assert new_habit.periodicity == "daily"
 
-    @patch('main.input_chosen_habit', return_value="sleep")
+    @patch('main.input_chosen_habit', return_value="Sleep")
     def test_identify_habit(self, mock_input):
         """
         tests the identify habit function
@@ -62,7 +62,7 @@ class TestCli(test_data.TestDataPytest):
         assert habit.user == self.user_sh
 
     @patch('main.confirm_delete', return_value=True)
-    @patch('main.input_chosen_habit', return_value="sleep")
+    @patch('main.input_chosen_habit', return_value="Sleep")
     def test_delete_habit(self, mock_habit, mock_confirm):
         """
         tests if the habit was successfully deleted
@@ -70,7 +70,7 @@ class TestCli(test_data.TestDataPytest):
         :return:
         """
         main.delete_habit(self.user_sh)
-        assert "sleep" not in ana.return_habits_only(self.user_sh)
+        assert "Sleep" not in ana.return_habits_only(self.user_sh)
 
     @patch('main.input_habit_modify_target', return_value="name")
     @patch('main.input_new_habit_name', return_value="Clean flat")

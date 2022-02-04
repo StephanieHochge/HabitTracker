@@ -81,7 +81,7 @@ class UserDB(User):
     def determine_best_habit(self):
         habits_with_data = ana.find_habits_with_data(self.return_habit_list())
         longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(habits_with_data)
-        self.best_habit = best_habit  # ist möglicherweise auch eine Liste oder?
+        self.best_habit = ", ".join(best_habit)  # trennt mehrere Habitnamen mit einem Komma
         return longest_streak_of_all  # TODO: generell bei Klassenmethoden überlegen, ob ich die returns
         # brauche
 
@@ -90,17 +90,20 @@ class UserDB(User):
          completion rate (ein worst habit gibt es nur, wenn der Nutzer mindestens ein daily oder weekly habit hat)"""
         habits_with_data = ana.find_habits_with_data(self.return_habit_list())
         lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
-        self.worst_habit = worst_habit
+        self.worst_habit = ", ".join(worst_habit)
         return lowest_completion_rate
 
     def analyze_habits(self):
         # TODO: möglicherweise hier die Daten aller Habits nebeneinander packen zum Vergleich
         # TODO: möglicherweise die Liste der Habits noch aufhübschen
         # TODO: hier am besten noch anbieten, nur Habits eines bestimmten Typs zu analysieren
-        analysis = ["Habit(s) with the longest streak: ", "longest streak: ",
-                    "Habit(s) with the lowest completion rate during the last four weeks: ", "lowest completion rate: "]
+        analysis = ["Habit(s) with the longest streak: ", "longest streak of all habits: ",
+                    "Habit(s) with the lowest completion rate during the last four weeks: ",
+                    "lowest completion rate of all habits: "]
         longest_streak = self.determine_best_habit()
         lowest_completion_rate = self.determine_worst_habit()
         data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]
         analysis_df = ana.list_to_df(analysis, data)
-        return analysis_df.to_string(index=False)
+        habit_list = self.return_habit_list()
+        habit_comparison = ana.detailed_analysis_of_all_habits(habit_list)
+        return  habit_comparison, analysis_df.to_string(index=False)
