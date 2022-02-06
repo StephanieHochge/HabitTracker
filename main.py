@@ -252,6 +252,7 @@ def cli():
     #  Neustart die ursprünglichen Daten wieder enthalten sind?
     # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
     # TODO: Handle Python KeyboardInterrupt
+    # Test
 
     # Program Flow
     current_user = start(main_database)
