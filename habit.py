@@ -99,7 +99,6 @@ class HabitDB(Habit):
     def __str__(self):
         return f"{self.name} with {self.periodicity} periodicity from {self.user} saved in {self.database}"
 
-    # TODO: def __str__(self) Funktion noch in die Habit-Klasse einbauen
 
     # die übrigen Methoden
     def store_habit(self, creation_time=None):

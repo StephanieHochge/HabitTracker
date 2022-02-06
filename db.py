@@ -3,7 +3,6 @@ from sqlite3 import Error
 from datetime import datetime
 
 
-# TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
 def get_db(name):
     try:
         database = sqlite3.connect(name)
@@ -30,7 +29,7 @@ def create_tables(database):
 
     cursor.execute(habit_table)
 
-    # create Period table # TODO: Tabelle noch umbenennen
+    # create Completions table
     completions_table = """CREATE TABLE IF NOT EXISTS Completions
     (PKCompletionsID INTEGER PRIMARY KEY, FKHabitID INTEGER, CompletionDate TEXT, CompletionTime TEXT, 
     FOREIGN KEY(FKHabitID) REFERENCES Habit(PKHabitID) ON DELETE CASCADE ON UPDATE CASCADE)"""
@@ -46,7 +45,6 @@ def add_user(user):
     cursor = db.cursor()
     cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user.username])
     db.commit()
-    # TODO: Sicherstellen, dass UserName nicht bereits existiert (möglicherweise mit sqlite3.IntegrityError?)
 
 
 def find_user_id(user):
@@ -66,7 +64,6 @@ def add_habit(habit, creation_time=None):
     cursor.execute("INSERT INTO Habit(FKUserID, Name, Periodicity, CreationTime) VALUES (?, ?, ?, ?)",
                    (user_id, habit.name, habit.periodicity, creation_time))
     db.commit()
-    # TODO: Sicherstellen, dass User nicht schon ein Habit mit demselben Namen hat
 
 
 def find_habit_id(habit):

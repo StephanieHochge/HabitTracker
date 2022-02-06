@@ -16,7 +16,6 @@ def create_data_frame(database, table):
     :return: dataframe from the table
     """
     habit_columns = ["PKHabitID", "FKUserID", "Name", "Periodicity", "CreationTime"]
-    # TODO: Überprüfen: Gibt es eine bessere Möglichkeit, die Table Header zu übergeben?
     user_columns = ["PKUserID", "UserName"]
     completions_columns = ["CompletionsID", "FKHabitID", "CompletionDate", "CompletionTime"]
     column_names = {"Habit": habit_columns, "HabitAppUser": user_columns, "Completions": completions_columns}

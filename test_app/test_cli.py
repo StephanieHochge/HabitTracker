@@ -116,8 +116,7 @@ class TestCli(test_data.DataForTestingPytest):
         assert main.determine_possible_actions(self.user_le) == actions["no habits"]
         assert main.determine_possible_actions(self.user_hp) == actions["habit without data"]
 
-    # TODO: test user input (see main.py)
-    ## Tests der CLI
+    # TODO: überprüfen, ob alle wichtigen Funktionen getestet wurden
     # Creating a new user:
     # test that it is not possible to store an empty value as user name
     # test that it is not possible to store a user name containing a space
