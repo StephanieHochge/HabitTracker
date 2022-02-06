@@ -8,7 +8,7 @@ from user import UserDB
 import analyze as ana
 
 
-class TestCli(test_data.TestDataPytest):
+class TestCli(test_data.DataForTestingPytest):
 
     @patch('main.input_username', return_value="Fritz")
     def test_create_new_user(self, mock_input):
@@ -24,9 +24,13 @@ class TestCli(test_data.TestDataPytest):
         """tests that entering an unknown username leads to a failed login"""
         with patch('main.input_username', return_value="UnknownUser"):
             main.login(self.database)
-            assert mock_stdout.getvalue() == "This user does not exist. Please enter a username that does.\nThis user " \
-                                             "does not exist. Please enter a username that does.\nThis user does not " \
-                                             "exist. Please enter a username that does.\nLogin failed three times.\n"
+            assert mock_stdout.getvalue() == "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
+                                             "\x1b[0;0;41mPlease try again.\x1b[0m\n" \
+                                             "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
+                                             "\x1b[0;0;41mPlease try again.\x1b[0m\n" \
+                                             "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
+                                             "\x1b[0;0;41mLogin failed three times. Do you perhaps want to perform " \
+                                             "another action?\x1b[0m\n"
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_success(self, mock_stdout):
@@ -89,16 +93,15 @@ class TestCli(test_data.TestDataPytest):
         assert ana.return_habit_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Dance")
-    @patch('main.check_now', return_value=True)
+    @patch('main.input_past_check_date', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
         main.check_off_habit(self.user_sh)
         self.dance_sh.find_last_check()
         assert self.dance_sh.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Brush teeth")
-    @patch('main.check_now', return_value=False)
     @patch('main.input_past_check_date', return_value="yesterday")
-    def test_check_off_habit_past(self, mock_check_date, mock_past, mock_habit):
+    def test_check_off_habit_past(self, mock_check_date, mock_habit):
         main.check_off_habit(self.user_sh)
         self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
@@ -112,8 +115,6 @@ class TestCli(test_data.TestDataPytest):
         assert main.determine_possible_actions(self.user_sh) == actions["habit with data"]
         assert main.determine_possible_actions(self.user_le) == actions["no habits"]
         assert main.determine_possible_actions(self.user_hp) == actions["habit without data"]
-
-    # TODO: aus irgendeinem Grund wird, wenn man das Skript ausführt die main.db erstellt
 
     # TODO: test user input (see main.py)
     ## Tests der CLI

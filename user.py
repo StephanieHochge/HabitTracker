@@ -21,7 +21,7 @@ class User:
 
 class UserDB(User):
 
-    def __init__(self, username, database=db.get_db()):
+    def __init__(self, username, database):
         User.__init__(self, username)
         self._best_habit = None
         self._worst_habit = None
@@ -95,9 +95,9 @@ class UserDB(User):
 
     def analyze_habits(self):
         # TODO: hier am besten noch anbieten, nur Habits einer bestimmten Periodizität zu analysieren
-        analysis = ["Habit(s) with the longest streak: ", "longest streak of all habits: ",
-                    "Habit(s) with the lowest completion rate during the last four weeks: ",
-                    "lowest completion rate of all habits: "]
+        analysis = ["Habit(s) with the longest streak: ", "longest streak of all: ",
+                    "Habit(s) with the lowest completion rate (last 4 weeks): ",
+                    "lowest completion rate of all: "]
         longest_streak = self.determine_best_habit()
         lowest_completion_rate = self.determine_worst_habit()
         data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]

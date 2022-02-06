@@ -6,7 +6,7 @@ from user import UserDB
 from datetime import date, timedelta, datetime
 
 
-class TestData:
+class DataForTesting:
 
     def create_users(self, database):
         self.user_sh = UserDB("StephanieHochge", database)
@@ -132,7 +132,7 @@ class TestData:
         self.store_habit_completions()
 
 
-class TestDataPytest(TestData):
+class DataForTestingPytest(DataForTesting):
     def setup_method(self):
         self.database = db.get_db("test.db")
         self.create_test_data(self.database)
@@ -141,7 +141,7 @@ class TestDataPytest(TestData):
         os.remove("test.db")  # löscht die Datenbank
 
 
-class DataCli(TestData):
+class DataForTestingCLI(DataForTesting):
     def __init__(self, database):
         self.database = db.get_db(database)
         self.create_test_data(self.database)

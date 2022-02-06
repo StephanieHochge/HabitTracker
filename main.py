@@ -14,7 +14,6 @@ import os
 
 
 # Auslagern der Input-Befehle in eigene Funktionen zum einfachen Testen des Inputs
-# TODO: vielleicht macht es Sinn, die main.db als Default-Datenbank zu verwenden? Dann muss man sie nicht mehr übergeben
 def input_username(database, action):
     text = "Please choose a username: " if action == "create" else "Please enter your username: "
     username = qu.text(text, validate=UserNameValidator(database, action)).ask()
@@ -247,12 +246,8 @@ def determine_possible_actions(user):  # tested
 def cli():
     main_database = get_db()  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
     if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
-        test_data.DataCli("main.db")
-    # TODO: wäre es vielleicht nicht doch besser, auf eine separate Testdatenbank zurückzugreifen, wo bei jedem
-    #  Neustart die ursprünglichen Daten wieder enthalten sind?
-    # TODO: Generelle Information: Wie bekomme ich Hilfe? Wie beende ich das Programm?
+        test_data.DataForTestingCLI("main.db")
     # TODO: Handle Python KeyboardInterrupt
-    # Test
 
     # Program Flow
     current_user = start(main_database)
@@ -277,8 +272,6 @@ def cli():
             print("See you later, Bye!")
             break
 
-    #  TODO: Help-Funktion implementieren und damit Streak, Break und sowas erklären?
-    #   (geht möglicherweise bei der Enter Frage, indem man help eingibt)
 
 
 if __name__ == "__main__":

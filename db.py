@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 # TODO: Entscheidung: Ist es erlaubt, Max's Datenbank-Code zu verwenden?
-def get_db(name="main.db"):
+def get_db(name):
     try:
         database = sqlite3.connect(name)
     except Error as e:

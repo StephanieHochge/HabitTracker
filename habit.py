@@ -38,7 +38,7 @@ class Habit:
 
 class HabitDB(Habit):
 
-    def __init__(self, name, periodicity, user, database=db.get_db()):
+    def __init__(self, name, periodicity, user, database):
         Habit.__init__(self, name, periodicity, user)
         self._current_streak = 0
         self._best_streak = 0

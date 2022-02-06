@@ -7,7 +7,7 @@ import test_data
 from user import UserDB
 
 
-class TestHabitAnalysis(test_data.TestDataPytest):
+class TestHabitAnalysis(test_data.DataForTestingPytest):
 
     def test_create_data_frame(self):
         """

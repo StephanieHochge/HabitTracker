@@ -2,7 +2,7 @@ import db
 import test_data
 
 
-class TestDB(test_data.TestDataPytest):
+class TestDB(test_data.DataForTestingPytest):
 
     def test_user_table_db(self):
         """

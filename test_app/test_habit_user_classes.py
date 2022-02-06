@@ -7,13 +7,13 @@ from datetime import date, datetime, timedelta
 import pytest
 
 
-class TestHabitUser(test_data.TestDataPytest):
+class TestHabitUser(test_data.DataForTestingPytest):
 
     def test_habit(self):
         """
         tests whether a habit object is correctly created
         """
-        habit = HabitDB("Brush teeth", "weekly", "StephanieHochge")
+        habit = HabitDB("Brush teeth", "weekly", "StephanieHochge", self.database)
         assert habit.name == "Brush teeth"
         assert habit.periodicity == "weekly"
         assert habit.user == "StephanieHochge"
@@ -24,7 +24,7 @@ class TestHabitUser(test_data.TestDataPytest):
         """
         tests whether a user object is correctly created
         """
-        user = UserDB("StephanieHochge")
+        user = UserDB("StephanieHochge", self.database)
         assert user.username == "StephanieHochge"
 
     def test_habitDB(self):
