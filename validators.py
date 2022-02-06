@@ -20,13 +20,13 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
             )
         elif re.search("[ &@!]", document.text) is not None:  # darf keine Sonder- oder Leerzeichen enthalten
             raise ValidationError(
-                message="User name must not contain spaces or '&', '@', or '!'",
+                message="Username must not contain spaces or '&', '@', or '!'",
                 cursor_position=len(document.text),
             )
         elif user_existing and self.action_type == "create":  # User Name schon in der Datenbank vorhanden?
             # ist aber nur relevant, wenn man einen neuen User anlegt
             raise ValidationError(
-                message="User name already existing. Please choose another one.",
+                message="Username already existing. Please choose another one.",
                 cursor_position=len(document.text),
             )
 

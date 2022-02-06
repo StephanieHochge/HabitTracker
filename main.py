@@ -8,6 +8,7 @@ from validators import HabitNameValidator, UserNameValidator
 from exceptions import UserNameNotExisting, UserHasNoHabits
 import test_data
 import datetime
+from unittest.mock import patch
 import time
 import os
 
@@ -27,7 +28,7 @@ def input_new_habit(user):
 
 
 def input_periodicity(habit_name):
-    periodicity = qu.select(f"Which periodicity shall {habit_name} have?",
+    periodicity = qu.select(f"Which periodicity shall \"{habit_name}\" have?",
                             choices=["daily", "weekly", "monthly", "yearly"]).ask()
     return periodicity
 
@@ -66,16 +67,20 @@ def login(database):
     count = 0
     while not username_existing:
         if count == 3:  # wenn man drei Mal den Nutzernamen falsch eingegeben hat, wird das Programm unterbrochen
-            print("Login failed three times.")
+            print("\x1b[0;0;41m" +
+                  "Login failed three times. Do you perhaps want to perform another action?"
+                  + "\x1b[0m")  # mit roter Hintergrundfarbe
             return False
         try:
             username = input_username(database, "login")
             user = UserDB(username, database)
             if not an.check_for_user(user):
                 raise UserNameNotExisting(user.username)
-        except UserNameNotExisting:
-            print("This user does not exist. Please enter a username that does.")
+        except UserNameNotExisting as e:
+            print("\x1b[0;0;41m" + str(e) + "\x1b[0m")  # mit roter Hintergrundfarbe
             count += 1
+            if count < 3:
+                print("\x1b[0;0;41m" + "Please try again." + "\x1b[0m")
         else:
             print(f"Logged in as {username}")
             username_existing = True
@@ -85,7 +90,7 @@ def login(database):
 def start(database):
     start_action = qu.select(
         "What do you want to do?",
-        choices=["Create new user", "Login", "Exit"]
+        choices=["Login", "Create new user", "Exit"]
     ).ask()
     if start_action == "Create new user":
         current_user = create_new_user(database)
@@ -144,47 +149,51 @@ def return_past_days(no_days):
     return str(datetime.date.today() - datetime.timedelta(days=no_days))
 
 
-def check_now():
-    return qu.confirm("Did you complete your habit just now?", default=True).ask()
-
-
 def input_past_check_date():
     # es werden nur die letzten Tage zur Auswahl angeboten
     return qu.select("When did you complete your habit?",
-                     choices=[f"today", f"yesterday", return_past_days(2), return_past_days(3),
+                     choices=[f"just now", f"earlier today", f"yesterday", return_past_days(2), return_past_days(3),
                               return_past_days(4), return_past_days(5)]).ask()
 
 
 def check_off_habit(user):
     habit = identify_habit("check off", user)
-    if check_now():
-        habit.check_off_habit()
-        print("Habit successfully completed (today).")
+    check_day = input_past_check_date()
+    if check_day == "just now":
+        check_date = None
+    elif check_day == "earlier today":
+        now = datetime.datetime.now()
+        check_time = str(f"{now.hour-2}:00:00") if now.hour > 2 else str(f"01:00:00")  # wenn man es heute früher
+        # irgendwann durchgeführt hat, werden zwei Stunden von der aktuellen Zeit abgezogen, es sei denn,
+        # es wurde vor 3 Uhr heute Morgen durchgeführt
+        today = datetime.date.today()
+        check_date = (" ".join([str(today), check_time]))
     else:
-        check_day = input_past_check_date()
-        if check_day == "today":
-            manual_date = datetime.date.today()
-        elif check_day == "yesterday":
+        if check_day == "yesterday":
             manual_date = return_past_days(1)
         else:
             manual_date = check_day
         check_date = (" ".join([str(manual_date), "12:00:00"]))  # es wird einfach die Mittagszeit genommen
-        habit.check_off_habit(check_date)
-        print(f"Habit successfully completed ({check_day}).")
+    habit.check_off_habit(check_date)
+    print(f"Habit successfully completed ({check_day}).")
 
 
 def analyze_habits(user):
     # Funktion brauche ich meiner Meinung nach nicht zu testen
-    type_of_analysis = qu.select("Do you want to analyse all habits or just one?",
-                                 choices=["All habits", "Just one"]).ask()
-    if type_of_analysis == "All habits":
+    tracked_habits = an.habit_creator(user)
+    habits_with_data = an.find_habits_with_data(tracked_habits)
+    habit_names = [habit.name for habit in habits_with_data]
+    habit_name = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
+    # TODO: den Code mit identify_habit in eine Funktion packen, weil der sehr ähnlich ist
+    if habit_name == "All habits":
         habit_comparison, analysis = user.analyze_habits()
         print("Summary statistics:")
         print(analysis)
         print("\nA detailed comparison of all habits:")
         print(habit_comparison)
-    else:  # type_of_analysis == "Just one"
-        habit = identify_habit("analyze", user)
+    else:
+        habit_periodicity = an.return_habit_periodicity(user, habit_name)
+        habit = HabitDB(habit_name, habit_periodicity, user, user.database)
         data = habit.analyze_habit()
         print(an.analysis_one_habit(data, habit.name))
 
@@ -211,8 +220,8 @@ def manage_habits(user):
 def inspect_habits(user):
     user_periodicities = an.return_ordered_periodicites(user)
     periodicity = qu.select("Which habits do you want to look at?",
-                            choices=["All habits"] + [(x + " habits only") for x in user_periodicities]).ask()
-    if periodicity == "All habits":
+                            choices=["all habits"] + [(x + " habits only") for x in user_periodicities]).ask()
+    if periodicity == "all habits":
         print(user.return_habit_information())
     else:
         print(user.return_habits_of_type(periodicity.replace(" habits only", "")))
@@ -273,3 +282,6 @@ def cli():
 
 if __name__ == "__main__":
     cli()
+
+# TODO: immer wenn möglich das Attribut find habits beim User verwenden (das einmal in der CLI-Funktion initialisieren)
+# TODO: möglicherweise noch ein Attribut zum User hinzufügen, das habit mit data anzeigt

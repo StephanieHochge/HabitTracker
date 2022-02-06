@@ -247,3 +247,4 @@ class TestHabitAnalysis(test_data.TestDataPytest):
         # test if this works for habits, for which only one completion was added
 
 # TODO: bei jeder Funktion überprüfen, ob die auch geht, wenn das Habit noch keine Daten hat
+# TODO: überprüfen, ob die Streakberechnung auch funktioniert, wenn man das Habit mehrmals pro Tag abgeschlossen hat

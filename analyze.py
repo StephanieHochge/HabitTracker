@@ -474,7 +474,7 @@ def find_habits_with_data(habit_list):
 
 def analysis_index():
     return ["periodicity: ", "last completion: ", "longest streak: ", "current streak: ",
-             "breaks total: ", "completion rate (last 4 weeks): "]
+            "total breaks: ", "completion rate (last 4 weeks): "]
 
 
 def detailed_analysis_of_all_habits(habit_list):

@@ -94,9 +94,7 @@ class UserDB(User):
         return lowest_completion_rate
 
     def analyze_habits(self):
-        # TODO: möglicherweise hier die Daten aller Habits nebeneinander packen zum Vergleich
-        # TODO: möglicherweise die Liste der Habits noch aufhübschen
-        # TODO: hier am besten noch anbieten, nur Habits eines bestimmten Typs zu analysieren
+        # TODO: hier am besten noch anbieten, nur Habits einer bestimmten Periodizität zu analysieren
         analysis = ["Habit(s) with the longest streak: ", "longest streak of all habits: ",
                     "Habit(s) with the lowest completion rate during the last four weeks: ",
                     "lowest completion rate of all habits: "]
