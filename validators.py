@@ -11,7 +11,7 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
         self.action_type = action_type
 
     def validate(self, document):
-        user = UserDB(document.text)
+        user = UserDB(document.text, self.database)
         user_existing = an.check_for_user(user)
         if len(document.text) == 0:  # mindestens ein Zeichen muss eingegeben werden
             raise ValidationError(
@@ -38,7 +38,7 @@ class HabitNameValidator(Validator):
         self.user = user
 
     def validate(self, document):
-        habits_of_user = an.return_habits_only(self.user)
+        habits_of_user = an.return_habit_names(self.user)
         if len(document.text.strip()) == 0:  # Habit enthält kein Zeichen oder nur Leerzeichen
             raise ValidationError(
                 message="Please enter at least one character that is not a space.",  # error message that is displayed

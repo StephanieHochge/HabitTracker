@@ -13,100 +13,168 @@ import time
 import os
 
 
-# Auslagern der Input-Befehle in eigene Funktionen zum einfachen Testen des Inputs
+# Some input commands are outsourced to facilitate testing of the cli
 def input_username(database, action):
+    """ask the user to input either a new (creating a new user) or an already existing username.
+
+    :param database: the database, in which user data shall be/is already stored (type: sqlite3 connection)
+    :param action: the action, the user wants to undergo (either "create new user" or "loing") (type: str)
+    :return: the new/already existing username
+    """
     text = "Please choose a username: " if action == "create" else "Please enter your username: "
     username = qu.text(text, validate=UserNameValidator(database, action)).ask()
     return username
 
 
 def input_new_habit(user):
+    """ask the user to specify a new habit (name and periodicity).
+
+    :param user: the user who wants to create a new habit (type: user.Userdb object)
+    :return: a tuple containg the name and the periodicity of the new habit (type: tuple)
+    """
     habit_name = qu.text("Which habit do you want to create?", validate=HabitNameValidator(user)).ask()
-    periodicity = input_periodicity(habit_name.strip())  # strip, um leading und ending spaces zu deleten
+    periodicity = input_periodicity(habit_name.strip())  # strip: to delete leading und ending spaces
     return habit_name.strip(), periodicity
 
 
 def input_periodicity(habit_name):
+    """ask the user to specify the periodicity of a habit.
+
+    :param habit_name: the name of the habit (type: str)
+    :return: the selected periodicity (type: str)
+    """
     periodicity = qu.select(f"Which periodicity shall \"{habit_name}\" have?",
                             choices=["daily", "weekly", "monthly", "yearly"]).ask()
     return periodicity
 
 
 def input_new_habit_name(user):
+    """ask the user to input a new name.
+
+    :param user: the user who wants to modify the habit name (type: user.UserDB object)
+    :return: the new name (type: str)
+    """
     new_name = qu.text("Please enter a new name: ", validate=HabitNameValidator(user)).ask()
     return new_name
 
 
 def input_habit_modify_target():
+    """ask the user to input what part of the habit he wants to modify.
+
+    :return: the modification target (type: str)
+    """
     target = qu.select("What part of the habit do you want to modify?", choices=["name", "periodicity", "both"]).ask()
     return target
 
 
 def input_chosen_habit(habit_action, tracked_habits):
+    """ask the user to select a habit from the list of tracked habits.
+
+    :param habit_action: the action the user wants to perform with the habit, e.g. delete or check off,  (type: str)
+    :param tracked_habits: a list of the users tracked habits (type: str)
+    :return: the habit name the user chose (type: str)
+    """
     habit_name = qu.select(f"Which habit do you want to {habit_action}?", choices=tracked_habits).ask()
     return habit_name
 
 
 def confirm_delete(habit_name):
+    """ask the user for confirmation to perform the deletion of a habit and all its data.
+
+    :param habit_name: the name of the habit to be deleted (type: str)
+    :return: True if the user confirms the deletion, False if not (type: bool)
+    """
     return qu.confirm(f"Are you sure that you want to delete \"{habit_name}\" and all corresponding data?",
                       default=False).ask()
 
 
-# Programmlogik
+def return_past_days(no_days):
+    """return the date of the day that is no_days away from the current date.
+
+    :param no_days: the number of days to be substracted from the current date (type: int)
+    :return: the date of the day that is no_days
+    """
+    return str(datetime.date.today() - datetime.timedelta(days=no_days))
+
+
+def input_check_date():
+    """ask the user to specify the checkoff date and time by selecting one of the options presented.
+
+    :return: the selected checkoff date (type: str)
+    """
+    return qu.select("When did you complete your habit?",
+                     choices=[f"just now", f"earlier today", f"yesterday", return_past_days(2), return_past_days(3),
+                              return_past_days(4), return_past_days(5)]).ask()
+
+
+# Functions to perform the main functionalities of the habit tracker
 def create_new_user(database):
+    """create a new user based on user input data and store the user in the specified sqlite3 database connection.
+
+    :param database: the database in which the user is to be stored (type: sqlite3 connection)
+    :return: the newly created and stored user (type: user.UserDB object)
+    """
     username = input_username(database, "create")
-    app_user = UserDB(username, database)
-    app_user.store_user()
+    new_user = UserDB(username, database)
+    new_user.store_user()
     print(f"A user with the username {username} has successfully been created. Logged in as {username}.")
-    return app_user
+    return new_user
 
 
 def login(database):
-    username_existing = False
+    """ask for a username and check whether the username exists in the database. If it does, return the corresponding
+    user. It the login fails three times, return to the start menu.
+
+    :param database: The database, in which the user is stored (type: sqlite3 connection)
+    :return: The user (type: user.UserDB object) if the username exists in the database, else False.
+    """
     count = 0
-    while not username_existing:
-        if count == 3:  # wenn man drei Mal den Nutzernamen falsch eingegeben hat, wird das Programm unterbrochen
+    while True:
+        if count == 3:  # after entering an incorrect username thrice, return to the start menu
             print("\x1b[0;0;41m" +
                   "Login failed three times. Do you perhaps want to perform another action?"
-                  + "\x1b[0m")  # mit roter Hintergrundfarbe
+                  + "\x1b[0m")  # add red highlight to the text
             return False
         try:
             username = input_username(database, "login")
             user = UserDB(username, database)
-            if not an.check_for_user(user):
+            if not an.check_for_user(user):  # check if a user with the entered name exists in the database
                 raise UserNameNotExisting(user.username)
         except UserNameNotExisting as e:
-            print("\x1b[0;0;41m" + str(e) + "\x1b[0m")  # mit roter Hintergrundfarbe
+            print("\x1b[0;0;41m" + str(e) + "\x1b[0m")
             count += 1
             if count < 3:
                 print("\x1b[0;0;41m" + "Please try again." + "\x1b[0m")
         else:
             print(f"Logged in as {username}")
-            username_existing = True
             return user
 
 
 def start(database):
-    start_action = qu.select(
-        "What do you want to do?",
-        choices=["Login", "Create new user", "Exit"]
-    ).ask()
-    if start_action == "Create new user":
-        current_user = create_new_user(database)
-    elif start_action == "Login":
-        current_user = login(database)
-    else:
-        print("See you later, Bye!")
+    """Ask the user what he wants to do. Depending on his choice, either let the user log in to the app, create a new
+    user, or quit the application.
+
+    :param database: The database, in which the users are to be stored (type: sqlite3 connection)
+    :return: the current user (type: user.UserDB instance), if the user logged in successfully or successfully
+    created a new user
+    """
+    start_action = qu.select("What do you want to do?",
+                             choices=["Login", "Create new user", "Exit"]).ask()
+    if start_action == "Exit":
+        print("See you later, Alligator!")
         quit()
-    if current_user:  # ist nur None, wenn man nicht "Exit" gewählt hat und drei mal einen falschen Nutzernamen
-        # eingegeben hat, dann wird nochmal die einleitende Frage gestellt
-        # wenn man den Nutzernamen vergessen hat, hat man Pech
-        return current_user
     else:
-        start(database)
+        current_user = login(database) if start_action == "Login" else create_new_user(database)
+        return current_user if current_user else start(database)  # if the login was unsuccessful, the introductory
+        # question is asked again and the user has the ability to choose a different action
 
 
 def create_habit(user):
+    """create a new habit by asking the user for a (valid) habit name and a periodicity.
+
+    :param user: the user who wants to create a new habit (type: user.UserDB)
+    :return: the newly created habit (type: habit.HabitDB instance)
+    """
     habit_name, periodicity = input_new_habit(user)
     habit = HabitDB(habit_name, periodicity, user, user.database)
     habit.store_habit()
@@ -115,7 +183,7 @@ def create_habit(user):
 
 
 def identify_habit(habit_action, user):
-    tracked_habits = an.return_habits_only(user)
+    tracked_habits = an.return_habit_names(user)
     habit_name = input_chosen_habit(habit_action, tracked_habits)
     habit_periodicity = an.return_habit_periodicity(user, habit_name)
     habit = HabitDB(habit_name, habit_periodicity, user, user.database)
@@ -144,20 +212,9 @@ def modify_habit(user):
             print(f"The habit's periodicity was successfully changed to {new_periodicity}.")
 
 
-def return_past_days(no_days):
-    return str(datetime.date.today() - datetime.timedelta(days=no_days))
-
-
-def input_past_check_date():
-    # es werden nur die letzten Tage zur Auswahl angeboten
-    return qu.select("When did you complete your habit?",
-                     choices=[f"just now", f"earlier today", f"yesterday", return_past_days(2), return_past_days(3),
-                              return_past_days(4), return_past_days(5)]).ask()
-
-
 def check_off_habit(user):
     habit = identify_habit("check off", user)
-    check_day = input_past_check_date()
+    check_day = input_check_date()
     if check_day == "just now":
         check_date = None
     elif check_day == "earlier today":
@@ -232,7 +289,7 @@ def determine_possible_actions(user):  # tested
         "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
         "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
     }  # um Fehler zu vermeiden, stehen User nur die Handlungen zur Verfügung, die sie ausführen können
-    habits = an.return_habits_only(user)
+    habits = an.return_habit_names(user)
     habit_data_existing = an.check_any_habit_data(user)
     if len(habits) == 0:
         category = "no habits"
@@ -244,7 +301,7 @@ def determine_possible_actions(user):  # tested
 
 
 def cli():
-    main_database = get_db()  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
+    main_database = get_db("main.db")  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
     if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
         test_data.DataForTestingCLI("main.db")
     # TODO: Handle Python KeyboardInterrupt
@@ -279,3 +336,4 @@ if __name__ == "__main__":
 
 # TODO: immer wenn möglich das Attribut find habits beim User verwenden (das einmal in der CLI-Funktion initialisieren)
 # TODO: möglicherweise noch ein Attribut zum User hinzufügen, das habit mit data anzeigt
+# TODO: add docstrings to all modules and __init__ constructors

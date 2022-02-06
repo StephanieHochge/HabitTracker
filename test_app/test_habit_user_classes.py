@@ -61,7 +61,7 @@ class TestHabitUser(test_data.DataForTestingPytest):
         assert self.dance_rb.periodicity == "daily"
         assert self.dance_rb.name == "Ballet"
         assert self.bathroom_sh.modify_habit(name="Flat") is True
-        assert "Flat" in ana.return_habits_only(self.user_sh)
+        assert "Flat" in ana.return_habit_names(self.user_sh)
 
     def test_analyze_habit(self):
         analysis_teeth = self.teeth_sh.analyze_habit()

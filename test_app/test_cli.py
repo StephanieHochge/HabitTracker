@@ -74,14 +74,14 @@ class TestCli(test_data.DataForTestingPytest):
         :return:
         """
         main.delete_habit(self.user_sh)
-        assert "Sleep" not in ana.return_habits_only(self.user_sh)
+        assert "Sleep" not in ana.return_habit_names(self.user_sh)
 
     @patch('main.input_habit_modify_target', return_value="name")
     @patch('main.input_new_habit_name', return_value="Clean flat")
     @patch('main.input_chosen_habit', return_value="Clean bathroom")
     def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
         main.modify_habit(self.user_sh)
-        assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
+        assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
 
     @patch('main.input_habit_modify_target', return_value="both")
     @patch('main.input_periodicity', return_value="monthly")
@@ -89,18 +89,18 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('main.input_chosen_habit', return_value="Clean bathroom")
     def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
         main.modify_habit(self.user_sh)
-        assert "Clean bathroom" not in ana.return_habits_only(self.user_sh)
+        assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
         assert ana.return_habit_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Dance")
-    @patch('main.input_past_check_date', return_value="just now")
+    @patch('main.input_check_date', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
         main.check_off_habit(self.user_sh)
         self.dance_sh.find_last_check()
         assert self.dance_sh.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Brush teeth")
-    @patch('main.input_past_check_date', return_value="yesterday")
+    @patch('main.input_check_date', return_value="yesterday")
     def test_check_off_habit_past(self, mock_check_date, mock_habit):
         main.check_off_habit(self.user_sh)
         self.teeth_sh.find_last_check()

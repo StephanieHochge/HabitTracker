@@ -25,7 +25,7 @@ class UserDB(User):
         User.__init__(self, username)
         self._best_habit = None
         self._worst_habit = None
-        self._habit_list = None
+        self._habits = None
         self._database = database
 
     # Getter- und Setter-Methoden
@@ -46,12 +46,12 @@ class UserDB(User):
         self._worst_habit = worst_habit
 
     @property
-    def habit_list(self):
-        return self._habit_list
+    def habits(self):
+        return self._habits
 
-    @habit_list.setter
-    def habit_list(self, habit_list):
-        self._habit_list = habit_list
+    @habits.setter
+    def habits(self, habits):
+        self._habits = habits
 
     @property
     def database(self):

@@ -109,7 +109,7 @@ def check_any_habit_data(user):
 
 
 # Return a list of all currently tracked habits of a user
-def return_habits_only(user):
+def return_habit_names(user):
     """
     :param user: the user
     :return: a list containing only the habits of the user
@@ -338,7 +338,7 @@ def habit_creator(user):
     :return: a list of habit objects (type: list of instances of the HabitDB class)
     """
     # TODO: Was passiert, wenn der User noch keine Habits angelegt hat?
-    habit_list = return_habits_only(user)
+    habit_list = return_habit_names(user)
     periodicities = return_user_habits(user)["Periodicity"].to_list()
     combined = list(zip(habit_list, periodicities))
     return list(map(lambda x: hb.HabitDB(x[0], x[1], user, user.database), combined))
