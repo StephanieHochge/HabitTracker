@@ -58,9 +58,9 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """
         tests whether user_habits of a specific type are correctly returned
         """
-        weekly_habits = ana.return_habits_of_type(self.user_sh, "weekly")
+        weekly_habits = ana.return_habit_info(self.user_sh, "weekly")
         assert len(weekly_habits) == 2
-        quaterly_habits = ana.return_habits_of_type(self.user_sh, "quarterly")
+        quaterly_habits = ana.return_habit_info(self.user_sh, "quarterly")
         assert len(quaterly_habits) == 0
 
     def test_return_habit_id(self):

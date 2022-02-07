@@ -136,16 +136,17 @@ def return_ordered_periodicites(user):
 
 
 # Filter for periodicity and return habits with said periodicity
-def return_habits_of_type(user, periodicity):
+def return_habit_info(user, periodicity=None):
     """
 
     :param user: the user (object)
     :param periodicity: the periodicity for which the user looks (str)
     :return: a pandas series with the names of the user's habits of the specified periodicity
     """
-    defined_habits = return_user_habits(user)
-    habits_of_type = defined_habits.loc[defined_habits["Periodicity"] == periodicity].reset_index()
-    return habits_of_type[["Name", "CreationTime"]]
+    habit_info = return_user_habits(user)
+    if periodicity:
+        habit_info = habit_info.loc[habit_info["Periodicity"] == periodicity].reset_index()
+    return habit_info[["Name", "Periodicity", "CreationTime"]]
 
 
 # change a list of dates as strings into a list of dates as datetime objects

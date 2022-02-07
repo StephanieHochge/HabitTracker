@@ -17,7 +17,6 @@ class TestCli(test_data.DataForTestingPytest):
         """
         new_user = main.create_new_user(self.database)
         assert new_user.username == "Fritz"
-        # TODO: muss ich hier auch die validators testen?
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_fail(self, mock_stdout):
@@ -38,11 +37,6 @@ class TestCli(test_data.DataForTestingPytest):
         with patch('main.input_username', return_value="StephanieHochge"):
             main.login(self.database)
             assert mock_stdout.getvalue() == "Logged in as StephanieHochge\n"
-
-    def test_start(self):
-        """test that recursion works (i.e., correctly creating a new user, correctly creating a new habit,
-        failing to login but then being asked to perform another action)"""
-        pass
 
     @patch('main.input_new_habit', return_value=("sleeping", "daily"))
     def test_create_habit(self, mock_input):
@@ -105,6 +99,7 @@ class TestCli(test_data.DataForTestingPytest):
         main.check_off_habit(self.user_sh)
         self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
+        # TODO: hier am besten auch die Uhrzeit testen, ob das auch funktioniert
 
     def test_determine_possible_actions(self):
         actions = {

@@ -14,6 +14,11 @@ import os
 
 
 # Some input commands are outsourced to facilitate testing of the cli
+def input_start_action():
+    """ask the user what s/he wants to do after starting the app"""
+    return qu.select("What do you want to do?", choices=["Login", "Create new user", "Exit"]).ask()
+
+
 def input_username(database, action):
     """ask the user to input either a new (creating a new user) or an already existing username.
 
@@ -158,15 +163,15 @@ def start(database):
     :return: the current user (type: user.UserDB instance), if the user logged in successfully or successfully
     created a new user
     """
-    start_action = qu.select("What do you want to do?",
-                             choices=["Login", "Create new user", "Exit"]).ask()
+    start_action = input_start_action()
     if start_action == "Exit":
-        print("See you later, Alligator!")
+        print("See you later, Bye!")
         quit()
     else:
         current_user = login(database) if start_action == "Login" else create_new_user(database)
         return current_user if current_user else start(database)  # if the login was unsuccessful, the introductory
         # question is asked again and the user has the ability to choose a different action
+    # TODO: @Chris: diese Funktion hab ich jetzt nicht getestet (ich wüsste nicht wie), ist das in Ordnung?
 
 
 def create_habit(user):
@@ -183,6 +188,12 @@ def create_habit(user):
 
 
 def identify_habit(habit_action, user):
+    """present a list of all habits the user defined and let the user choose one of these habits.
+
+    :param habit_action: the action which is to be done with the habit (e.g., "delete", †ype: str)
+    :param user: the user whose habits are displayed (type: user.UserDB)
+    :return: the habit which the user chose (type: habit.HabitDB)
+    """
     tracked_habits = an.return_habit_names(user)
     habit_name = input_chosen_habit(habit_action, tracked_habits)
     habit_periodicity = an.return_habit_periodicity(user, habit_name)
@@ -191,78 +202,88 @@ def identify_habit(habit_action, user):
 
 
 def delete_habit(user):
+    """ask which habit the user wants to delete, ask for confirmation and then delete the habit and its corresponding
+     data if the user confirms that the habit should be deleted.
+
+    :param user: the user who wants to delete a habit and its corresponding data (type: user.UserDB)
+    """
     habit = identify_habit("delete", user)
     if confirm_delete(habit.name):
-        if habit.delete_habit():
-            print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" was successfully deleted.")
+        habit.delete_habit()
+        print(f"The habit \"{habit.name}\" with the periodicity \"{habit.periodicity}\" was successfully deleted.")
 
 
 def modify_habit(user):
+    """ask which habit the user wants to modify and for the modification target (name, periodicity, or both), then
+    let the user modify the target and save the modification in the database.
+
+    :param user: the user who wants to modify a habit (type: user.UserDB)
+    """
     habit = identify_habit("modify", user)
     target = input_habit_modify_target()
     if target in ("name", "both"):
         print(f"The habit's old name is {habit.name}.")
         new_name = input_new_habit_name(user)
-        if habit.modify_habit(name=new_name):
-            print(f"The habit's name was successfully changed to {new_name}.")
+        habit.modify_habit(name=new_name)
+        print(f"The habit's name was successfully changed to {new_name}.")
     if target in ("periodicity", "both"):
         print(f"The habit's old periodicity is {habit.periodicity}.")
         new_periodicity = input_periodicity(habit.name)
-        if habit.modify_habit(periodicity=new_periodicity):
-            print(f"The habit's periodicity was successfully changed to {new_periodicity}.")
+        habit.modify_habit(periodicity=new_periodicity)
+        print(f"The habit's periodicity was successfully changed to {new_periodicity}.")
+        # TODO: @Chris: sehr schlimm, dass die beiden if-Teile so gleich sind?
 
 
 def check_off_habit(user):
+    """ask which habit the user wants to check off, then ask for the check date and store a completion for the
+    selected habit and the selected check date.
+
+    :param user: the user who wants to check off the habit (type: user.UserDB)
+    """
     habit = identify_habit("check off", user)
     check_day = input_check_date()
     if check_day == "just now":
         check_date = None
     elif check_day == "earlier today":
         now = datetime.datetime.now()
-        check_time = str(f"{now.hour-2}:00:00") if now.hour > 2 else str(f"01:00:00")  # wenn man es heute früher
-        # irgendwann durchgeführt hat, werden zwei Stunden von der aktuellen Zeit abgezogen, es sei denn,
-        # es wurde vor 3 Uhr heute Morgen durchgeführt
-        today = datetime.date.today()
-        check_date = (" ".join([str(today), check_time]))
+        check_time = str(f"{now.hour - 2}:00:00") if now.hour > 2 else str(f"01:00:00")  # two hours are subtracted
+        # unless the habit was completed before 3 am
+        check_date = (" ".join([str(now.date()), check_time]))
     else:
-        if check_day == "yesterday":
-            manual_date = return_past_days(1)
-        else:
-            manual_date = check_day
-        check_date = (" ".join([str(manual_date), "12:00:00"]))  # es wird einfach die Mittagszeit genommen
+        manual_date = return_past_days(1) if check_day == "yesterday" else check_day
+        check_date = (" ".join([str(manual_date), "12:00:00"]))  # 12 pm is chosen as time
     habit.check_off_habit(check_date)
     print(f"Habit successfully completed ({check_day}).")
 
 
 def analyze_habits(user):
-    # Funktion brauche ich meiner Meinung nach nicht zu testen
+    """ask the user which habit s/he wants to analyse or if s/he wants to analyze all habits and then display
+    the requested analysis.
+
+    :param user: the user who wants to analyze habit(s) (type: user.UserDB)
+    """
     tracked_habits = an.habit_creator(user)
-    habits_with_data = an.find_habits_with_data(tracked_habits)
+    habits_with_data = an.find_habits_with_data(tracked_habits)  # only habits with data can be analyzed
     habit_names = [habit.name for habit in habits_with_data]
-    habit_name = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
-    # TODO: den Code mit identify_habit in eine Funktion packen, weil der sehr ähnlich ist
-    if habit_name == "All habits":
+    habit_to_analyze = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
+    if habit_to_analyze == "All habits":
         habit_comparison, analysis = user.analyze_habits()
-        print("Summary statistics:")
-        print(analysis)
-        print("\nA detailed comparison of all habits:")
-        print(habit_comparison)
+        print(f"""Summary statistics:
+        {analysis}
+        A detailed comparison of all habits:
+        {habit_comparison}""")
     else:
-        habit_periodicity = an.return_habit_periodicity(user, habit_name)
-        habit = HabitDB(habit_name, habit_periodicity, user, user.database)
+        habit_periodicity = an.return_habit_periodicity(user, habit_to_analyze)
+        habit = HabitDB(habit_to_analyze, habit_periodicity, user, user.database)
         data = habit.analyze_habit()
         print(an.analysis_one_habit(data, habit.name))
 
 
-def test_data_existing(database):
-    """
-    checks if the test data has already been entered or not
-    :return:
-    """
-    return db.user_data_existing(database)
-
-
 def manage_habits(user):
+    """ask the user what kind of habit management they want to perform, and then start the desired process.
+
+    :param user: the user who wants to manage a habit (type: user.UserDB)
+    """
     manage_action = qu.select("What do you want to do with your habits?",
                               choices=["Create habit", "Delete habit", "Modify habit"]).ask()
     if manage_action == "Create habit":
@@ -274,22 +295,30 @@ def manage_habits(user):
 
 
 def inspect_habits(user):
+    """ask the user which habit(s) they want to inspect and then display information about the requested habits.
+
+    :param user: the user who wants to inspect the habits (type: user.UserDB)
+    """
     user_periodicities = an.return_ordered_periodicites(user)
-    periodicity = qu.select("Which habits do you want to look at?",
+    view_habits = qu.select("Which habits do you want to look at?",
                             choices=["all habits"] + [(x + " habits only") for x in user_periodicities]).ask()
-    if periodicity == "all habits":
-        print(user.return_habit_information())
-    else:
-        print(user.return_habits_of_type(periodicity.replace(" habits only", "")))
+    periodicity = None if view_habits == "all habits" else view_habits.replace(" habits only", "")
+    print(user.return_habit_information(periodicity))
 
 
-def determine_possible_actions(user):  # tested
+def determine_possible_actions(user):
+    """determine the actions which a user can perform, depending on whether s/he has already created habits or not
+    and whether the habits have already been completed.
+
+    :param user: the user for which the possible actions are to be determined (type: user.UserDB)
+    :return: the possible actions of the user (type: list)
+    """
     actions = {
         "no habits": ["Create habit", "Exit"],
         "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
         "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
-    }  # um Fehler zu vermeiden, stehen User nur die Handlungen zur Verfügung, die sie ausführen können
-    habits = an.return_habit_names(user)
+    }  # to avoid exceptions at runtime, only the actions that users can perform are available to them
+    habits = an.return_user_habits(user)
     habit_data_existing = an.check_any_habit_data(user)
     if len(habits) == 0:
         category = "no habits"
@@ -301,16 +330,15 @@ def determine_possible_actions(user):  # tested
 
 
 def cli():
+    """expose the user to the CLI"""
     main_database = get_db("main.db")  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
-    if not db.user_data_existing(main_database):  # creates test data only if no other data is existing
+    if not db.user_data_existing(main_database):  # create test data only if no other data is existing
         test_data.DataForTestingCLI("main.db")
-    # TODO: Handle Python KeyboardInterrupt
 
-    # Program Flow
     current_user = start(main_database)
     counter = 0
     while True:
-        counter += 1  # zur Verbesserung der Usability
+        counter += 1  # to improve usability
         possible_actions = determine_possible_actions(current_user)
         if counter > 1:
             qu.text("Press \"enter\" to proceed to the main menu.").ask()
@@ -330,10 +358,10 @@ def cli():
             break
 
 
-
 if __name__ == "__main__":
     cli()
 
-# TODO: immer wenn möglich das Attribut find habits beim User verwenden (das einmal in der CLI-Funktion initialisieren)
-# TODO: möglicherweise noch ein Attribut zum User hinzufügen, das habit mit data anzeigt
 # TODO: add docstrings to all modules and __init__ constructors
+# TODO: test if all functions are used
+
+### für jede Funktion, die ich testen wollte, existiert mind. 1 Test hier

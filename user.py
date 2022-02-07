@@ -69,14 +69,11 @@ class UserDB(User):
         self.habit_list = ana.habit_creator(self)
         return self.habit_list
 
-    def return_habit_information(self):
-        habit_info_df = ana.return_user_habits(self)[["Name", "Periodicity", "CreationTime"]]
-        sorted_habits = habit_info_df.sort_values("Periodicity")
-        return sorted_habits.to_string(index=False)
-
-    def return_habits_of_type(self, periodicity):
-        habits_of_type = ana.return_habits_of_type(self, periodicity)
-        return habits_of_type.to_string(index=False)
+    def return_habit_information(self, periodicity=None):
+        habit_info = ana.return_habit_info(self, periodicity)
+        if not periodicity:
+            habit_info = habit_info.sort_values("Periodicity")
+        return habit_info.to_string(index=False)
 
     def determine_best_habit(self):
         habits_with_data = ana.find_habits_with_data(self.return_habit_list())
