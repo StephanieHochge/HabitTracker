@@ -81,5 +81,6 @@ class TestHabitUser(test_data.DataForTestingPytest):
         habit_comparison, statistics = self.user_sh.analyze_habits()
         assert len(habit_comparison.columns) == 5
         assert "Clean bathroom" in statistics
-        # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat
-        # TODO: irgendwie wird die CompletionRate in der Summary nicht immer richtig berechnet!
+        # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat TODO: noch einen Test
+        #  hinzufügen, der testet, dass bei der Summary Analyse bei der lowest completion rate richtig gerundet wird
+        #  (war zuerst nicht der Fall)

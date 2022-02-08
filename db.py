@@ -157,3 +157,6 @@ def check_for_user_data(database):
     cursor.execute("SELECT * From HabitAppUser")
     user_data = cursor.fetchall()
     return True if len(user_data) > 0 else False
+
+
+# TODO: es muss noch geprüft werden, ob alle wichtigen Funktionen getestet werden

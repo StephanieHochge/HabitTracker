@@ -97,7 +97,8 @@ class UserDB(User):
                     "lowest completion rate of all: "]
         longest_streak = self.determine_best_habit()
         lowest_completion_rate = self.determine_worst_habit()
-        data = [self.best_habit, f"{longest_streak} periods", self.worst_habit, f"{round(lowest_completion_rate)} %"]
+        data = [self.best_habit, f"{longest_streak} periods", self.worst_habit,
+                f"{round((lowest_completion_rate*100))} %"]
         analysis_df = ana.list_to_df(analysis, data)
         habit_list = self.return_habit_list()
         habit_comparison = ana.detailed_analysis_of_all_habits(habit_list)
