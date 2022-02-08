@@ -11,7 +11,7 @@ def get_db(name):
     """
     try:
         database = sqlite3.connect(name)
-    except Error as e:
+    except Error as e:  # TODO: Entscheiden: drin lassen oder rausnehmen?
         print(e)
     else:
         database.execute("PRAGMA foreign_keys = 1")  # otherwise, on delete cascade does not work
@@ -35,14 +35,14 @@ def create_tables(database):
 
     # create Habit table
     habit_table = """CREATE TABLE IF NOT EXISTS Habit
-    (PKHabitID INTEGER PRIMARY KEY, FKUserID INTEGER, Name TEXT, Periodicity TEXT, CreationTime TEXT,
+    (PKHabitID INTEGER PRIMARY KEY, FKUserID INTEGER, Name TEXT, Periodicity TEXT, CreationTime TIMESTAMP,
     FOREIGN KEY(FKUserID) REFERENCES HabitAppUser(PKUserID) ON DELETE CASCADE ON UPDATE CASCADE)"""
 
     cursor.execute(habit_table)
 
     # create Completions table
     completions_table = """CREATE TABLE IF NOT EXISTS Completions
-    (PKCompletionsID INTEGER PRIMARY KEY, FKHabitID INTEGER, CompletionDate TEXT, CompletionTime TEXT, 
+    (PKCompletionsID INTEGER PRIMARY KEY, FKHabitID INTEGER, CompletionDate DATE, CompletionTime TIME, 
     FOREIGN KEY(FKHabitID) REFERENCES Habit(PKHabitID) ON DELETE CASCADE ON UPDATE CASCADE)"""
 
     cursor.execute(completions_table)
@@ -96,21 +96,21 @@ def find_habit_id(habit):
     return habit_id[0]
 
 
-def add_completion(habit, check_date=None):
+def add_completion(habit, check_datetime=None):
     """
     adds a new completion to the completion table with the correct streak affiliation
     :param habit: the habit for which a new period is to be added
-    :param check_date: the datetime on which the habit was checked off (type: str)
+    :param check_datetime: the datetime on which the habit was checked off (type: str)
     :return: --
     """
     db = habit.database
     cursor = db.cursor()
-    if not check_date:
-        check_date = str(datetime.now())
-    dates, time = check_date.split(" ")
+    if not check_datetime:
+        check_datetime = str(datetime.now())
+    check_date, check_time = check_datetime.split(" ")
     habit_id = find_habit_id(habit)
     cursor.execute("INSERT INTO Completions(FKHabitID, CompletionDate, CompletionTime) VALUES (?, ?, ?)",
-                   (habit_id, dates, time))
+                   (habit_id, check_date, check_time))
     db.commit()
 
 
