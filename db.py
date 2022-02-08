@@ -4,6 +4,11 @@ from datetime import datetime
 
 
 def get_db(name):
+    """create a sqlite database connection with the specified table schema and the passed name
+
+    :param name: the name of the database connection (type: str)
+    :return: a database connection to the sqlite database with the specified name (type: sqlite3 connection)
+    """
     try:
         database = sqlite3.connect(name)
     except Error as e:
@@ -15,6 +20,11 @@ def get_db(name):
 
 
 def create_tables(database):
+    """create the data schema for the database containing three tables: the HabitAppUser, the Habit and the
+    Completions table.
+
+    :param database: the database connection in which the tables are to be created
+    """
     cursor = database.cursor()
 
     # create HabitAppUser table
@@ -40,8 +50,13 @@ def create_tables(database):
     database.commit()
 
 
-# add data into tables
+# insert data into tables
 def add_user(user):
+    """add user data into the table
+
+    :param user:
+    :return:
+    """
     db = user.database
     cursor = db.cursor()
     cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user.username])

@@ -331,7 +331,7 @@ def determine_possible_actions(user):
 
 def cli():
     """expose the user to the CLI"""
-    main_database = get_db("main.db")  # TODO: hier Verbindung zur Datenbank checken, sonst einen Fehler ausgeben
+    main_database = get_db("main.db")
     if not db.user_data_existing(main_database):  # create test data only if no other data is existing
         test_data.DataForTestingCLI("main.db")
 
