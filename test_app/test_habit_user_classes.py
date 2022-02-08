@@ -60,10 +60,10 @@ class TestHabitUser(test_data.DataForTestingPytest):
         assert len_completions_after_del == (len_completions - len_habit_data)
 
     def test_modify_habit(self):
-        assert self.dance_rb.modify_habit(name="Ballet", periodicity="daily") is True
+        self.dance_rb.modify_habit(name="Ballet", periodicity="daily")
         assert self.dance_rb.periodicity == "daily"
         assert self.dance_rb.name == "Ballet"
-        assert self.bathroom_sh.modify_habit(name="Flat") is True
+        self.bathroom_sh.modify_habit(name="Flat")
         assert "Flat" in ana.return_habit_names(self.user_sh)
 
     def test_analyze_habit(self):

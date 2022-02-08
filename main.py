@@ -332,7 +332,7 @@ def determine_possible_actions(user):
 def cli():
     """expose the user to the CLI"""
     main_database = get_db("main.db")
-    if not db.user_data_existing(main_database):  # create test data only if no other data is existing
+    if not db.check_for_user_data(main_database):  # create test data only if no other data is existing
         test_data.DataForTestingCLI("main.db")
 
     current_user = start(main_database)

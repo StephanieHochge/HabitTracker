@@ -24,7 +24,7 @@ def create_data_frame(database, table):
 
 
 # return the user_id of a user
-def return_user_id(user):
+def return_user_id(user):  # TODO: find user ID und find habit ID Funktionen gibt es auch schon im db file
     """
     returns the user_id of a user
     :param user: the user
