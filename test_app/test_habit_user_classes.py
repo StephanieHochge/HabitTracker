@@ -49,12 +49,15 @@ class TestHabitUser(test_data.DataForTestingPytest):
         assert self.teeth_sh.find_last_check() == str(date.today() - timedelta(weeks=1))
 
     def test_delete_habit(self):
+        """test that it is possible to delete a habit and its corresponding data from the Habit and Completion tables"""
+        len_completions = len(ana.create_data_frame(self.database, "Completions"))
+        len_habit_data = len(ana.return_habit_completions(self.teeth_rb))
         assert db.find_habit_id(self.teeth_rb) == 1
-        assert self.teeth_rb.delete_habit() is True
+        self.teeth_rb.delete_habit()
         with pytest.raises(TypeError):
             db.find_habit_id(self.teeth_rb)
-        with pytest.raises(IndexError):  # test if corresponding data in completions was also deleted
-            ana.return_habit_completions(self.teeth_rb)
+        len_completions_after_del = len(ana.create_data_frame(self.database, "Completions"))
+        assert len_completions_after_del == (len_completions - len_habit_data)
 
     def test_modify_habit(self):
         assert self.dance_rb.modify_habit(name="Ballet", periodicity="daily") is True
@@ -79,3 +82,4 @@ class TestHabitUser(test_data.DataForTestingPytest):
         assert len(habit_comparison.columns) == 5
         assert "Clean bathroom" in statistics
         # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat
+        # TODO: irgendwie wird die CompletionRate in der Summary nicht immer richtig berechnet!

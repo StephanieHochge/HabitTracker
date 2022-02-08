@@ -10,17 +10,17 @@ import analyze as ana
 
 class TestCli(test_data.DataForTestingPytest):
 
-    @patch('main.input_username', return_value="Fritz")
+    @patch('main.input_username', return_value="Hermione")
     def test_create_new_user(self, mock_input):
-        """
-        tests the create new user function
-        """
+        """test that it is possible to create a new user"""
         new_user = main.create_new_user(self.database)
-        assert new_user.username == "Fritz"
+        user_df = ana.create_data_frame(self.database, "HabitAppUser")
+        assert new_user.username == "Hermione"
+        assert "Hermione" in user_df["UserName"].to_list()
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_fail(self, mock_stdout):
-        """tests that entering an unknown username leads to a failed login"""
+        """test that entering an unknown username leads to a failed login"""
         with patch('main.input_username', return_value="UnknownUser"):
             main.login(self.database)
             assert mock_stdout.getvalue() == "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
@@ -33,47 +33,40 @@ class TestCli(test_data.DataForTestingPytest):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_success(self, mock_stdout):
-        """test that it is possible to login using a correct username"""
+        """test that it is possible to log in using a correct username"""
         with patch('main.input_username', return_value="StephanieHochge"):
             main.login(self.database)
             assert mock_stdout.getvalue() == "Logged in as StephanieHochge\n"
 
-    @patch('main.input_new_habit', return_value=("sleeping", "daily"))
+    @patch('main.input_new_habit', return_value=("feed Hedwig", "daily"))
     def test_create_habit(self, mock_input):
-        """
-        tests the create new habit function
-        """
-        user = UserDB("Fritz", self.database)
-        user.store_user()
-        new_habit = main.create_habit(user)
-        assert new_habit.name == "sleeping"
+        """test that it is possible to create a new habit"""
+        new_habit = main.create_habit(self.user_hp)
+        habit_df = ana.create_data_frame(self.database, "Habit")
+        assert new_habit.name == "feed Hedwig"
         assert new_habit.periodicity == "daily"
+        assert "feed Hedwig" in habit_df["Name"].to_list()
 
     @patch('main.input_chosen_habit', return_value="Sleep")
     def test_identify_habit(self, mock_input):
-        """
-        tests the identify habit function
-        :return:
-        """
+        """test that it is possible to identify the correct habit of the user"""
         habit = main.identify_habit("delete", self.user_sh)
         assert habit.periodicity == "daily"
         assert habit.user == self.user_sh
 
     @patch('main.confirm_delete', return_value=True)
-    @patch('main.input_chosen_habit', return_value="Sleep")
+    @patch('main.input_chosen_habit', return_value="Dance")
     def test_delete_habit(self, mock_habit, mock_confirm):
-        """
-        tests if the habit was successfully deleted
-        :param mock_input:
-        :return:
-        """
-        main.delete_habit(self.user_sh)
-        assert "Sleep" not in ana.return_habit_names(self.user_sh)
+        """test if it is possible to delete a habit"""
+        assert "Dance" in ana.return_habit_names(self.user_rb)
+        main.delete_habit(self.user_rb)
+        assert "Dance" not in ana.return_habit_names(self.user_rb)
 
     @patch('main.input_habit_modify_target', return_value="name")
     @patch('main.input_new_habit_name', return_value="Clean flat")
     @patch('main.input_chosen_habit', return_value="Clean bathroom")
     def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
+        """test if it is possible to rename a habit without changing its periodicity"""
         main.modify_habit(self.user_sh)
         assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
 
@@ -82,16 +75,26 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('main.input_new_habit_name', return_value="Clean flat")
     @patch('main.input_chosen_habit', return_value="Clean bathroom")
     def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
+        """test if it possible to modify a habit's name and periodicity"""
         main.modify_habit(self.user_sh)
         assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
         assert ana.return_habit_periodicity(self.user_sh, "Clean flat") == "monthly"
 
-    @patch('main.input_chosen_habit', return_value="Dance")
+    @patch('main.input_chosen_habit', return_value="Conjuring")
     @patch('main.input_check_date', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
+        """test that it is possible to check off a habit at the current moment"""
+        main.check_off_habit(self.user_hp)
+        self.conjure_hp.find_last_check()
+        assert self.conjure_hp.last_completion == str(datetime.date.today())
+
+    @patch('main.input_chosen_habit', return_value="Brush teeth")
+    @patch('main.input_check_date', return_value="earlier today")
+    def test_check_off_habit_earlier(self, mock_now, mock_habit):
+        """test that it is possible to check off a habit at the earlier today"""
         main.check_off_habit(self.user_sh)
-        self.dance_sh.find_last_check()
-        assert self.dance_sh.last_completion == str(datetime.date.today())
+        self.teeth_sh.find_last_check()
+        assert self.teeth_sh.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Brush teeth")
     @patch('main.input_check_date', return_value="yesterday")
@@ -99,9 +102,9 @@ class TestCli(test_data.DataForTestingPytest):
         main.check_off_habit(self.user_sh)
         self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
-        # TODO: hier am besten auch die Uhrzeit testen, ob das auch funktioniert
 
     def test_determine_possible_actions(self):
+        """test that the possible actions of a user are correctly determined"""
         actions = {
             "no habits": ["Create habit", "Exit"],
             "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
@@ -111,8 +114,4 @@ class TestCli(test_data.DataForTestingPytest):
         assert main.determine_possible_actions(self.user_le) == actions["no habits"]
         assert main.determine_possible_actions(self.user_hp) == actions["habit without data"]
 
-    # TODO: überprüfen, ob alle wichtigen Funktionen getestet wurden
-    # Creating a new user:
-    # test that it is not possible to store an empty value as user name
-    # test that it is not possible to store a user name containing a space
-    # ist nach Max nicht unbedingt notwendig, weil die eigentliche Programmlogik schon durch die Tests abgedeckt wird
+# File wurde getestet, meiner Meinung nach wurden die wichtigsten Funktionen der CLI getestet

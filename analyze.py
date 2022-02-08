@@ -17,7 +17,7 @@ def create_data_frame(database, table):
     """
     habit_columns = ["PKHabitID", "FKUserID", "Name", "Periodicity", "CreationTime"]
     user_columns = ["PKUserID", "UserName"]
-    completions_columns = ["CompletionsID", "FKHabitID", "CompletionDate", "CompletionTime"]
+    completions_columns = ["PKCompletionsID", "FKHabitID", "CompletionDate", "CompletionTime"]
     column_names = {"Habit": habit_columns, "HabitAppUser": user_columns, "Completions": completions_columns}
     sql_query = pd.read_sql_query(f'''SELECT * FROM {table}''', database)
     return pd.DataFrame(sql_query, columns=column_names[table])
@@ -77,7 +77,7 @@ def return_habit_completions(habit):
     """
 
     :param habit: the habit for which all completions are to be returned
-    :return: a data frame containing all completions of the user's habit
+    :return: a list containing all completions of the user's habit
     """
     habit_id = return_habit_id(habit)
     completions_df = create_data_frame(habit.database, "Completions")
@@ -351,7 +351,8 @@ def calculate_longest_streak_per_habit(habit_list):
     :param habit_list: a list of habits (type: list of instances of the HabitDB class)
     :return: a dictionary with the habit names as keys and their longest streaks as values
     """
-    habit_names = [habit.name for habit in habit_list]  # verwende ich an einer anderen Stelle nochmal
+    habit_names = [habit.name for habit in habit_list]  # verwende ich an einer anderen Stelle nochmal, ich hab auch
+    # eine Funktion, die die Habit Names returned
     longest_streaks = map(calculate_longest_streak, habit_list)
     return dict(zip(habit_names, longest_streaks))
 

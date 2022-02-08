@@ -9,6 +9,7 @@ def get_db(name):
     except Error as e:
         print(e)
     else:
+        database.execute("PRAGMA foreign_keys = 1")  # otherwise, on delete cascade does not work
         create_tables(database)
         return database
 
