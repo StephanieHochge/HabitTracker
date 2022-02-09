@@ -12,7 +12,7 @@ class UserNameValidator(Validator):  # Code from Questionary documentation
 
     def validate(self, document):
         user = UserDB(document.text, self.database)
-        user_existing = an.check_for_user(user)
+        user_existing = an.check_for_username(user)
         if len(document.text) == 0:  # mindestens ein Zeichen muss eingegeben werden
             raise ValidationError(
                 message="Please enter at least one character.",  # error message that is displayed

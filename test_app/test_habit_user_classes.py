@@ -51,7 +51,7 @@ class TestHabitUser(test_data.DataForTestingPytest):
     def test_delete_habit(self):
         """test that it is possible to delete a habit and its corresponding data from the Habit and Completion tables"""
         len_completions = len(ana.create_data_frame(self.database, "Completions"))
-        len_habit_data = len(ana.return_habit_completions(self.teeth_rb))
+        len_habit_data = len(ana.return_completions(self.teeth_rb))
         assert db.find_habit_id(self.teeth_rb) == 1
         self.teeth_rb.delete_habit()
         with pytest.raises(TypeError):

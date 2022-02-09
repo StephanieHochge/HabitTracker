@@ -143,7 +143,7 @@ def login(database):
         try:
             username = input_username(database, "login")
             user = UserDB(username, database)
-            if not an.check_for_user(user):  # check if a user with the entered name exists in the database
+            if not an.check_for_username(user):  # check if a user with the entered name exists in the database
                 raise UserNameNotExisting(user.username)
         except UserNameNotExisting as e:
             print("\x1b[0;0;41m" + str(e) + "\x1b[0m")
@@ -196,7 +196,7 @@ def identify_habit(habit_action, user):
     """
     tracked_habits = an.return_habit_names(user)
     habit_name = input_chosen_habit(habit_action, tracked_habits)
-    habit_periodicity = an.return_habit_periodicity(user, habit_name)
+    habit_periodicity = an.return_periodicity(user, habit_name)
     habit = HabitDB(habit_name, habit_periodicity, user, user.database)
     return habit
 
@@ -273,7 +273,7 @@ def analyze_habits(user):
         A detailed comparison of all habits:
         {habit_comparison}""")
     else:
-        habit_periodicity = an.return_habit_periodicity(user, habit_to_analyze)
+        habit_periodicity = an.return_periodicity(user, habit_to_analyze)
         habit = HabitDB(habit_to_analyze, habit_periodicity, user, user.database)
         data = habit.analyze_habit()
         print(an.analysis_one_habit(data, habit.name))
@@ -318,8 +318,8 @@ def determine_possible_actions(user):
         "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
         "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
     }  # to avoid exceptions at runtime, only the actions that users can perform are available to them
-    habits = an.return_user_habits(user)
-    habit_data_existing = an.check_any_habit_data(user)
+    habits = an.show_habit_data(user)
+    habit_data_existing = an.check_any_completions(user)
     if len(habits) == 0:
         category = "no habits"
     elif not habit_data_existing:

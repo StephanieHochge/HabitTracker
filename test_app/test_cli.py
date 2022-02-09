@@ -78,7 +78,7 @@ class TestCli(test_data.DataForTestingPytest):
         """test if it possible to modify a habit's name and periodicity"""
         main.modify_habit(self.user_sh)
         assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
-        assert ana.return_habit_periodicity(self.user_sh, "Clean flat") == "monthly"
+        assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Conjuring")
     @patch('main.input_check_date', return_value="just now")

@@ -22,26 +22,26 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         tests whether the function to identify whether a user name already exists works or not
         :return:
         """
-        user_existing = ana.check_for_user(self.user_sh)
+        user_existing = ana.check_for_username(self.user_sh)
         assert user_existing is True
         user_sh_2 = UserDB("StephanieH", self.database)
-        user_existing_2 = ana.check_for_user(user_sh_2)
+        user_existing_2 = ana.check_for_username(user_sh_2)
         assert user_existing_2 is False
 
     def test_return_habits(self):
         """
         tests whether user_habits are correctly returned
         """
-        defined_habits = ana.return_user_habits(self.user_sh)
+        defined_habits = ana.show_habit_data(self.user_sh)
         assert len(defined_habits) == 6
 
     def test_return_habit_periodicity(self):
         """
         tests whether the periodicity of the habit is correctly returned
         """
-        periodicity = ana.return_habit_periodicity(self.user_sh, "Brush teeth")
+        periodicity = ana.return_periodicity(self.user_sh, "Brush teeth")
         assert periodicity == "daily"
-        periodicity = ana.return_habit_periodicity(self.user_sh, "Dance")
+        periodicity = ana.return_periodicity(self.user_sh, "Dance")
         assert periodicity == "weekly"
 
     def test_return_ordered_periodicities(self):
@@ -63,23 +63,18 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         quaterly_habits = ana.return_habit_info(self.user_sh, "quarterly")
         assert len(quaterly_habits) == 0
 
-    def test_return_habit_id(self):
-        # test if return_habit_id returns the correct habit_id
-        habit_id = ana.return_habit_id(self.dance_sh)
-        assert habit_id == 4
-
     def test_return_habit_completions(self):
         # test if return_habit_completions returns the correct table
-        habit_completions = ana.return_habit_completions(self.dance_sh)
+        habit_completions = ana.return_completions(self.dance_sh)
         assert len(habit_completions) == 20
 
     def test_check_for_habit_data(self):
-        completions_sh = ana.return_all_user_completions(self.user_sh)
-        completions_le = ana.return_all_user_completions(self.user_le)
+        completions_sh = ana.return_all_completions(self.user_sh)
+        completions_le = ana.return_all_completions(self.user_le)
         assert len(completions_sh) == 6
         assert len(completions_le) == 0
-        assert ana.check_any_habit_data(self.user_sh) is True
-        assert ana.check_any_habit_data(self.user_le) is False
+        assert ana.check_any_completions(self.user_sh) is True
+        assert ana.check_any_completions(self.user_le) is False
 
     def test_calculate_period_starts(self):
         """

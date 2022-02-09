@@ -121,7 +121,7 @@ class HabitDB(Habit):
         db.add_completion(self, check_date)
 
     def find_last_check(self):
-        completions = ana.return_habit_completions(self)
+        completions = ana.return_completions(self)
         if not completions:
             self.last_completion = None
         else:
