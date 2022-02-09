@@ -229,26 +229,26 @@ def allowed_time(periodicity):
 def add_future_period(tidy_period_starts, periodicity):
     """add a future period to correctly calculate streaks and breaks
 
-    :param tidy_period_starts: the sorted period start list without duplicates (type: list of date objects)
-    :param periodicity: the periodicity of the corresponding habit (type: str)
-    :return: a list of dates including the calculated future period (type: list of date objects)
+    :param tidy_period_starts: the sorted list (type: list) of period starts (type: datetime.dates) without duplicates
+    :param periodicity: the habit's periodicity (type: str)
+    :return: a list (type: list) of period starts (type: datetime.date) including the calculated future period
     """
-    period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
-    duration = allowed_time(periodicity)  # ungefähre Dauer einer Periode
-    future_period = calculate_one_period_start(periodicity, date.today() + 2 * duration)  # Berechnung einer
-    # zukünftigen Periode mit mindestens einer Periode Abstand zu der aktuellen Periode
-    if period_starts[-1] != future_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
-        # wird sie hinzufügt zur Berechnung der Breaks
-        period_starts.append(future_period)
+    period_starts = tidy_period_starts  # so as not to change the actual list
+    duration = allowed_time(periodicity)  # approximate duration of a period
+    future_period = calculate_one_period_start(periodicity, date.today() + 2 * duration)  # calculate a future period
+    # with at least one period distance to the current period
+    period_starts.append(future_period)
     return period_starts
 
 
 # prepare for streak and break analysis
 def return_final_period_starts(habit):
-    """return a clean list of periods, in which the habit was performed at least once
+    """prepare for streak and break analysis by performing all functions necessary to return a clean list of periods,
+    in which the habit was performed at least once, including the future period to correctly calculate break indices.
 
-    :param habit: the habit which is to be analyzed (type: instance of type HabitDB)
-    :return: a clean list of periods, in which the habit was performed at least once (type: list of date objects)
+    :param habit: the habit which is to be analyzed (type: habit.HabitDB)
+    :return: a clean list (type: list) of period starts (type: datetime.date), marking the start of periods,
+    in which the habit was performed at least once
     """
     check_dates = return_completions(habit)
     period_starts = calculate_period_starts(habit.periodicity, check_dates)
