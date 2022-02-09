@@ -3,6 +3,7 @@ from sqlite3 import Error
 from datetime import datetime
 
 
+# create database structure and tables
 def get_db(name):
     """create a sqlite database connection with the specified table schema and the passed name
 
@@ -123,13 +124,13 @@ def delete_habit(habit):
 
     :param habit: the habit to be deleted (type: habit.HabitDB)
     """
+    # is tested in "test_habit_user_classes"
     habit_id = find_habit_id(habit)
     cursor = habit.database.cursor()
     cursor.execute("DELETE FROM Habit WHERE PKHabitID == ?", [habit_id])
     habit.database.commit()
 
 
-# modify the habit's name, periodicity oder both
 def modify_habit(habit, name=None, periodicity=None):
     """modify the habit's name, the habit's periodicity or both in the database
 
@@ -137,6 +138,7 @@ def modify_habit(habit, name=None, periodicity=None):
     :param name: the new name of the habit (type: str), if the user wants to change the name
     :param periodicity: the new periodicity of the habit (type: str), if the user wants to change the periodicity
     """
+    # is tested in "test_habit_user_classes"
     habit_id = find_habit_id(habit)
     cursor = habit.database.cursor()
     if name:
@@ -146,7 +148,6 @@ def modify_habit(habit, name=None, periodicity=None):
     habit.database.commit()
 
 
-# check if data was already entered to the user table
 def check_for_user_data(database):
     """check if data has already been entered into the HabitAppUser table.
 
@@ -159,4 +160,4 @@ def check_for_user_data(database):
     return True if len(user_data) > 0 else False
 
 
-# TODO: es muss noch geprüft werden, ob alle wichtigen Funktionen getestet werden
+# File wurde durchgegangen, für jede wichtige Funktion existiert an irgendeiner Stelle ein Test
