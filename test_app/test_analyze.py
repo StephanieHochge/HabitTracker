@@ -127,7 +127,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         final_periods_dentist = ana.return_final_period_starts(self.dentist_sh)
         assert len(final_periods_teeth) == 36
         assert len(final_periods_dance) == 12
-        assert len(final_periods_windows) == 8
+        assert len(final_periods_windows) == 9
         assert len(final_periods_dentist) == 3
 
     def test_calculate_break_indices(self):
@@ -142,14 +142,14 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         final_periods_dentist = ana.return_final_period_starts(self.dentist_sh)
         assert ana.calculate_break_indices(final_periods_teeth, "daily") == [4, 25, 28, 29, 32, 34]
         assert ana.calculate_break_indices(final_periods_dance, "weekly") == [4, 7, 10]
-        assert ana.calculate_break_indices(final_periods_windows, "monthly") == [1, 5, 6]
+        assert ana.calculate_break_indices(final_periods_windows, "monthly") == [1, 7]
         assert ana.calculate_break_indices(final_periods_dentist, "yearly") == [1]
 
     def test_calculate_longest_streak(self):
         # test calculate_streak_lengths function
         assert ana.calculate_streak_lengths(self.teeth_sh) == [5, 21, 3, 1, 3, 2]
         assert ana.calculate_streak_lengths(self.dance_sh) == [5, 3, 3]
-        assert ana.calculate_streak_lengths(self.windows_sh) == [2, 4, 1]
+        assert ana.calculate_streak_lengths(self.windows_sh) == [2, 6]
         assert ana.calculate_streak_lengths(self.dentist_sh) == [2]
 
         # test calculate_longest_streak function
@@ -186,6 +186,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.calculate_curr_streak(self.dance_sh) == 3
         self.dance_rb.check_off_habit(check_date=str(datetime.now()))
         assert ana.calculate_curr_streak(self.dance_rb) == 1
+        assert ana.calculate_curr_streak(self.windows_sh) == 6
 
     def test_calculate_completion_rate(self):
         assert ana.calculate_completion_rate(self.teeth_sh) == 6 / 28
@@ -203,7 +204,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         # test calulate_breaks function
         assert ana.calculate_breaks(self.teeth_sh) == 6
         assert ana.calculate_breaks(self.dance_sh) == 2
-        assert ana.calculate_breaks(self.windows_sh) == 2
+        assert ana.calculate_breaks(self.windows_sh) == 1
         assert ana.calculate_breaks(self.dentist_sh) == 0
 
     def test_find_habits_with_data(self):

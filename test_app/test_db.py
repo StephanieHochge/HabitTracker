@@ -40,7 +40,7 @@ class TestDB(test_data.DataForTestingPytest):
 
     def test_completions_table_db(self):
         """test whether data was added to the completions table"""
-        assert len(self.retrieve_data("Completions")) == 78
+        assert len(self.retrieve_data("Completions")) == 79
         cursor = self.database.cursor()  # look for the user_id of a habit
         cursor.execute("SELECT FKHabitID FROM Completions WHERE CompletionDate = ? AND PKCompletionsID = ?",
                        ("2021-12-01", 5))

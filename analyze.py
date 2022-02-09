@@ -221,7 +221,6 @@ def allowed_time(periodicity):
                   "weekly": timedelta(days=7),
                   "monthly": timedelta(days=32),  # if a habit has not been completed in a month, the timedelta is at
                   # least 58 days
-                  # TODO: Fehler bei der Berechnung des aktuellen Streaks für monatliche Habits ausmerzen
                   "yearly": timedelta(days=366)
                   }
     return timeliness[periodicity]
