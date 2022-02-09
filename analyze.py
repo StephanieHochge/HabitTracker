@@ -5,9 +5,11 @@ import pandas as pd
 
 import habit as hb
 
-
 # TODO: vielleicht kann man die ganzen Funktionen, wo einfach nur Daten zurückgegeben werden in ein separates File
 #  auslagern (außerhalb der Analyse, vielleicht in db?)
+import user
+
+
 def create_data_frame(database, table):
     """create a pandas dataframe from one of the database tables
 
@@ -112,13 +114,15 @@ def return_ordered_periodicites(user):
     possible_periodicities = ["daily", "weekly", "monthly", "yearly"]  # to determine the order in the next step
     return [x for x in possible_periodicities if x in user_periodicities]
 
-# bis hier über Funktionen drüber gegangen
-def return_habit_info(user, periodicity=None):
-    """Filter for periodicity and return habits with said periodicity
 
-    :param user: the user (object)
-    :param periodicity: the periodicity for which the user looks (str)
-    :return: a pandas series with the names of the user's habits of the specified periodicity
+def return_habit_info(user, periodicity=None):
+    """return the name, periodicity and creation time of either all of the user's habits (periodicity = None) or
+    only the habits with a certain periodicity.
+
+    :param user: the user (type: user.UserDB)
+    :param periodicity: the periodicity for which infos are to be returned (str)
+    :return: a data frame containing the name, periodicity and creation time of the desired habits
+    (type: pandas.core.frame.DataFrame)
     """
     habit_info = show_habit_data(user)
     if periodicity:
@@ -126,93 +130,98 @@ def return_habit_info(user, periodicity=None):
     return habit_info[["Name", "Periodicity", "CreationTime"]]
 
 
-def to_date_format(check_dates):
-    """change a list of dates as strings into a list of dates as datetime objects
+def str_to_date(str_dates):
+    """convert a list of dates as strings into a list of dates as datetime dates
 
-    :param check_dates:
-    :return:
+    :param str_dates: list (type: list) of dates as strings (type: str)
+    :return: a list (type: list) of datetime dates (type: datetime.date)
     """
-    return list(map(lambda x: date.fromisoformat(x), check_dates))
+    return list(map(lambda x: date.fromisoformat(x), str_dates))
 
 
 def weekly_start(check_date):
-    """determine for any given date the date of the last Monday before that date, used for habits with weekly periodicity
+    """for the given date, determine the date of the preceding Monday (to determine the period start for weekly
+    habits). The period start is defined as the date where the period starts (is each day for daily habits and
+    each Monday for weekly habits etc.).
 
-    :param check_date: type: date
-    :return: the date of the Monday before the passed in date
+    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
+    :return: the date of the Monday before the passed in date (type: datetime.date)
     """
-    diff_to_start = timedelta(days=check_date.weekday())
-    return check_date - diff_to_start
+    diff_to_monday = timedelta(days=check_date.weekday()) 
+    return check_date - diff_to_monday
 
 
 def monthly_start(check_date):
-    """return the first day of the month of the check_date
+    """determine the first day of the month of the passed in date
 
-    :param check_date: type: date
-    :return: the first day of the passed in month
+    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
+    :return: the first day of the passed in month (type: datetime.date)
     """
-    diff_to_start = timedelta(days=check_date.day - 1)
-    return check_date - diff_to_start
+    diff_to_first = timedelta(days=check_date.day - 1)
+    return check_date - diff_to_first
 
 
 def yearly_start(check_date):
-    """return the first day of the year of the check_date
+    """determine the first day of the year of the passed in date
 
-    :param check_date: type: date
-    :return: the first day of the passed in year
+    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
+    :return: the first day of the passed in year (type: datetime.date)
     """
     return date.fromisoformat(f"{check_date.year}-01-01")
 
 
-def calculate_one_period_start(periodicity, check_date):
-    """calculate the start of the period when a habit with the specified periodicity was checked off
-
-    :param periodicity: the habit's periodicty (type: str)
-    :param check_date: the date the habit was checked off (type: date)
-    :return: the start of the period as a date when the habit was checked off (type: date)
-    """
-    period_start = calculate_period_starts(periodicity, [check_date])
-    return period_start[0]
-
-
 def calculate_period_starts(periodicity, check_dates):
-    """calculate the period starts for each check-off date of a habit
+    """for each completion date of a habit, calculate the period start. The period start is defined as the date where
+    the period starts (is each day for daily habits and each Monday for weekly habits etc.)
 
-    :param periodicity: the habit's periodicity
-    :param check_dates: the dates on which the habits were checked off (type: list, dates: either date or str)
-    :return: a list of period starts (which can contain duplicates)
+    :param periodicity: the habit's periodicity (type: str)
+    :param check_dates: a list (type: list) of the habit's completion dates (dates: datetime.date or str)
+    :return: a list (type: list) of period starts (type: datetime.date) - can contain duplicates
     """
-    if isinstance(check_dates[0], str):  # wandelt das nur ins Datumsformat um, wenn es noch nicht in diesem ist
-        check_dates = to_date_format(check_dates)
+    if isinstance(check_dates[0], str):  # are dates already in datetime.date format?
+        check_dates = str_to_date(check_dates)
     period_start_funcs = {
         "daily": (lambda x: x),
         "weekly": weekly_start,
         "monthly": monthly_start,
         "yearly": yearly_start
     }
-    period_start_func = period_start_funcs[periodicity]
-    return list(map(period_start_func, check_dates))
+    period_start_func = period_start_funcs[periodicity]  # determine the correct function to calculate period starts
+    return list(map(period_start_func, check_dates))  # calculate for each completion date the period start
+
+
+def calculate_one_period_start(periodicity, check_date):
+    """calculate the start of the period when a habit with the specified periodicity was completed
+
+    :param periodicity: the habit's periodicty (type: str)
+    :param check_date: the date the habit was checked off (type: datetime.date)
+    :return: the start of the period (type: datetime.date)
+    """
+    period_start = calculate_period_starts(periodicity, [check_date])
+    return period_start[0]
 
 
 def tidy_starts(period_starts):
     """remove duplicates in the inserted list and sort the elements
 
-    :param period_starts: the period starts generated by "calculate period starts" (type: list of date objects)
-    :return: the sorted list of period_starts without duplicates (type: list of date objects)
+    :param period_starts: a list (type: list) of period starts (type: datetime.date)
+    :return: a sorted list (type: list) of period starts (type: datetime.date) without duplicates
     """
     return sorted(list(set(period_starts)))
 
 
-def check_in_time(periodicity):
-    """check what time differences between two habit completions is allowed by the habit's periodicity
+def allowed_time(periodicity):
+    """check what time difference is allowed between two habit completions according to the habit's periodicity
+    so that the streak is not broken
 
-    :param periodicity: the periodicity of the habit (type: str)
-    :return: the allowed timedifference (type: timedelta object)
+    :param periodicity: the habit's periodicity (type: str)
+    :return: the allowed time difference (type: datetime.timedelta)
     """
     timeliness = {"daily": timedelta(days=1),
                   "weekly": timedelta(days=7),
-                  "monthly": timedelta(days=31),  # wenn ein Habit in einem Monat nicht durchgeführt wurde, ist das
-                  # timedelta mind. 58 days
+                  "monthly": timedelta(days=32),  # if a habit has not been completed in a month, the timedelta is at
+                  # least 58 days
+                  # TODO: Fehler bei der Berechnung des aktuellen Streaks für monatliche Habits ausmerzen
                   "yearly": timedelta(days=366)
                   }
     return timeliness[periodicity]
@@ -226,7 +235,7 @@ def add_future_period(tidy_period_starts, periodicity):
     :return: a list of dates including the calculated future period (type: list of date objects)
     """
     period_starts = tidy_period_starts  # notwendig, weil sonst die eigentliche Liste verändert wird
-    duration = check_in_time(periodicity)  # ungefähre Dauer einer Periode
+    duration = allowed_time(periodicity)  # ungefähre Dauer einer Periode
     future_period = calculate_one_period_start(periodicity, date.today() + 2 * duration)  # Berechnung einer
     # zukünftigen Periode mit mindestens einer Periode Abstand zu der aktuellen Periode
     if period_starts[-1] != future_period:  # wenn die aktuelle Periode nicht in der aufgeräumten Liste enthalten ist,
@@ -267,7 +276,7 @@ def calculate_break_indices(tidy_periods, periodicity):
     :return: a list of the indices (type: list of integers)
     """
     diffs = diffs_list_elements(tidy_periods)
-    in_time = check_in_time(periodicity)
+    in_time = allowed_time(periodicity)
     return [index for index, value in enumerate(diffs) if value > in_time]
 
 
@@ -423,7 +432,7 @@ def calculate_completion_rate(habit):
     period_4_weeks_ago = calculate_one_period_start(habit.periodicity, (date.today() - time_diff))
     cur_period = calculate_one_period_start(habit.periodicity, date.today())
     completed_periods_4_weeks = list(filter(lambda x: period_4_weeks_ago < x < cur_period, final_periods))
-    return len(completed_periods_4_weeks)/no_possible_periods
+    return len(completed_periods_4_weeks) / no_possible_periods
 
 
 def calculate_completion_rate_per_habit(habits_with_data):
@@ -504,6 +513,3 @@ def list_to_df(analysis, data):
     :return:
     """
     return pd.DataFrame({'Analysis': analysis, 'data': data})
-
-
-

@@ -115,6 +115,7 @@ class DataForTesting:
         db.add_completion(self.windows_sh, "2021-10-02 07:56:24.999098")
         db.add_completion(self.windows_sh, "2021-11-17 07:56:24.999098")
         db.add_completion(self.windows_sh, "2021-12-30 07:56:24.999098")
+        db.add_completion(self.windows_sh, "2022-01-30 07:56:24.999098")
         db.add_completion(self.windows_sh)
         db.add_completion(self.dentist_sh, "2022-01-05 07:56:24.999098")
         db.add_completion(self.dentist_sh, "2021-12-05 07:56:24.999098")
