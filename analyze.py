@@ -210,7 +210,7 @@ def tidy_starts(period_starts):
     return sorted(list(set(period_starts)))
 
 
-def allowed_time(periodicity):
+def return_allowed_time(periodicity):
     """check what time difference is allowed between two habit completions according to the habit's periodicity
     so that the streak is not broken
 
@@ -234,7 +234,7 @@ def add_future_period(tidy_period_starts, periodicity):
     :return: a list (type: list) of period starts (type: datetime.date) including the calculated future period
     """
     period_starts = tidy_period_starts  # so as not to change the actual list
-    duration = allowed_time(periodicity)  # approximate duration of a period
+    duration = return_allowed_time(periodicity)  # approximate duration of a period
     future_period = calculate_one_period_start(periodicity, date.today() + 2 * duration)  # calculate a future period
     # with at least one period distance to the current period
     period_starts.append(future_period)
@@ -256,43 +256,43 @@ def return_final_period_starts(habit):
     return add_future_period(tidy_periods, habit.periodicity)
 
 
-def diffs_list_elements(period_starts):
-    """calculate the differences of two consecutive elements in a list
+def calculate_element_diffs(final_periods):
+    """calculate the differences between two consecutive elements in a list
 
-    :param period_starts: list of dates that correspond to the periods in which the habit was checked off, cleaned
-    (duplicates removed and sorted), the future period was already added (type: list of date objects)
-    :return: a list of differences between two consecutive dates (type: list of timedelta objects)
+    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+     of the periods, in which the habit was checked off, including one future period
+    :return: a list (type: list) of differences (type: datetime.timedelta) between two consecutive period starts
     """
-    return [t - s for s, t in zip(period_starts, period_starts[1:])]
+    return [t - s for s, t in zip(final_periods, final_periods[1:])]
 
 
-def calculate_break_indices(tidy_periods, periodicity):
-    """calculate the indices of the periods, after which a habit was broken
+def calculate_break_indices(final_periods, periodicity):
+    """return for the list of final periods the indices, of the periods, after which a habit streak was broken
+    (i.e., the indices, after which at least one period is missing in the course of time)
 
-    :param tidy_periods: a list of the periods in which the habit was checked off at least once
-    (type: list of date objects)
+    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+     of the periods, in which the habit was checked off, including one future period
     :param periodicity: the habit's periodicity (type: str)
-    :return: a list of the indices (type: list of integers)
+    :return: a list (type: list) of the indices (type: int) which indicate the break of a streak
     """
-    diffs = diffs_list_elements(tidy_periods)
-    in_time = allowed_time(periodicity)
-    return [index for index, value in enumerate(diffs) if value > in_time]
+    diffs = calculate_element_diffs(final_periods)
+    allowed_time = return_allowed_time(periodicity)
+    return [index for index, value in enumerate(diffs) if value > allowed_time]
 
 
-# generate list of streak lengths of one habit
-# funktioniert für die vier getesteten Habits
 def calculate_streak_lengths(habit):
-    """calculate for each habits the length of each streak
+    """for a habit, calculate the length of each streak (i.e., the number of periods in a row, in which the habit was
+    completed at least once)
 
-    :param habit: the habit for which the streak lengths are to be calculated (type: instance of the HabitDB class)
-    :return: a list of the habit's streak lengths (type: list of integers)
+    :param habit: the habit for which the streak lengths are to be calculated (type: habit.HabitDB)
+    :return: a list (type: list) of the habit's streak lengths (type: int)
     """
-    period_starts_curr = return_final_period_starts(habit)
-    break_indices = calculate_break_indices(period_starts_curr, habit.periodicity)  # es muss immer break indices
-    # geben, weil ja die zukünftige Periode hinzugefügt wird
-    streak_lengths = [-1]  # weil der erste Streak sonst in der folgenden Berechnung nicht berücksichtigt wird
-    streak_lengths[1:] = break_indices  # anhängen der restlichen Break Indizes
-    return diffs_list_elements(streak_lengths)
+    final_periods = return_final_period_starts(habit)
+    break_indices = calculate_break_indices(final_periods, habit.periodicity)  # due to the added future period,
+    # there is always at least one break index, even if no streak has been broken yet
+    streak_lengths = [-1]  # because otherwise the following calculation does not consider the first streak
+    streak_lengths[1:] = break_indices  # append the remaining break indices
+    return calculate_element_diffs(streak_lengths)
 
 
 def calculate_longest_streak(habit):

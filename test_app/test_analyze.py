@@ -133,7 +133,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
     def test_calculate_break_indices(self):
         # test diffs_list_elements function
         dates = [date(2021, 7, 3), date(2021, 7, 9), date(2021, 7, 10), date(2021, 8, 10)]
-        assert ana.diffs_list_elements(dates) == [timedelta(days=6), timedelta(days=1), timedelta(days=31)]
+        assert ana.calculate_element_diffs(dates) == [timedelta(days=6), timedelta(days=1), timedelta(days=31)]
 
         # test calculate_break_indices function
         final_periods_teeth = ana.return_final_period_starts(self.teeth_sh)
