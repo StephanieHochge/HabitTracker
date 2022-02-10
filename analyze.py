@@ -55,7 +55,6 @@ def return_completions(habit):
     return habit_data["CompletionDate"].to_list()
 
 
-# return all completions of a user
 def return_all_completions(user):
     """return all completion dates for all habits of a user
 
@@ -143,7 +142,7 @@ def weekly_start(check_date):
     :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
     :return: the date of the Monday before the passed in date (type: datetime.date)
     """
-    diff_to_monday = timedelta(days=check_date.weekday()) 
+    diff_to_monday = timedelta(days=check_date.weekday())
     return check_date - diff_to_monday
 
 
@@ -494,5 +493,4 @@ def list_to_df(analysis, data):
     """
     return pd.DataFrame({'Analysis': analysis, 'data': data})
 
-# File wurde durchgegangen, jede Funktion ist jetzt dokumentiert
-# noch überprüfen, ob jede Funktion auch getestet wurde
+# File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet

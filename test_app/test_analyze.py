@@ -1,8 +1,6 @@
 from datetime import date, timedelta, datetime
-from unittest.mock import patch
 
 import analyze as ana
-from habit import HabitDB
 import test_data
 from user import UserDB
 
@@ -125,7 +123,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         dates = [date(2021, 7, 3), date(2021, 7, 9), date(2021, 7, 10), date(2021, 8, 10)]
         assert ana.calculate_element_diffs(dates) == [timedelta(days=6), timedelta(days=1), timedelta(days=31)]
 
-        # test return_final_period_starts function
+        # test calculate break_indices function
         final_periods_teeth = ana.return_final_period_starts(self.teeth_sh)
         final_periods_dance = ana.return_final_period_starts(self.dance_sh)
         final_periods_windows = ana.return_final_period_starts(self.windows_sh)
@@ -197,6 +195,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """test if a habit's current streak is calculated correctly"""
         assert ana.calculate_curr_streak(self.teeth_sh) == 0
         assert ana.calculate_curr_streak(self.dance_sh) == 3
+        assert ana.calculate_curr_streak(self.dance_rb) == 0
         self.dance_rb.check_off_habit(check_date=str(datetime.now()))
         assert ana.calculate_curr_streak(self.dance_rb) == 1
         assert ana.calculate_curr_streak(self.windows_sh) == 6
@@ -222,27 +221,42 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """test if a user's lowest completion rate and the corresponding habit(s) are correctly determined"""
 
         # test if completions rates per habit are correctly calculated
-        habit_list = self.user_sh.return_habit_list()
-        completed_habits = ana.find_completed_habits(habit_list)
-        completion_rates = ana.calculate_completion_rate_per_habit(completed_habits)
-        assert list(completion_rates.values()) == [6 / 28, 2 / 4, 0 / 4]
+        habit_list_sh = self.user_sh.return_habit_list()
+        completed_habits_sh = ana.find_completed_habits(habit_list_sh)
+
+        self.dance_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=1)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=2)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=3)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=4)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=5)))
+        self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=6)))
+
+        habit_list_rb = self.user_rb.return_habit_list()
+        completed_habits_rb = ana.find_completed_habits(habit_list_rb)
+
+        completion_rates_sh = ana.calculate_completion_rate_per_habit(completed_habits_sh)
+        assert list(completion_rates_sh.values()) == [6 / 28, 2 / 4, 0 / 4]
+        completion_rates_rb = ana.calculate_completion_rate_per_habit(completed_habits_rb)
+        assert list(completion_rates_rb.values()) == [7 / 28, 1 / 4]
 
         # test if the lowest completion rate and the corresponding habit is correctly identified
-        lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(completed_habits)
-        assert round(lowest_completion_rate) == 0
-        assert worst_habit == ["Clean bathroom"]
+        lowest_completion_rate_sh, worst_habit_sh = ana.calculate_worst_completion_rate_of_all(completed_habits_sh)
+        assert round(lowest_completion_rate_sh) == 0
+        assert worst_habit_sh == ["Clean bathroom"]
+        lowest_completion_rate_rb, worst_habit_rb = ana.calculate_worst_completion_rate_of_all(completed_habits_rb)
+        assert lowest_completion_rate_rb == 0.25
+        assert worst_habit_rb == ["Brush teeth", "Dance"]
 
     def test_analyze_all_habits(self):
         """test if the dataframes to analyze all habits are built correctly"""
         habit_list_sh = ana.habit_creator(self.user_sh)
-        habits_with_data_sh = ana.find_completed_habits(habit_list_sh)
-        comparison_data_sh = ana.analyse_all_habits(habits_with_data_sh)
+        completed_habits_sh = ana.find_completed_habits(habit_list_sh)
+        comparison_data_sh = ana.analyse_all_habits(completed_habits_sh)
         assert list(comparison_data_sh.columns) == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom",
                                                     "Go to dentist"]
         habit_list_rb = ana.habit_creator(self.user_rb)
         habits_with_data_rb = ana.find_completed_habits(habit_list_rb)
         comparison_data_rb = ana.analyse_all_habits(habits_with_data_rb)
         assert list(comparison_data_rb) == ["Brush teeth", "Dance"]
-
-        # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
-        #  berücksichtigen
