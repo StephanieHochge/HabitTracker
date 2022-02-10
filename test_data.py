@@ -44,11 +44,11 @@ class DataForTesting:
 
     def store_habit_completions(self):
         db.add_completion(self.teeth_rb)
-        db.add_completion(self.teeth_rb, "2022-12-02 07:56:24.999098")
+        db.add_completion(self.teeth_rb, "2021-12-02 07:56:24.999098")
         db.add_completion(self.dance_rb, "2021-12-02 07:56:24.999098")
         db.add_completion(self.dance_rb, "2021-12-31 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-01 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-01 07:56:24.999098")
+        db.add_completion(self.teeth_sh, "2021-12-01 09:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")

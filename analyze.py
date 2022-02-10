@@ -5,10 +5,6 @@ import pandas as pd
 
 import habit as hb
 
-# TODO: vielleicht kann man die ganzen Funktionen, wo einfach nur Daten zurückgegeben werden in ein separates File
-#  auslagern (außerhalb der Analyse, vielleicht in db?)
-import user
-
 
 def create_data_frame(database, table):
     """create a pandas dataframe from one of the database tables
@@ -497,3 +493,6 @@ def list_to_df(analysis, data):
     :return: a dataframe (type: pandas.core.frame.DataFrame) from the two lists
     """
     return pd.DataFrame({'Analysis': analysis, 'data': data})
+
+# File wurde durchgegangen, jede Funktion ist jetzt dokumentiert
+# noch überprüfen, ob jede Funktion auch getestet wurde
