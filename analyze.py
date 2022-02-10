@@ -350,7 +350,7 @@ def calculate_longest_streak_of_all(completed_habits):
         return longest_streak_of_all, best_habits
 
 
-def check_previous_period(final_periods, periodicity, period):
+def completed_in_period(final_periods, periodicity, period):
     """check if the habit was completed in the passed in period.
 
     :param period: the period to check for, either "current" or "previous" (type: str)
@@ -360,8 +360,11 @@ def check_previous_period(final_periods, periodicity, period):
     :return: true if the list of final periods contains the previous period, false otherwise (type: bool)
     """
     cur_period_start = calculate_one_period_start(periodicity, date.today())
-    prev_period_start = calculate_one_period_start(periodicity, cur_period_start - timedelta(days=1))
-    return True if prev_period_start in final_periods else False
+    if period == "current":
+        return True if cur_period_start in final_periods else False
+    else:
+        prev_period_start = calculate_one_period_start(periodicity, cur_period_start - timedelta(days=1))
+        return True if prev_period_start in final_periods else False
 
 
 def calculate_curr_streak(habit):
@@ -374,23 +377,11 @@ def calculate_curr_streak(habit):
     final_periods = return_final_period_starts(habit)
     # if a habit was not completed in the previous period, the current streak is either 0 (not completed in
     # the current period) or 1 (completed in the current period)
-    if not check_previous_period(final_periods, habit.periodicity):
-        return 0 if not check_current_period(final_periods, habit.periodicity) else 1
+    if not completed_in_period(final_periods, habit.periodicity, "previous"):
+        return 0 if not completed_in_period(final_periods, habit.periodicity, "current") else 1
     else:
         streak_lengths = calculate_streak_lengths(habit)
         return streak_lengths[-1]
-
-
-def check_current_period(final_periods, periodicity):
-    """check whether a habit was performed in the current period
-
-    :param final_periods: a list of the periods in which the habit was checked off at least once
-    (type: list of date objects)
-    :param periodicity: the habit's periodicity (type: str)
-    :return: True if the current period is contained in the list of periods, False if not
-    """
-    cur_period = calculate_one_period_start(periodicity, date.today())
-    return True if cur_period in final_periods else False
 
 
 # calculate last month
@@ -411,7 +402,7 @@ def calculate_breaks(habit):
     """
     final_periods = return_final_period_starts(habit)
     break_indices = calculate_break_indices(final_periods, habit.periodicity)
-    if check_current_period(final_periods, habit.periodicity):
+    if completed_in_period(final_periods, habit.periodicity, "current"):
         return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
         # eine Break weniger als break_indices ausrechnet (weil ja die zukünftige Periode mit berücksichtigt wird)
     else:

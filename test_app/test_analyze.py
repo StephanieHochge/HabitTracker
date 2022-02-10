@@ -189,11 +189,16 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le_data)
         assert longest_streak_all_le == (None, None)
 
-    def test_check_previous_period(self):
+    def test_completed_in_period(self):
         final_periods_teeth_sh = ana.return_final_period_starts(self.teeth_sh)
-        assert ana.check_previous_period(final_periods_teeth_sh, self.teeth_sh.periodicity) is False
         final_periods_dance_sh = ana.return_final_period_starts(self.dance_sh)
-        assert ana.check_previous_period(final_periods_dance_sh, self.dance_sh.periodicity) is True
+        final_periods_teeth_rb = ana.return_final_period_starts(self.teeth_rb)
+        assert ana.completed_in_period(final_periods_teeth_sh, self.teeth_sh.periodicity, "previous") is False
+        assert ana.completed_in_period(final_periods_dance_sh, self.dance_sh.periodicity, "previous") is True
+        assert ana.completed_in_period(final_periods_teeth_rb, self.teeth_rb.periodicity, "previous") is False
+        assert ana.completed_in_period(final_periods_teeth_sh, self.teeth_sh.periodicity, "current") is False
+        assert ana.completed_in_period(final_periods_dance_sh, self.dance_sh.periodicity, "current") is True
+        assert ana.completed_in_period(final_periods_teeth_rb, self.teeth_rb.periodicity, "current") is True
 
     def test_calculate_curr_streak(self):
         assert ana.calculate_curr_streak(self.teeth_sh) == 0
@@ -209,12 +214,6 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
     @patch('analyze.return_last_month', return_value=(12, 2021))  # damit Tests trotz der Verwendung des
     # aktuellen Datums weiterhin funktionieren
     def test_calculate_breaks(self, mock_last_month):
-        # test check_curr_period function
-        period_starts_curr_teeth = ana.return_final_period_starts(self.teeth_sh)
-        assert ana.check_current_period(period_starts_curr_teeth, "daily") is False
-        period_starts_curr_dance = ana.return_final_period_starts(self.dance_sh)
-        assert ana.check_current_period(period_starts_curr_dance, "weekly") is True
-
         # test calulate_breaks function
         assert ana.calculate_breaks(self.teeth_sh) == 6
         assert ana.calculate_breaks(self.dance_sh) == 2
