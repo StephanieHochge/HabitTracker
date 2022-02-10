@@ -296,81 +296,84 @@ def calculate_streak_lengths(habit):
 
 
 def calculate_longest_streak(habit):
-    """calculate the longest streak of one habit
+    """calculate the longest streak of a habit
 
-    :param habit: the habit for which the longest streak is to be calculated (type: instance of HabitDB class)
-    :return: the longest streak of the habit (type: int)
+    :param habit: the habit for which the longest streak is to be calculated (type: habit.HabitDB)
+    :return: the habit's longest streak (type: int)
     """
-    check_dates = return_completions(habit)  # kann schon null sein, wenn es keine completions gibt
-    if not check_dates:
-        return 0
-    else:
-        streak_lengths = calculate_streak_lengths(habit)
-        return max(streak_lengths)
+    streak_lengths = calculate_streak_lengths(habit)
+    return max(streak_lengths)
 
 
 def habit_creator(user):
     """create a list of the user's habits
 
-    :param user: the user for whom the habit list is to be created (type: instance of UserDB class)
-    :return: a list of habit objects (type: list of instances of the HabitDB class)
+    :param user: the user for whom the habit list is to be created (type: user.UserDB)
+    :return: a list (type: list) of habits (type: habit.HabitDB)
     """
-    habit_list = return_habit_names(user)
-    periodicities = show_habit_data(user)["Periodicity"].to_list()
-    combined = list(zip(habit_list, periodicities))
-    return list(map(lambda x: hb.HabitDB(x[0], x[1], user, user.database), combined))
+    habit_data = show_habit_data(user)
+    names_and_periodicity = habit_data[["Name", "Periodicity"]].values.tolist()
+    return list(map(lambda x: hb.HabitDB(x[0], x[1], user, user.database), names_and_periodicity))
 
 
-def calculate_longest_streak_per_habit(habit_list):
-    """calculate the longest streak per habit
+def calculate_longest_streak_per_habit(completed_habits):
+    """calculate the longest streak for each habit in the passed in list of habits
 
-    :param habit_list: a list of habits (type: list of instances of the HabitDB class)
-    :return: a dictionary with the habit names as keys and their longest streaks as values
+    :param completed_habits: a list (type: list) of habits which have been completed at least once (type: habit.HabitDB)
+    :return: a dictionary (type: dict) with the habit names (type: str) as keys and their longest streaks (type: int) 
+    as values
     """
-    habit_names = [habit.name for habit in habit_list]  # verwende ich an einer anderen Stelle nochmal, ich hab auch
-    # eine Funktion, die die Habit Names returned
-    longest_streaks = map(calculate_longest_streak, habit_list)
-    return dict(zip(habit_names, longest_streaks))
+    if len(completed_habits) == 0:
+        return None
+    else:
+        habit_names = [habit.name for habit in completed_habits]
+        longest_streaks = map(calculate_longest_streak, completed_habits)
+        return dict(zip(habit_names, longest_streaks))
 
 
-def calculate_longest_streak_of_all(habits_with_data):
-    """calculate the longest streak of all tracked habits
-    the habit with the longest streak is defined as the habit which was performed the most periods in a row (i.e., a
-    daily habit has a better chance of becoming the best habit than a yearly habit)
-    :param habits_with_data: a list of habits (type: list of instances of the HabitDB class)
+def calculate_longest_streak_of_all(completed_habits):
+    """calculate the longest streak of all tracked habits. The habit with the longest streak is defined as the habit
+    completed the most periods in a row (i.e., a daily habit has a better chance of becoming the best habit than
+    a yearly habit)
+
+    :param completed_habits: a list (type: list) of habits (type: habit.HabitDB) that have been completed at least once
     :return: the value of the longest streak of all habits as well as the corresponding habit name (or habit names,
     since it is possible that several habits have the same longest streak)
     """
-    longest_streaks = calculate_longest_streak_per_habit(habits_with_data)
-    if len(longest_streaks) == 0:  # wenn noch kein Habit completed wurde  # TODO: brauche ich das überhaupt noch?
+    longest_streaks = calculate_longest_streak_per_habit(completed_habits)
+    if not longest_streaks:  # if none of the user's habits have been completed
         return None, None
     else:
         longest_streak_of_all = longest_streaks[max(longest_streaks, key=longest_streaks.get)]
         best_habits = [key for (key, value) in longest_streaks.items() if value == longest_streak_of_all]  # it is
-        # possible that two habits have the same streak lengths, this way they would both be returned
+        # possible that two habits have the same longest streak. In this way, both habits are returned.
         return longest_streak_of_all, best_habits
 
 
-def check_previous_period(tidy_period_starts, periodicity):
-    """
+def check_previous_period(final_periods, periodicity, period):
+    """check if the habit was completed in the passed in period.
 
-    :param tidy_period_starts:
-    :param periodicity:
-    :return:
+    :param period: the period to check for, either "current" or "previous" (type: str)
+    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+     of the periods, in which the habit was checked off, including one future period
+    :param periodicity: the habit's periodicity
+    :return: true if the list of final periods contains the previous period, false otherwise (type: bool)
     """
-    # TODO: Test and add documentation
-    cur_period = calculate_one_period_start(periodicity, date.today())
-    prev_period = calculate_one_period_start(periodicity, cur_period - timedelta(days=1))
-    return True if prev_period in tidy_period_starts else False
+    cur_period_start = calculate_one_period_start(periodicity, date.today())
+    prev_period_start = calculate_one_period_start(periodicity, cur_period_start - timedelta(days=1))
+    return True if prev_period_start in final_periods else False
 
 
 def calculate_curr_streak(habit):
-    """
+    """calculate the passed in habit's current streak.
 
-    :param habit:
-    :return:
+    :param habit: the habit (type: habit.HabitDB), for which the current streak is to be calculated
+    :return: the current streak (i.e., the current number of periods in a row, in which the user has
+    completed the habit) (type: int)
     """
     final_periods = return_final_period_starts(habit)
+    # if a habit was not completed in the previous period, the current streak is either 0 (not completed in
+    # the current period) or 1 (completed in the current period)
     if not check_previous_period(final_periods, habit.periodicity):
         return 0 if not check_current_period(final_periods, habit.periodicity) else 1
     else:
@@ -378,16 +381,16 @@ def calculate_curr_streak(habit):
         return streak_lengths[-1]
 
 
-def check_current_period(tidy_period_starts, periodicity):
+def check_current_period(final_periods, periodicity):
     """check whether a habit was performed in the current period
 
-    :param tidy_period_starts: a list of the periods in which the habit was checked off at least once
+    :param final_periods: a list of the periods in which the habit was checked off at least once
     (type: list of date objects)
     :param periodicity: the habit's periodicity (type: str)
     :return: True if the current period is contained in the list of periods, False if not
     """
     cur_period = calculate_one_period_start(periodicity, date.today())
-    return True if cur_period in tidy_period_starts else False
+    return True if cur_period in final_periods else False
 
 
 # calculate last month
@@ -434,33 +437,33 @@ def calculate_completion_rate(habit):
     return len(completed_periods_4_weeks) / no_possible_periods
 
 
-def calculate_completion_rate_per_habit(habits_with_data):
+def calculate_completion_rate_per_habit(completed_habits):
     """
 
-    :param habits_with_data:
+    :param completed_habits:
     :return:
     """
-    frequent_habits = [habit for habit in habits_with_data if habit.periodicity in ("daily", "weekly")]
+    frequent_habits = [habit for habit in completed_habits if habit.periodicity in ("daily", "weekly")]
     habit_names = [habit.name for habit in frequent_habits]
     completion_rates = list(map(calculate_completion_rate, frequent_habits))
     return dict(zip(habit_names, completion_rates))
 
 
-def calculate_worst_completion_rate_of_all(habits_with_data):
+def calculate_worst_completion_rate_of_all(completed_habits):
     """
 
-    :param habits_with_data:
+    :param completed_habits:
     :return:
     """
     # man muss es schaffen, dass in dieser Habit-Liste nur Habits mit Daten ausgegeben werden
-    completion_rates = calculate_completion_rate_per_habit(habits_with_data)
+    completion_rates = calculate_completion_rate_per_habit(completed_habits)
     lowest_completion_rate = completion_rates[min(completion_rates, key=completion_rates.get)]
     worst_habits = [key for (key, value) in completion_rates.items() if value == lowest_completion_rate]  # it is
     # possible that two habits have the same streak lengths, this way they would both be returned
     return lowest_completion_rate, worst_habits
 
 
-def find_habits_with_data(habit_list):
+def find_completed_habits(habit_list):
     """
     returns only habits that contain data
     :param habit_list:
@@ -486,9 +489,9 @@ def detailed_analysis_of_all_habits(habit_list):
     :param habit_list:
     :return:
     """
-    habits_with_data = find_habits_with_data(habit_list)
-    habit_names = [habit.name for habit in habits_with_data]
-    analysis_data = [habit.analyze_habit() for habit in habits_with_data]
+    completed_habits = find_completed_habits(habit_list)
+    habit_names = [habit.name for habit in completed_habits]
+    analysis_data = [habit.analyze_habit() for habit in completed_habits]
     analysis_dict = dict(zip(habit_names, analysis_data))
     pd.set_option("display.max_columns", None)
     return pd.DataFrame(analysis_dict, index=analysis_index())

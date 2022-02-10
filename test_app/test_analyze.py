@@ -153,8 +153,8 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.calculate_streak_lengths(self.dentist_sh) == [2]
 
         # test calculate_longest_streak function
-        assert ana.calculate_longest_streak(self.sleep_sh) == 0
         assert ana.calculate_longest_streak(self.teeth_sh) == 21
+        assert ana.calculate_longest_streak(self.dentist_sh) == 2
 
     def test_calculate_longest_streak_of_all(self):
         # test habit creator function
@@ -165,21 +165,35 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         habits_le = ana.habit_creator(self.user_le)
         assert len(habits_le) == 0
 
+        # test find habits with data function
+        habits_sh_data = ana.find_completed_habits(habits_sh)
+        assert len(habits_sh_data) == 5
+        habits_rb_data = ana.find_completed_habits(habits_rb)
+        assert len(habits_rb_data) == 2
+        habits_le_data = ana.find_completed_habits(habits_le)
+        assert len(habits_le_data) == 0
+
         # test calculate_longest_streak_per_habit function
-        longest_streaks_sh = ana.calculate_longest_streak_per_habit(habits_sh)
+        longest_streaks_sh = ana.calculate_longest_streak_per_habit(habits_sh_data)
         assert longest_streaks_sh["Dance"] == 5
-        longest_streak_rb = ana.calculate_longest_streak_per_habit(habits_rb)
+        longest_streak_rb = ana.calculate_longest_streak_per_habit(habits_rb_data)
         assert longest_streak_rb["Brush teeth"] == 1
-        longest_streak_le = ana.calculate_longest_streak_per_habit(habits_le)
-        assert len(longest_streak_le) == 0
+        longest_streak_le = ana.calculate_longest_streak_per_habit(habits_le_data)
+        assert longest_streak_le is None
 
         # test calculate_longest_streak_of_all function
-        longest_streak_all_sh = ana.calculate_longest_streak_of_all(habits_sh)
+        longest_streak_all_sh = ana.calculate_longest_streak_of_all(habits_sh_data)
         assert longest_streak_all_sh == (21, ["Brush teeth"])
-        longest_streak_all_rb = ana.calculate_longest_streak_of_all(habits_rb)
+        longest_streak_all_rb = ana.calculate_longest_streak_of_all(habits_rb_data)
         assert longest_streak_all_rb == (1, ["Brush teeth", "Dance"])
-        longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le)
+        longest_streak_all_le = ana.calculate_longest_streak_of_all(habits_le_data)
         assert longest_streak_all_le == (None, None)
+
+    def test_check_previous_period(self):
+        final_periods_teeth_sh = ana.return_final_period_starts(self.teeth_sh)
+        assert ana.check_previous_period(final_periods_teeth_sh, self.teeth_sh.periodicity) is False
+        final_periods_dance_sh = ana.return_final_period_starts(self.dance_sh)
+        assert ana.check_previous_period(final_periods_dance_sh, self.dance_sh.periodicity) is True
 
     def test_calculate_curr_streak(self):
         assert ana.calculate_curr_streak(self.teeth_sh) == 0
@@ -210,12 +224,12 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
     def test_find_habits_with_data(self):
         habit_list = ana.habit_creator(self.user_sh)
         assert len(habit_list) == 6
-        habits_with_data = ana.find_habits_with_data(habit_list)
+        habits_with_data = ana.find_completed_habits(habit_list)
         assert len(habits_with_data) == 5
 
     def test_calculate_worst_of_all(self):
         habit_list = self.user_sh.return_habit_list()
-        habits_with_data = ana.find_habits_with_data(habit_list)
+        habits_with_data = ana.find_completed_habits(habit_list)
         completion_rates = ana.calculate_completion_rate_per_habit(habits_with_data)
         assert list(completion_rates.values()) == [6 / 28, 2 / 4, 0 / 4]
         lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
@@ -223,22 +237,18 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert worst_habit == ["Clean bathroom"]
 
     def test_detailed_analysis_of_all_habits(self):
-        habit_list_sh = self.user_sh.return_habit_list()
-        comparison_data_sh = ana.detailed_analysis_of_all_habits(habit_list_sh)
+        habit_list_sh = ana.habit_creator(self.user_sh)
+        habits_with_data_sh = ana.find_completed_habits(habit_list_sh)
+        comparison_data_sh = ana.detailed_analysis_of_all_habits(habits_with_data_sh)
         assert list(comparison_data_sh.columns) == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom",
                                                     "Go to dentist"]
-        habit_list_rb = self.user_rb.return_habit_list()
-        comparison_data_rb = ana.detailed_analysis_of_all_habits(habit_list_rb)
+        habit_list_rb = ana.habit_creator(self.user_rb)
+        habits_with_data_rb = ana.find_completed_habits(habit_list_rb)
+        comparison_data_rb = ana.detailed_analysis_of_all_habits(habits_with_data_rb)
         assert list(comparison_data_rb) == ["Brush teeth", "Dance"]
 
         # TODO: bei allen zukünftigen Funktionen darauf achten, ob sie das aktuelle Datum verwenden, das in den Tests
         #  berücksichtigen
-
-        # new habit generation method
-        # TODO: test, if this works for habits for which no completion was added
-        running = HabitDB("Running", "daily", self.user_sh, self.database)
-        running.store_habit()
-        print(running.calculate_best_streak())
 
         # test if this works for habits, for which only one completion was added
 

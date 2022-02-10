@@ -76,7 +76,7 @@ class UserDB(User):
         return habit_info.to_string(index=False)
 
     def determine_best_habit(self):
-        habits_with_data = ana.find_habits_with_data(self.return_habit_list())
+        habits_with_data = ana.find_completed_habits(self.return_habit_list())
         longest_streak_of_all, best_habit = ana.calculate_longest_streak_of_all(habits_with_data)
         self.best_habit = ", ".join(best_habit)  # trennt mehrere Habitnamen mit einem Komma
         return longest_streak_of_all  # TODO: generell bei Klassenmethoden überlegen, ob ich die returns
@@ -85,7 +85,7 @@ class UserDB(User):
     def determine_worst_habit(self):
         """the worst habit is the one with which the user struggled the most last month, i.e., the habit with the lowest
          completion rate (ein worst habit gibt es nur, wenn der Nutzer mindestens ein daily oder weekly habit hat)"""
-        habits_with_data = ana.find_habits_with_data(self.return_habit_list())
+        habits_with_data = ana.find_completed_habits(self.return_habit_list())
         lowest_completion_rate, worst_habit = ana.calculate_worst_completion_rate_of_all(habits_with_data)
         self.worst_habit = ", ".join(worst_habit)
         return lowest_completion_rate

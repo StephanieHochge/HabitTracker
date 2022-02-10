@@ -263,7 +263,7 @@ def analyze_habits(user):
     :param user: the user who wants to analyze habit(s) (type: user.UserDB)
     """
     tracked_habits = an.habit_creator(user)
-    habits_with_data = an.find_habits_with_data(tracked_habits)  # only habits with data can be analyzed
+    habits_with_data = an.find_completed_habits(tracked_habits)  # only habits with data can be analyzed
     habit_names = [habit.name for habit in habits_with_data]
     habit_to_analyze = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
     if habit_to_analyze == "All habits":
