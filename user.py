@@ -101,5 +101,5 @@ class UserDB(User):
                 f"{round((lowest_completion_rate*100))} %"]
         analysis_df = ana.list_to_df(analysis, data)
         habit_list = self.return_habit_list()
-        habit_comparison = ana.detailed_analysis_of_all_habits(habit_list)
-        return  habit_comparison, analysis_df.to_string(index=False)
+        habit_comparison = ana.analyse_all_habits(habit_list)
+        return habit_comparison, analysis_df.to_string(index=False)

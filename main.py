@@ -276,7 +276,7 @@ def analyze_habits(user):
         habit_periodicity = an.return_periodicity(user, habit_to_analyze)
         habit = HabitDB(habit_to_analyze, habit_periodicity, user, user.database)
         data = habit.analyze_habit()
-        print(an.analysis_one_habit(data, habit.name))
+        print(an.present_habit_analysis(data, habit.name))
 
 
 def manage_habits(user):

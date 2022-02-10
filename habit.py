@@ -147,7 +147,7 @@ class HabitDB(Habit):
         return self.current_streak
 
     def calculate_breaks(self):
-        self.breaks_total = ana.calculate_breaks(self)
+        self.breaks_total = ana.calculate_break_no(self)
         return self.breaks_total
 
     def calculate_completion_rate(self):

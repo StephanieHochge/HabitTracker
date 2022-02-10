@@ -384,55 +384,49 @@ def calculate_curr_streak(habit):
         return streak_lengths[-1]
 
 
-# calculate last month
-def return_last_month():
-    """calculate the last month (i.e., if today is the 15 of Februar, the last month would be January)
+def calculate_break_no(habit):
+    """calculate how often a habit's streaks were broken since the first completion
 
-    :return: the number of the last month (type: int)
-    """
-    last_month = (date.today() - timedelta(days=date.today().day))
-    return last_month.month, last_month.year
-
-
-def calculate_breaks(habit):
-    """calculate the number of breaks a habit has experienced since the first completion
-
-    :param habit: the habit which is to be analyzed (type: instance of HabitDB class)
+    :param habit: the habit which is to be analyzed (type: habit.HabitDB)
     :return: the number of breaks (type: int)
     """
     final_periods = return_final_period_starts(habit)
     break_indices = calculate_break_indices(final_periods, habit.periodicity)
-    if completed_in_period(final_periods, habit.periodicity, "current"):
-        return len(break_indices) - 1  # wenn der Habit in der aktuellen Periode schon ausgeführt wurde, dann gibt es
-        # eine Break weniger als break_indices ausrechnet (weil ja die zukünftige Periode mit berücksichtigt wird)
+    # if the habit was executed in the current or the previous period, there is one break less than elements in
+    # break indices due to the consideration of the future period
+    curr_period = completed_in_period(final_periods, habit.periodicity, "current")
+    prev_period = completed_in_period(final_periods, habit.periodicity, "previous")
+    if curr_period or prev_period:
+        return len(break_indices) - 1
     else:
         return len(break_indices)
 
 
 def calculate_completion_rate(habit):
-    """
+    """calculate a habit's completion rate during the last 28 days (daily habits)/4 full weeks (weekly habits).
+    Completions in the current period are not counted. The completion rate is defined as the number of periods
+    in which the habit was completed divided by the number of periods in which the habit was not
+    completed during the last four weeks. Is only calculated for daily or weekly habits.
 
-    :param habit:
-    :return:
+    :param habit: the habit whose completion rate is to be calculated (type: habit.HabitDB)
+    :return: the habit's completion rate during the last four weeks (type: float)
     """
-    # only possible for daily and weekly habits
-    # completion rate is the number of periods in which the habit was completed divided by the number of periods in
-    # which the habit was not completed during the last four weeks
-    # TODO: was passiert hier, wenn Habit noch nicht completed wurde?
-    no_possible_periods = 28 if habit.periodicity == "daily" else 4
     final_periods = return_final_period_starts(habit)
-    time_diff = timedelta(days=28) if habit.periodicity == "daily" else timedelta(weeks=4)
-    period_4_weeks_ago = calculate_one_period_start(habit.periodicity, (date.today() - time_diff))
+
+    no_possible_periods = 28 if habit.periodicity == "daily" else 4
     cur_period = calculate_one_period_start(habit.periodicity, date.today())
-    completed_periods_4_weeks = list(filter(lambda x: period_4_weeks_ago < x < cur_period, final_periods))
+    period_4_weeks_ago = calculate_one_period_start(habit.periodicity, (cur_period - timedelta(weeks=4)))
+    completed_periods_4_weeks = list(filter(lambda x: period_4_weeks_ago <= x < cur_period, final_periods))
     return len(completed_periods_4_weeks) / no_possible_periods
 
 
 def calculate_completion_rate_per_habit(completed_habits):
-    """
+    """for each daily or weekly habit that has been completed at least once, calculate the completion rate of
+    the last four weeks
 
-    :param completed_habits:
-    :return:
+    :param completed_habits: a list (type: list) of completed habits (type: habit.HabitDB)
+    :return: a dictionary (type: dict) with the name of each daily or weekly habit (type: str) as key and their
+     completions rates (type: float) as values
     """
     frequent_habits = [habit for habit in completed_habits if habit.periodicity in ("daily", "weekly")]
     habit_names = [habit.name for habit in frequent_habits]
@@ -441,24 +435,24 @@ def calculate_completion_rate_per_habit(completed_habits):
 
 
 def calculate_worst_completion_rate_of_all(completed_habits):
-    """
+    """calculate from all daily and weekly habits that have been completed at least once the lowest completion rate.
 
-    :param completed_habits:
-    :return:
+    :param completed_habits: a list (type: list) of completed habits (type: habit.HabitDB)
+    :return: a tuple (type: tuple) containing the lowest completion rate (type: float) and the name(s) of the
+    habit(s) (type: str) that have the lowest completion rate(s)
     """
-    # man muss es schaffen, dass in dieser Habit-Liste nur Habits mit Daten ausgegeben werden
     completion_rates = calculate_completion_rate_per_habit(completed_habits)
     lowest_completion_rate = completion_rates[min(completion_rates, key=completion_rates.get)]
     worst_habits = [key for (key, value) in completion_rates.items() if value == lowest_completion_rate]  # it is
-    # possible that two habits have the same streak lengths, this way they would both be returned
+    # possible that two habits have the same completion rates. In this way, both are returned
     return lowest_completion_rate, worst_habits
 
 
 def find_completed_habits(habit_list):
-    """
-    returns only habits that contain data
-    :param habit_list:
-    :return:
+    """from a list of habits, identify the habits that have been completed at least once.
+
+    :param habit_list: a list (type: list) of habits (type: habit.HabitDB)
+    :return: a list (type: list) of habits (type: habit.HabitDB) that have been completed at least once
     """
     check_dates = list(map(return_completions, habit_list))
     habit_indices = [index for index, value in enumerate(check_dates) if len(value) > 0]
@@ -466,43 +460,40 @@ def find_completed_habits(habit_list):
 
 
 def analysis_index():
-    """
-
-    :return:
-    """
+    """return the index names for the analysis of habits"""
     return ["periodicity: ", "last completion: ", "longest streak: ", "current streak: ",
             "total breaks: ", "completion rate (last 4 weeks): "]
 
 
-def detailed_analysis_of_all_habits(habit_list):
-    """
+def analyse_all_habits(habit_list):
+    """provide a detailed analysis of a user's habits that have been completed at least once.
 
-    :param habit_list:
-    :return:
+    :param habit_list: a list (type: list) of all defined habits (type: habit.HabitDB) of a user
+    :return: a dataframe (type: pandas.core.frame.DataFrame) containing a detailed analysis for each habit
     """
     completed_habits = find_completed_habits(habit_list)
     habit_names = [habit.name for habit in completed_habits]
     analysis_data = [habit.analyze_habit() for habit in completed_habits]
     analysis_dict = dict(zip(habit_names, analysis_data))
-    pd.set_option("display.max_columns", None)
+    pd.set_option("display.max_columns", None)  # to show all columns
     return pd.DataFrame(analysis_dict, index=analysis_index())
 
 
-def analysis_one_habit(data, habit_name):
-    """
+def present_habit_analysis(data, habit_name):
+    """present the analysis of a habit as a data frame.
 
-    :param data:
-    :param habit_name:
-    :return:
+    :param data: a list (type: list) of the habit's statistics such as the longest streak, the current streak etc.
+    :param habit_name: the name of the habit whose analysis is to be presented (type: str)
+    :return: a dataframe presenting the habit's statistics (type: pandas.core.frame.DataFrame)
     """
     return pd.DataFrame(data, index=analysis_index(), columns=[habit_name])
 
 
 def list_to_df(analysis, data):
-    """
+    """turn two lists into a dataframe.
 
-    :param analysis:
-    :param data:
-    :return:
+    :param analysis: a list (type: list) containg the type of analysis (type: str) that was carried out
+    :param data: a list (type: list) containing the data that is to be displayed
+    :return: a dataframe (type: pandas.core.frame.DataFrame) from the two lists
     """
     return pd.DataFrame({'Analysis': analysis, 'data': data})
