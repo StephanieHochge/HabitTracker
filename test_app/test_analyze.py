@@ -27,16 +27,26 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert user_existing_2 is False
 
     def test_show_habit_data(self):
-        """test whether a user's habit information is returned correctly for all habits and for habits of a certain
-        periodicity"""
+        """test whether a user's habit information is returned correctly"""
         defined_habits = ana.show_habit_data(self.user_sh)
         assert len(defined_habits) == 6
+        assert "Sleep" in defined_habits["Name"].to_list()
 
-        """test whether a user's habits of a specific periodicity are correctly returned"""
-        weekly_habits = ana.return_habit_info(self.user_sh, "weekly")
-        assert len(weekly_habits) == 2
-        quaterly_habits = ana.return_habit_info(self.user_sh, "quarterly")
-        assert len(quaterly_habits) == 0
+    def test_return_completions(self):
+        """test if a habit's completion dates are correctly returned"""
+        habit_completions_dance_sh = ana.return_completions(self.dance_sh)
+        assert len(habit_completions_dance_sh) == 20
+        habit_completions_dance_rb = ana.return_completions(self.dance_rb)
+        assert habit_completions_dance_rb == ["2021-12-02", "2021-12-31"]
+
+    def test_check_any_completions(self):
+        """test if it is possible to check whether the user has completed any habits"""
+        completions_sh = ana.return_all_completions(self.user_sh)
+        completions_le = ana.return_all_completions(self.user_le)
+        assert len(completions_sh) == 6
+        assert len(completions_le) == 0
+        assert ana.check_any_completions(self.user_sh) is True
+        assert ana.check_any_completions(self.user_le) is False
 
     def test_return_periodicity(self):
         """test whether the periodicity of the habit is correctly returned"""
@@ -52,19 +62,13 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.return_ordered_periodicites(self.user_le) == []
         assert ana.return_ordered_periodicites(self.user_hp) == ["daily"]
 
-    def test_return_completions(self):
-        """test if a habit's completion dates are correctly returned"""
-        habit_completions = ana.return_completions(self.dance_sh)
-        assert len(habit_completions) == 20
-
-    def test_check_any_completions(self):
-        """test if it is possible to check whether the user has completed any habits"""
-        completions_sh = ana.return_all_completions(self.user_sh)
-        completions_le = ana.return_all_completions(self.user_le)
-        assert len(completions_sh) == 6
-        assert len(completions_le) == 0
-        assert ana.check_any_completions(self.user_sh) is True
-        assert ana.check_any_completions(self.user_le) is False
+    def test_return_habit_info(self):
+        all_habits = ana.return_habit_info(self.user_sh)
+        assert len(all_habits) == 6
+        weekly_habits = ana.return_habit_info(self.user_sh, "weekly")
+        assert len(weekly_habits) == 2
+        quaterly_habits = ana.return_habit_info(self.user_sh, "quarterly")
+        assert len(quaterly_habits) == 0
 
     def test_calculate_period_starts(self):
         """tests if the period starts corresponding to the completion dates of a habit are calculated correctly"""
@@ -101,7 +105,6 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert tidy_starts_weekly == [date(2022, 1, 17), date(2022, 1, 24)]
 
         # test add_future_period function
-        # wird nur einmal getestet, weil calculate_one_period_start schon getestet wurde
         future_period = ana.calculate_one_period_start("weekly", date.today() + timedelta(weeks=2))
         assert ana.add_future_period(tidy_starts_weekly, "weekly") == [date(2022, 1, 17), date(2022, 1, 24),
                                                                        future_period]
