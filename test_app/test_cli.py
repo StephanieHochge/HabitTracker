@@ -58,9 +58,9 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('main.input_chosen_habit', return_value="Dance")
     def test_delete_habit(self, mock_habit, mock_confirm):
         """test if it is possible to delete a habit"""
-        assert "Dance" in ana.return_habit_names(self.user_rb)
+        assert "Dance" in self.user_rb.habit_names
         main.delete_habit(self.user_rb)
-        assert "Dance" not in ana.return_habit_names(self.user_rb)
+        assert "Dance" not in self.user_rb.habit_names
 
     @patch('main.input_habit_modify_target', return_value="name")
     @patch('main.input_new_habit_name', return_value="Clean flat")
@@ -68,7 +68,7 @@ class TestCli(test_data.DataForTestingPytest):
     def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
         """test if it is possible to rename a habit without changing its periodicity"""
         main.modify_habit(self.user_sh)
-        assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
+        assert "Clean bathroom" not in self.user_sh.habit_names
 
     @patch('main.input_habit_modify_target', return_value="both")
     @patch('main.input_periodicity', return_value="monthly")
@@ -77,8 +77,9 @@ class TestCli(test_data.DataForTestingPytest):
     def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
         """test if it possible to modify a habit's name and periodicity"""
         main.modify_habit(self.user_sh)
-        assert "Clean bathroom" not in ana.return_habit_names(self.user_sh)
-        assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
+        habit = [habit for habit in self.user_sh.defined_habits if habit.name == "Clean flat"][0]
+        assert "Clean bathroom" not in self.user_sh.habit_names
+        assert habit.periodicity == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Conjuring")
     @patch('main.input_check_day', return_value="just now")

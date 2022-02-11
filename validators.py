@@ -38,13 +38,12 @@ class HabitNameValidator(Validator):
         self.user = user
 
     def validate(self, document):
-        habits_of_user = an.return_habit_names(self.user)
         if len(document.text.strip()) == 0:  # Habit enthält kein Zeichen oder nur Leerzeichen
             raise ValidationError(
                 message="Please enter at least one character that is not a space.",  # error message that is displayed
                 cursor_position=len(document.text),
             )
-        elif document.text in habits_of_user:  # Habit wird schon von dem Nutzer genutzt?
+        elif document.text in self.user.habit_names:  # Habit wird schon von dem Nutzer genutzt?
             raise ValidationError(
                 message="Habit already existing. Please choose another name.",
                 cursor_position=len(document.text),

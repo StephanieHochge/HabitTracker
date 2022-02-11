@@ -37,22 +37,6 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         habit_completions_dance_rb = ana.return_completions(self.dance_rb)
         assert habit_completions_dance_rb == ["2021-12-02", "2021-12-31"]
 
-    def test_check_any_completions(self):
-        """test if it is possible to check whether the user has completed any habits"""
-        completions_sh = ana.return_all_completions(self.user_sh)
-        completions_le = ana.return_all_completions(self.user_le)
-        assert len(completions_sh) == 6
-        assert len(completions_le) == 0
-        assert ana.check_any_completions(self.user_sh) is True
-        assert ana.check_any_completions(self.user_le) is False
-
-    def test_return_periodicity(self):
-        """test whether the periodicity of the habit is correctly returned"""
-        periodicity = ana.return_periodicity(self.user_sh, "Brush teeth")
-        assert periodicity == "daily"
-        periodicity = ana.return_periodicity(self.user_sh, "Dance")
-        assert periodicity == "weekly"
-
     def test_return_ordered_periodicities(self):
         """test whether the periodicities of a user's habits are correctly returned and in the correct order"""
         assert ana.return_ordered_periodicities(self.user_sh) == ["daily", "weekly", "monthly", "yearly"]

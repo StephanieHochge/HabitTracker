@@ -6,8 +6,6 @@ import pandas as pd
 import habit as hb
 
 
-# TODO: File durchgehen und schauen, ob ich noch öfter neuen Attribute von User nutzen kann (defined und completed
-#  habits)
 def create_data_frame(database, table):
     """create a pandas dataframe from one of the database tables
 
@@ -57,59 +55,13 @@ def return_completions(habit):
     return habit_data["CompletionDate"].to_list()
 
 
-def return_all_completions(user):
-    """return all completion dates for all habits of a user
-
-    :param user: the user for whom all completion dates are to be returned
-    :return: a list of lists of all habit completions
-    """
-    habit_list = habit_creator(user)
-    return list(map(return_completions, habit_list))
-
-
-def check_any_completions(user):
-    # TODO: löschen, weil es glaube ich nicht mehr verwendet wird
-    """check if at least one habit of a user has been completed
-
-    :param user: the user in question (type: user.UserDB)
-    :return: True if at least one habit has been completed, false if not (type: bool)
-    """
-    user_completions = return_all_completions(user)
-    data_existing = [True for x in user_completions if len(x) > 0]  # len(x) is > 0 if a habit has been completed
-    return True if True in data_existing else False
-
-
-def return_habit_names(user):
-    """Return a list of the names of all currently tracked habits of a user
-
-    :param user: the user in question (type: user.UserDB)
-    :return: a list (type: list) containing only the habit names (type: str) of the user
-    """
-    defined_habits = show_habit_data(user)
-    return defined_habits["Name"].to_list()
-
-
-def return_periodicity(user, habit_name):
-    # TODO: Funktion wird glaube ich nicht mehr bentutzt
-    """return the stored periodicity for a habit (e.g., to load the habit and its data).
-
-    :param user: the habit's user (type: user.UserDB)
-    :param habit_name: the name of the habit (type: str)
-    :return: the habit's stored periodicity (type: str)
-    """
-    habit_data = show_habit_data(user)
-    habit = habit_data.loc[habit_data["Name"] == habit_name]
-    return habit["Periodicity"].to_list()[0]
-
-
 def return_ordered_periodicities(user):
     """return a user's periodicities in the correct order (daily < weekly < monthly < yearly)
 
     :param user: the user for whom periodicities are to be returned (type: user.UserDB)
     :return: a list (type: list) of the correctly ordered periodicities (type: str)
     """
-    defined_habits = show_habit_data(user)
-    user_periodicities = (set(defined_habits["Periodicity"]))
+    user_periodicities = (set([habit.periodicity for habit in user.defined_habits]))
     possible_periodicities = ["daily", "weekly", "monthly", "yearly"]  # to determine the order in the next step
     return [x for x in possible_periodicities if x in user_periodicities]
 
@@ -411,7 +363,6 @@ def calculate_completion_rate(habit):
     :return: the habit's completion rate during the last four weeks (type: float)
     """
     final_periods = return_final_period_starts(habit)
-
     no_possible_periods = 28 if habit.periodicity == "daily" else 4
     cur_period = calculate_one_period_start(habit.periodicity, date.today())
     period_4_weeks_ago = calculate_one_period_start(habit.periodicity, (cur_period - timedelta(weeks=4)))

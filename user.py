@@ -37,6 +37,10 @@ class UserDB(User):
         return ana.habit_creator(self)
 
     @property
+    def habit_names(self):
+        return [habit.name for habit in self.defined_habits]
+
+    @property
     def completed_habits(self):
         return ana.find_completed_habits(self.defined_habits)
 
