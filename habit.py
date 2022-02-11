@@ -5,105 +5,24 @@ import db
 
 
 class Habit:
-    def __init__(self, name, periodicity, user):  # TODO: eventuell für die Periodicity enum library verwenden
-        self._name = name
-        self._periodicity = periodicity
-        self._user = user
-
-    # Implementation der Getter– und Setter-Methoden mithilfe von @Property Decorators
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
-    @property
-    def periodicity(self):
-        return self._periodicity
-
-    @periodicity.setter
-    def periodicity(self, periodicity):
-        self._periodicity = periodicity
-
-    @property
-    def user(self):
-        return self._user
-
-    @user.setter
-    def user(self, user):
-        self._user = user
+    def __init__(self, name, periodicity, user):
+        self.name = name
+        self.periodicity = periodicity
+        self.user = user
 
 
 class HabitDB(Habit):
 
     def __init__(self, name, periodicity, user, database):
         Habit.__init__(self, name, periodicity, user)
-        self._current_streak = 0
-        self._best_streak = 0
-        self._last_completion = None
-        self._breaks_total = 0
-        self._database = database
-        self._completion_rate = None
-
-    # Getter und Setter Methoden mithilfe des @property decorators
-    @property
-    def current_streak(self):
-        return self._current_streak
-
-    @current_streak.setter
-    def current_streak(self, current_streak):
-        self._current_streak = current_streak
-
-    @property
-    def best_streak(self):
-        return self._best_streak
-
-    @best_streak.setter
-    def best_streak(self, best_streak):
-        self._best_streak = best_streak
-
-    @property
-    def last_completion(self):
-        return self._last_completion
-
-    @last_completion.setter
-    def last_completion(self, last_completion):
-        self._last_completion = last_completion
-
-    @property
-    def breaks_total(self):
-        return self._breaks_total
-
-    @breaks_total.setter
-    def breaks_total(self, breaks_total):
-        self._breaks_total = breaks_total
-
-    @property
-    def database(self):
-        return self._database
-
-    @database.setter
-    def database(self, database):
-        self._database = database
-
-    @property
-    def completion_rate(self):
-        return self._completion_rate
-
-    @completion_rate.setter
-    def completion_rate(self, completion_rate):
-        self._completion_rate = completion_rate
+        self.database = database
 
     def __str__(self):
         return f"{self.name} with {self.periodicity} periodicity from {self.user} saved in {self.database}"
 
-
     # die übrigen Methoden
     def store_habit(self, creation_time=None):
         db.add_habit(self, creation_time)
-        return True  # TODO: Chris fragen, ob das so gemeint war
 
     def check_off_habit(self, check_date: str = None):
         """
@@ -111,22 +30,12 @@ class HabitDB(Habit):
         :param check_date:
         :type check_date: object
         """
-        if not check_date:
-            self.last_completion = str(date.today())
-        elif not self.last_completion or datetime.fromisoformat(check_date) > \
-                datetime.fromisoformat(self.last_completion):
-            # last_completion wird nur geändert, wenn das aktuelle Datum von Check-Date größer ist als das last
-            # completion date oder es noch keins gibt
-            self.last_completion, _ = check_date.split(" ")
         db.add_completion(self, check_date)
 
-    def find_last_check(self):
+    @property
+    def last_completion(self):
         completions = ana.return_completions(self)
-        if not completions:
-            self.last_completion = None
-        else:
-            self.last_completion = max(completions)
-        return self.last_completion
+        return None if not completions else max(completions)
 
     def delete_habit(self):
         db.delete_habit(self)
@@ -138,32 +47,25 @@ class HabitDB(Habit):
         if name:
             self.name = name
 
-    def calculate_best_streak(self):
-        self.best_streak = ana.calculate_longest_streak(self)
-        return self.best_streak
+    @property
+    def best_streak(self):
+        return ana.calculate_longest_streak(self)
 
-    def calculate_current_streak(self):
-        self.current_streak = ana.calculate_curr_streak(self)
-        return self.current_streak
+    @property
+    def current_streak(self):
+        return ana.calculate_curr_streak(self)
 
-    def calculate_breaks(self):
-        self.breaks_total = ana.calculate_break_no(self)
-        return self.breaks_total
+    @property
+    def breaks_total(self):
+        return ana.calculate_break_no(self)
 
-    def calculate_completion_rate(self):
-        self.completion_rate = round((ana.calculate_completion_rate(self))*100)
+    @property
+    def completion_rate(self):
+        return round((ana.calculate_completion_rate(self))*100)
 
     def analyze_habit(self):
-        self.calculate_breaks()
-        self.calculate_best_streak()
-        self.calculate_current_streak()
-        self.find_last_check()
         data = [self.periodicity, self.last_completion, f"{self.best_streak} period(s)",
                 f"{self.current_streak} period(s)", self.breaks_total]
-        if self.periodicity in ["daily", "weekly"]:
-            self.calculate_completion_rate()
-            data.append(f"{self.completion_rate} %")
-        else:
-            data.append("---")
+        data.append(f"{self.completion_rate} %") if self.periodicity in ["daily", "weekly"] else data.append("---")
         return data
 
