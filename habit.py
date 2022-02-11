@@ -1,5 +1,3 @@
-from datetime import datetime, date
-
 import analyze as ana
 import db
 

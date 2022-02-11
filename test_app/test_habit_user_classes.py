@@ -9,43 +9,23 @@ import pytest
 
 class TestHabitUser(test_data.DataForTestingPytest):
 
-    def test_habit(self):
-        """
-        tests whether a habit object is correctly created
-        """
-        habit = HabitDB("Brush teeth", "weekly", "StephanieHochge", self.database)
-        assert habit.name == "Brush teeth"
-        assert habit.periodicity == "weekly"
-        assert habit.user == "StephanieHochge"
-        # TODO: Entscheidung: muss ich das überhaupt testen? (wird ja auch schon bei der Initialisierung der
-        #  Testdatenbank verwendet)
-
-    def test_user(self):
-        """
-        tests whether a user object is correctly created
-        """
-        user = UserDB("StephanieHochge", self.database)
-        assert user.username == "StephanieHochge"
-
     def test_habitDB(self):
-        """
-        tests whether habits can be stored and checked off
-        """
-        user = UserDB("Hansi", self.database)
-        user.store_user()
-        habit = HabitDB("Brush teeth", "weekly", user, self.database)
-        habit.store_habit()
-        habit.check_off_habit()
-        habit.check_off_habit("2021-12-05 12:54:24.999098")
-        assert habit.last_completion == str(date.today())
-        user2 = UserDB("Mausi", self.database)
-        user2.store_user()
-        habit_2 = HabitDB("Clean window", "weekly", user2, self.database)
-        habit_2.store_habit()
-        habit_2.check_off_habit("2021-12-05 12:54:24.999098")
-        assert habit_2.last_completion == "2021-12-05"
+        """tests whether habits can be stored and checked off and whether the last completion is calculated correctly"""
+        hermione_g = UserDB("HermioneGranger", self.database)
+        hermione_g.store_user()
+        read = HabitDB("Read books", "daily", hermione_g, self.database)
+        read.store_habit()
+        read.check_off_habit()
+        read.check_off_habit("2021-12-05 12:54:24.999098")
+        assert read.last_completion == str(date.today())
 
-    def test_last_completion(self):
+        voldemort = UserDB("Voldemort", self.database)
+        voldemort.store_user()
+        kill = HabitDB("Kill Harry", "yearly", voldemort, self.database)
+        kill.store_habit()
+        kill.check_off_habit("2021-12-05 12:54:24.999098")
+        assert kill.last_completion == "2021-12-05"
+
         assert self.teeth_sh.last_completion == str(date.today() - timedelta(weeks=1))
 
     def test_delete_habit(self):
@@ -63,24 +43,44 @@ class TestHabitUser(test_data.DataForTestingPytest):
         self.dance_rb.modify_habit(name="Ballet", periodicity="daily")
         assert self.dance_rb.periodicity == "daily"
         assert self.dance_rb.name == "Ballet"
+        assert "Ballet" in self.user_rb.habit_names
         self.bathroom_sh.modify_habit(name="Flat")
         assert "Flat" in self.user_sh.habit_names
 
     def test_analyze_habit(self):
         analysis_teeth = self.teeth_sh.analyze_habit()
         assert len(analysis_teeth) == 6
+        assert self.teeth_sh.completion_rate == round(((6/28)*100))
+        assert self.teeth_sh.current_streak == 0
+        assert self.teeth_sh.breaks_total == 6
+        assert self.teeth_sh.best_streak == 21
+
+        self.bathroom_sh.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=1)))
+        assert self.bathroom_sh.completion_rate == 25
+
+        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=2)))
+        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=3)))
+        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=4)))
+        assert self.sleep_sh.best_streak == 3
+        assert self.sleep_sh.completion_rate == round(((3/28)*100))
 
     def test_userDB(self):
-        """
-        tests whether users can be stored
-        """
-        user = UserDB("HansJ", self.database)
+        """test whether users can be stored in the database"""
+        user = UserDB("RonWeasley", self.database)
         user.store_user()
+        user_df = ana.create_data_frame(user.database, "HabitAppUser")
+        assert user.username in user_df["UserName"].to_list()
 
     def test_analyze_habits(self):
         habit_comparison, statistics = self.user_sh.analyze_habits()
         assert len(habit_comparison.columns) == 5
         assert "Clean bathroom" in statistics
-        # TODO: Überprüfen, was passiert, wenn man keine weekly oder daily habits hat
-        # TODO: noch einen Test hinzufügen, der testet, dass bei der Summary Analyse bei der lowest completion rate
-        #  richtig gerundet wird (war zuerst nicht der Fall)
+        assert self.user_sh.best_habit == "Brush teeth"
+        assert self.user_sh.worst_habit == "Clean bathroom"
+        assert self.user_sh.lowest_completion_rate == 0
+        assert self.user_sh.longest_streak == 21
+
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=6)))
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=7)))
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=8)))
+        assert self.user_hp.lowest_completion_rate == round(((3/28)*100))

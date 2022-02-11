@@ -45,8 +45,10 @@ class DataForTesting:
     def store_habit_completions(self):
         db.add_completion(self.teeth_rb)
         db.add_completion(self.teeth_rb, "2021-12-02 07:56:24.999098")
+
         db.add_completion(self.dance_rb, "2021-12-02 07:56:24.999098")
         db.add_completion(self.dance_rb, "2021-12-31 07:56:24.999098")
+
         db.add_completion(self.teeth_sh, "2021-12-01 07:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-01 09:56:24.999098")
         db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
@@ -84,6 +86,7 @@ class DataForTesting:
         db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=3)))
         db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=4)))
         db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=5)))
+
         db.add_completion(self.dance_sh, "2021-11-06 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-11-07 07:56:24.999098")
         db.add_completion(self.dance_sh, "2021-11-11 07:56:24.999098")
@@ -102,6 +105,7 @@ class DataForTesting:
         db.add_completion(self.dance_sh, "2021-12-30 07:56:24.999098")
         db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=1)))
         db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=2)))
+
         db.add_completion(self.bathroom_sh, "2021-11-06 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2021-11-13 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2021-11-20 07:56:24.999098")
@@ -109,6 +113,7 @@ class DataForTesting:
         db.add_completion(self.bathroom_sh, "2021-12-11 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2021-12-18 07:56:24.999098")
         db.add_completion(self.bathroom_sh, "2022-01-01 07:56:24.999098")
+
         db.add_completion(self.windows_sh, "2021-06-23 07:56:24.999098")
         db.add_completion(self.windows_sh, "2021-07-06 07:56:24.999098")
         db.add_completion(self.windows_sh, "2021-09-15 07:56:24.999098")
@@ -117,9 +122,12 @@ class DataForTesting:
         db.add_completion(self.windows_sh, "2021-12-30 07:56:24.999098")
         db.add_completion(self.windows_sh, "2022-01-30 07:56:24.999098")
         db.add_completion(self.windows_sh)
+
         db.add_completion(self.dentist_sh, "2022-01-05 07:56:24.999098")
         db.add_completion(self.dentist_sh, "2021-12-05 07:56:24.999098")
+
         db.add_completion(self.teeth_sh, "2021-12-03 07:56:24.999098")
+
         db.add_completion(self.dance_sh, "2021-12-21 07:56:24.999098")
         db.add_completion(self.dance_sh)
         # Todo: am besten noch ein paar Daten mehr einfügen, die mit timedelta und now berechnet werden, damit die Tests

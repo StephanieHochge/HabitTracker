@@ -60,7 +60,7 @@ class UserDB(User):
         """the worst habit is the one with which the user struggled the most last month, i.e., the habit with the lowest
          completion rate (ein worst habit gibt es nur, wenn der Nutzer mindestens ein daily oder weekly habit hat)"""
         lowest_completion_rate, _ = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
-        return lowest_completion_rate
+        return round((lowest_completion_rate*100))
 
     @property
     def worst_habit(self):
