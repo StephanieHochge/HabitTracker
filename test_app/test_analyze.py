@@ -221,7 +221,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """test if a user's lowest completion rate and the corresponding habit(s) are correctly determined"""
 
         # test if completions rates per habit are correctly calculated
-        habit_list_sh = self.user_sh.return_habit_list()
+        habit_list_sh = self.user_sh.return_habits()
         completed_habits_sh = ana.find_completed_habits(habit_list_sh)
 
         self.dance_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
@@ -233,7 +233,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=5)))
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=6)))
 
-        habit_list_rb = self.user_rb.return_habit_list()
+        habit_list_rb = self.user_rb.return_habits()
         completed_habits_rb = ana.find_completed_habits(habit_list_rb)
 
         completion_rates_sh = ana.calculate_completion_rate_per_habit(completed_habits_sh)
@@ -260,3 +260,5 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         habits_with_data_rb = ana.find_completed_habits(habit_list_rb)
         comparison_data_rb = ana.analyse_all_habits(habits_with_data_rb)
         assert list(comparison_data_rb) == ["Brush teeth", "Dance"]
+
+# File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet
