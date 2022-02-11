@@ -66,6 +66,7 @@ def return_all_completions(user):
 
 
 def check_any_completions(user):
+    # TODO: löschen, weil es glaube ich nicht mehr verwendet wird
     """check if at least one habit of a user has been completed
 
     :param user: the user in question (type: user.UserDB)
@@ -87,6 +88,7 @@ def return_habit_names(user):
 
 
 def return_periodicity(user, habit_name):
+    # TODO: Funktion wird glaube ich nicht mehr bentutzt
     """return the stored periodicity for a habit (e.g., to load the habit and its data).
 
     :param user: the habit's user (type: user.UserDB)
@@ -98,7 +100,7 @@ def return_periodicity(user, habit_name):
     return habit["Periodicity"].to_list()[0]
 
 
-def return_ordered_periodicites(user):
+def return_ordered_periodicities(user):
     """return a user's periodicities in the correct order (daily < weekly < monthly < yearly)
 
     :param user: the user for whom periodicities are to be returned (type: user.UserDB)

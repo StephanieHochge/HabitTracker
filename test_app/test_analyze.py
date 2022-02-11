@@ -55,10 +55,10 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
 
     def test_return_ordered_periodicities(self):
         """test whether the periodicities of a user's habits are correctly returned and in the correct order"""
-        assert ana.return_ordered_periodicites(self.user_sh) == ["daily", "weekly", "monthly", "yearly"]
-        assert ana.return_ordered_periodicites(self.user_rb) == ["daily", "weekly"]
-        assert ana.return_ordered_periodicites(self.user_le) == []
-        assert ana.return_ordered_periodicites(self.user_hp) == ["daily"]
+        assert ana.return_ordered_periodicities(self.user_sh) == ["daily", "weekly", "monthly", "yearly"]
+        assert ana.return_ordered_periodicities(self.user_rb) == ["daily", "weekly"]
+        assert ana.return_ordered_periodicities(self.user_le) == []
+        assert ana.return_ordered_periodicities(self.user_hp) == ["daily"]
 
     def test_return_habit_info(self):
         all_habits = ana.return_habit_info(self.user_sh)

@@ -194,11 +194,9 @@ def identify_habit(habit_action, user):
     :param user: the user whose habits are displayed (type: user.UserDB)
     :return: the habit which the user chose (type: habit.HabitDB)
     """
-    tracked_habits = an.return_habit_names(user)
+    tracked_habits = user.return_habits()
     habit_name = input_chosen_habit(habit_action, tracked_habits)
-    habit_periodicity = an.return_periodicity(user, habit_name)
-    habit = HabitDB(habit_name, habit_periodicity, user, user.database)
-    return habit
+    return [habit for habit in tracked_habits if habit.name == habit_name][0]
 
 
 def delete_habit(user):
@@ -262,9 +260,8 @@ def analyze_habits(user):
 
     :param user: the user who wants to analyze habit(s) (type: user.UserDB)
     """
-    tracked_habits = an.habit_creator(user)
-    habits_with_data = an.find_completed_habits(tracked_habits)  # only habits with data can be analyzed
-    habit_names = [habit.name for habit in habits_with_data]
+    completed_habits = user.find_completed_habits()
+    habit_names = [habit.name for habit in completed_habits]  # only completed habits can be analyzed
     habit_to_analyze = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
     if habit_to_analyze == "All habits":
         habit_comparison, analysis = user.analyze_habits()
@@ -273,8 +270,7 @@ def analyze_habits(user):
         A detailed comparison of all habits:
         {habit_comparison}""")
     else:
-        habit_periodicity = an.return_periodicity(user, habit_to_analyze)
-        habit = HabitDB(habit_to_analyze, habit_periodicity, user, user.database)
+        habit = [habit for habit in completed_habits if habit.name == habit_to_analyze][0]
         data = habit.analyze_habit()
         print(an.present_habit_analysis(data, habit.name))
 
@@ -299,7 +295,7 @@ def inspect_habits(user):
 
     :param user: the user who wants to inspect the habits (type: user.UserDB)
     """
-    user_periodicities = an.return_ordered_periodicites(user)
+    user_periodicities = an.return_ordered_periodicities(user)
     view_habits = qu.select("Which habits do you want to look at?",
                             choices=["all habits"] + [(x + " habits only") for x in user_periodicities]).ask()
     periodicity = None if view_habits == "all habits" else view_habits.replace(" habits only", "")
@@ -315,17 +311,17 @@ def determine_possible_actions(user):
     """
     actions = {
         "no habits": ["Create habit", "Exit"],
-        "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
-        "habit with data": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
+        "no completed habits": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
+        "completed habits": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
     }  # to avoid exceptions at runtime, only the actions that users can perform are available to them
-    habits = an.show_habit_data(user)
-    habit_data_existing = an.check_any_completions(user)
-    if len(habits) == 0:
+    tracked_habits = user.return_habits()
+    completed_habits = user.find_completed_habits()
+    if len(tracked_habits) == 0:
         category = "no habits"
-    elif not habit_data_existing:
-        category = "habit without data"
+    elif not completed_habits:
+        category = "no completed habits"
     else:
-        category = "habit with data"
+        category = "completed habits"
     return actions[category]
 
 
