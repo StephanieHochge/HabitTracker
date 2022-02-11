@@ -1,16 +1,13 @@
 import db
-from db import get_db, add_user, add_completion, add_habit
+from db import get_db
 from habit import HabitDB
 from user import UserDB
 import analyze as an
 import questionary as qu
 from validators import HabitNameValidator, UserNameValidator
-from exceptions import UserNameNotExisting, UserHasNoHabits
+from exceptions import UserNameNotExisting
 import test_data
 import datetime
-from unittest.mock import patch
-import time
-import os
 
 
 # Some input commands are outsourced to facilitate testing of the cli
@@ -102,7 +99,7 @@ def return_past_days(no_days):
     return str(datetime.date.today() - datetime.timedelta(days=no_days))
 
 
-def input_check_date():
+def input_check_day():
     """ask the user to specify the checkoff date and time by selecting one of the options presented.
 
     :return: the selected checkoff date (type: str)
@@ -194,9 +191,8 @@ def identify_habit(habit_action, user):
     :param user: the user whose habits are displayed (type: user.UserDB)
     :return: the habit which the user chose (type: habit.HabitDB)
     """
-    tracked_habits = user.return_habits()
-    habit_name = input_chosen_habit(habit_action, tracked_habits)
-    return [habit for habit in tracked_habits if habit.name == habit_name][0]
+    habit_name = input_chosen_habit(habit_action, user.defined_habits)
+    return [habit for habit in user.defined_habits if habit.name == habit_name][0]
 
 
 def delete_habit(user):
@@ -223,12 +219,12 @@ def modify_habit(user):
         print(f"The habit's old name is {habit.name}.")
         new_name = input_new_habit_name(user)
         habit.modify_habit(name=new_name)
-        print(f"The habit's name was successfully changed to {new_name}.")
+        print(f"The habit's name was successfully changed to {habit.name}.")
     if target in ("periodicity", "both"):
         print(f"The habit's old periodicity is {habit.periodicity}.")
         new_periodicity = input_periodicity(habit.name)
         habit.modify_habit(periodicity=new_periodicity)
-        print(f"The habit's periodicity was successfully changed to {new_periodicity}.")
+        print(f"The habit's periodicity was successfully changed to {habit.periodicity}.")
         # TODO: @Chris: sehr schlimm, dass die beiden if-Teile so gleich sind?
 
 
@@ -239,7 +235,7 @@ def check_off_habit(user):
     :param user: the user who wants to check off the habit (type: user.UserDB)
     """
     habit = identify_habit("check off", user)
-    check_day = input_check_date()
+    check_day = input_check_day()
     if check_day == "just now":
         check_date = None
     elif check_day == "earlier today":
@@ -260,8 +256,7 @@ def analyze_habits(user):
 
     :param user: the user who wants to analyze habit(s) (type: user.UserDB)
     """
-    completed_habits = user.find_completed_habits()
-    habit_names = [habit.name for habit in completed_habits]  # only completed habits can be analyzed
+    habit_names = [habit.name for habit in user.completed_habits]  # only completed habits can be analyzed
     habit_to_analyze = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
     if habit_to_analyze == "All habits":
         habit_comparison, analysis = user.analyze_habits()
@@ -270,7 +265,7 @@ def analyze_habits(user):
         A detailed comparison of all habits:
         {habit_comparison}""")
     else:
-        habit = [habit for habit in completed_habits if habit.name == habit_to_analyze][0]
+        habit = [habit for habit in user.completed_habits if habit.name == habit_to_analyze][0]
         data = habit.analyze_habit()
         print(an.present_habit_analysis(data, habit.name))
 
@@ -314,11 +309,9 @@ def determine_possible_actions(user):
         "no completed habits": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
         "completed habits": ["Manage habits", "Look at habits", "Check off habit", "Analyze habits", "Exit"]
     }  # to avoid exceptions at runtime, only the actions that users can perform are available to them
-    tracked_habits = user.return_habits()
-    completed_habits = user.find_completed_habits()
-    if len(tracked_habits) == 0:
+    if len(user.defined_habits) == 0:
         category = "no habits"
-    elif not completed_habits:
+    elif not user.completed_habits:
         category = "no completed habits"
     else:
         category = "completed habits"

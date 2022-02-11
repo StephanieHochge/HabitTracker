@@ -81,26 +81,23 @@ class TestCli(test_data.DataForTestingPytest):
         assert ana.return_periodicity(self.user_sh, "Clean flat") == "monthly"
 
     @patch('main.input_chosen_habit', return_value="Conjuring")
-    @patch('main.input_check_date', return_value="just now")
+    @patch('main.input_check_day', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
         """test that it is possible to check off a habit at the current moment"""
         main.check_off_habit(self.user_hp)
-        self.conjure_hp.find_last_check()
         assert self.conjure_hp.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Brush teeth")
-    @patch('main.input_check_date', return_value="earlier today")
+    @patch('main.input_check_day', return_value="earlier today")
     def test_check_off_habit_earlier(self, mock_now, mock_habit):
         """test that it is possible to check off a habit at the earlier today"""
         main.check_off_habit(self.user_sh)
-        self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Brush teeth")
-    @patch('main.input_check_date', return_value="yesterday")
+    @patch('main.input_check_day', return_value="yesterday")
     def test_check_off_habit_past(self, mock_check_date, mock_habit):
         main.check_off_habit(self.user_sh)
-        self.teeth_sh.find_last_check()
         assert self.teeth_sh.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
 
     def test_determine_possible_actions(self):

@@ -6,6 +6,8 @@ import pandas as pd
 import habit as hb
 
 
+# TODO: File durchgehen und schauen, ob ich noch öfter neuen Attribute von User nutzen kann (defined und completed
+#  habits)
 def create_data_frame(database, table):
     """create a pandas dataframe from one of the database tables
 

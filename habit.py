@@ -20,32 +20,10 @@ class HabitDB(Habit):
     def __str__(self):
         return f"{self.name} with {self.periodicity} periodicity from {self.user} saved in {self.database}"
 
-    # die übrigen Methoden
-    def store_habit(self, creation_time=None):
-        db.add_habit(self, creation_time)
-
-    def check_off_habit(self, check_date: str = None):
-        """
-
-        :param check_date:
-        :type check_date: object
-        """
-        db.add_completion(self, check_date)
-
     @property
     def last_completion(self):
         completions = ana.return_completions(self)
         return None if not completions else max(completions)
-
-    def delete_habit(self):
-        db.delete_habit(self)
-
-    def modify_habit(self, name=None, periodicity=None):
-        db.modify_habit(self, name, periodicity)
-        if periodicity:
-            self.periodicity = periodicity
-        if name:
-            self.name = name
 
     @property
     def best_streak(self):
@@ -62,6 +40,28 @@ class HabitDB(Habit):
     @property
     def completion_rate(self):
         return round((ana.calculate_completion_rate(self))*100)
+
+    # die übrigen Methoden
+    def store_habit(self, creation_time=None):
+        db.add_habit(self, creation_time)
+
+    def check_off_habit(self, check_date: str = None):
+        """
+
+        :param check_date:
+        :type check_date: object
+        """
+        db.add_completion(self, check_date)
+
+    def delete_habit(self):
+        db.delete_habit(self)
+
+    def modify_habit(self, name=None, periodicity=None):
+        db.modify_habit(self, name, periodicity)
+        if periodicity:
+            self.periodicity = periodicity
+        if name:
+            self.name = name
 
     def analyze_habit(self):
         data = [self.periodicity, self.last_completion, f"{self.best_streak} period(s)",

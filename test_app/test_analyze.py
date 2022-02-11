@@ -221,9 +221,6 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """test if a user's lowest completion rate and the corresponding habit(s) are correctly determined"""
 
         # test if completions rates per habit are correctly calculated
-        habit_list_sh = self.user_sh.return_habits()
-        completed_habits_sh = ana.find_completed_habits(habit_list_sh)
-
         self.dance_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=1)))
@@ -233,8 +230,8 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=5)))
         self.teeth_rb.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=6)))
 
-        habit_list_rb = self.user_rb.return_habits()
-        completed_habits_rb = ana.find_completed_habits(habit_list_rb)
+        completed_habits_sh = self.user_sh.completed_habits
+        completed_habits_rb = self.user_rb.completed_habits
 
         completion_rates_sh = ana.calculate_completion_rate_per_habit(completed_habits_sh)
         assert list(completion_rates_sh.values()) == [6 / 28, 2 / 4, 0 / 4]

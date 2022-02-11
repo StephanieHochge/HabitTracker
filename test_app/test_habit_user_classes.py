@@ -45,8 +45,8 @@ class TestHabitUser(test_data.DataForTestingPytest):
         habit_2.check_off_habit("2021-12-05 12:54:24.999098")
         assert habit_2.last_completion == "2021-12-05"
 
-    def test_find_last_check(self):
-        assert self.teeth_sh.find_last_check() == str(date.today() - timedelta(weeks=1))
+    def test_last_completion(self):
+        assert self.teeth_sh.last_completion == str(date.today() - timedelta(weeks=1))
 
     def test_delete_habit(self):
         """test that it is possible to delete a habit and its corresponding data from the Habit and Completion tables"""
