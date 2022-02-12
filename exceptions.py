@@ -7,7 +7,7 @@ class UserNameNotExisting(Exception):
         message ('str'): the error message that can be displayed
     """
 
-    def __init__(self, username):
+    def __init__(self, username: str):
         self.username = username
         self.message = "A user with this username does not exist."
         super().__init__(self.message)
