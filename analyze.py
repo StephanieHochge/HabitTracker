@@ -71,7 +71,7 @@ def return_habit_info(user, periodicity=None):
     only the habits with a certain periodicity.
 
     :param user: the user (type: user.UserDB)
-    :param periodicity: the periodicity for which infos are to be returned (str)
+    :param periodicity: the periodicity for which information is to be returned ('str')
     :return: a data frame containing the name, periodicity and creation time of the desired habits
     (type: pandas.core.frame.DataFrame)
     """
@@ -415,7 +415,7 @@ def analysis_index():
             "total breaks: ", "completion rate (last 4 weeks): "]
 
 
-def analyse_all_habits(habit_list):
+def analyze_all_habits(habit_list):
     """provide a detailed analysis of a user's habits that have been completed at least once.
 
     :param habit_list: a list (type: list) of all defined habits (type: habit.HabitDB) of a user

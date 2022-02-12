@@ -8,7 +8,7 @@ def get_db(name):
     """create a sqlite database connection with the specified table schema and the passed name
 
     :param name: the name of the database connection (type: str)
-    :return: a database connection to the sqlite database with the specified name (type: sqlite3 connection)
+    :return: a database connection to the sqlite database with the specified name (type: sqlite3.connection)
     """
     try:
         database = sqlite3.connect(name)

@@ -234,12 +234,12 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         """test if the dataframes to analyze all habits are built correctly"""
         habit_list_sh = ana.habit_creator(self.user_sh)
         completed_habits_sh = ana.find_completed_habits(habit_list_sh)
-        comparison_data_sh = ana.analyse_all_habits(completed_habits_sh)
+        comparison_data_sh = ana.analyze_all_habits(completed_habits_sh)
         assert list(comparison_data_sh.columns) == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom",
                                                     "Go to dentist"]
         habit_list_rb = ana.habit_creator(self.user_rb)
         habits_with_data_rb = ana.find_completed_habits(habit_list_rb)
-        comparison_data_rb = ana.analyse_all_habits(habits_with_data_rb)
+        comparison_data_rb = ana.analyze_all_habits(habits_with_data_rb)
         assert list(comparison_data_rb) == ["Brush teeth", "Dance"]
 
 # File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet
