@@ -7,20 +7,50 @@ from datetime import date, timedelta, datetime
 
 
 class DataForTesting:
+    """This class creates test data for the application that can be used to the test the application's
+    functionality using pytest. It provides four test users with a total of nine test habits. The test users differ
+    in how many habits they have create (from zero to six) and whether they have already completed habits.
+    Habits differ in their periodicity as well as in how often they were completed.
+
+    Attributes:
+        user_sh (user.UserDB): a test user with six habits, not all of which have already been completed
+                                    (every available periodicity is used at least once by these habits).
+        user_rb (user.UserDB): a test user with two habits which have the same streak length and completion rate.
+        user_le (user.UserDB): a test user without any habits.
+        user_hp (user.UserDB): a test user that has one habit that has not yet been completed.
+
+        the following attributes are all habits ('habit.HabitDB') with varying periodicities,
+        users and completion numbers:
+        - teeth_rb
+        - dance_rb
+        - teeth_sh
+        - dance_sh
+        - windows_sh
+        - bathroom_sh
+        - dentist_sh
+        - sleep_sh
+        - conjure_hp
+    """
 
     def create_users(self, database):
+        """create the test users that are to be stored in the specified database
+
+        :param database: the database connection where the test users are to be stored ('sqlite3.connection')
+        """
         self.user_sh = UserDB("StephanieHochge", database)
         self.user_rb = UserDB("RajaBe", database)
         self.user_le = UserDB("LibertyEvans", database)
         self.user_hp = UserDB("HarryPotter", database)
 
     def store_users(self):
+        """store the test users in the database"""
         db.add_user(self.user_sh)
         db.add_user(self.user_rb)
         db.add_user(self.user_le)
         db.add_user(self.user_hp)
 
     def create_habits(self):
+        """create the test users' habits"""
         self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb)
         self.dance_rb = HabitDB("Dance", "weekly", self.user_rb)
         self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh)
@@ -32,6 +62,7 @@ class DataForTesting:
         self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp)
 
     def store_habits(self):
+        """store the test users' habits in the database"""
         db.add_habit(self.teeth_rb)
         db.add_habit(self.dance_rb)
         db.add_habit(self.teeth_sh, "2021-11-30 07:54:24.999098")
@@ -43,6 +74,7 @@ class DataForTesting:
         db.add_habit(self.conjure_hp)
 
     def store_habit_completions(self):
+        """store completion data for the test habits"""
         db.add_completion(self.teeth_rb)
         db.add_completion(self.teeth_rb, "2021-12-02 07:56:24.999098")
 
@@ -130,10 +162,9 @@ class DataForTesting:
 
         db.add_completion(self.dance_sh, "2021-12-21 07:56:24.999098")
         db.add_completion(self.dance_sh)
-        # Todo: am besten noch ein paar Daten mehr einfügen, die mit timedelta und now berechnet werden, damit die Tests
-        #  immer stimmen und die App auch später noch gut getestet werden kann
 
     def create_test_data(self, database):
+        """create all test data (i.e., users, habits, and habit completions) for the application"""
         self.create_users(database)
         self.store_users()
         self.create_habits()
@@ -142,15 +173,35 @@ class DataForTesting:
 
 
 class DataForTestingPytest(DataForTesting):
+    """This class creates the test data provided by the DataForTesting class and stores is it in a
+    test database. The data can then be used for testing the application's main functionalities using
+    pytest.
+
+    Attributes:
+        database (sqlite3.connection): the test database which stores the test data.
+        additional attributes: see the documentation of the DataForTesting class
+    """
     def setup_method(self):
+        """create the database connection, create the test data and save it in the database"""
         self.database = db.get_db("test.db")
         self.create_test_data(self.database)
 
     def teardown_method(self):
-        os.remove("test.db")  # löscht die Datenbank
+        """delete the test database after testing"""
+        os.remove("test.db")
 
 
 class DataForTestingCLI(DataForTesting):
-    def __init__(self, database):
-        self.database = db.get_db(database)
+    """This class creates the test data provided by the DataForTesting class and stores is it in the
+    database specified. The data can then be used for testing the application's main functionalities using the CLI.
+
+    Attributes:
+        database ('sqlite3.connection'): the database which stores the test data.
+        additional attributes: see the documentation of the DataForTesting class
+
+    Parameters:
+        database_name ('str'): the name of the database which stores the test data.
+    """
+    def __init__(self, database_name: str):
+        self.database = db.get_db(database_name)
         self.create_test_data(self.database)
