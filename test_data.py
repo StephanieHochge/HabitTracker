@@ -21,15 +21,15 @@ class DataForTesting:
         db.add_user(self.user_hp)
 
     def create_habits(self):
-        self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb, self.user_rb.database)
-        self.dance_rb = HabitDB("Dance", "weekly", self.user_rb, self.user_rb.database)
-        self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh, self.user_sh.database)
-        self.dance_sh = HabitDB("Dance", "weekly", self.user_sh, self.user_sh.database)
-        self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh, self.user_sh.database)
-        self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh, self.user_sh.database)
-        self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh, self.user_sh.database)
-        self.sleep_sh = HabitDB("Sleep", "daily", self.user_sh, self.user_sh.database)
-        self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp, self.user_sh.database)
+        self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb)
+        self.dance_rb = HabitDB("Dance", "weekly", self.user_rb)
+        self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh)
+        self.dance_sh = HabitDB("Dance", "weekly", self.user_sh)
+        self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh)
+        self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh)
+        self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh)
+        self.sleep_sh = HabitDB("Sleep", "daily", self.user_sh)
+        self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp)
 
     def store_habits(self):
         db.add_habit(self.teeth_rb)

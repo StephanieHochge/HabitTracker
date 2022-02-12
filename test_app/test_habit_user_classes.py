@@ -13,7 +13,7 @@ class TestHabitUser(test_data.DataForTestingPytest):
         """tests whether habits can be stored and checked off and whether the last completion is calculated correctly"""
         hermione_g = UserDB("HermioneGranger", self.database)
         hermione_g.store_user()
-        read = HabitDB("Read books", "daily", hermione_g, self.database)
+        read = HabitDB("Read books", "daily", hermione_g)
         read.store_habit()
         read.check_off_habit()
         read.check_off_habit("2021-12-05 12:54:24.999098")
@@ -21,7 +21,7 @@ class TestHabitUser(test_data.DataForTestingPytest):
 
         voldemort = UserDB("Voldemort", self.database)
         voldemort.store_user()
-        kill = HabitDB("Kill Harry", "yearly", voldemort, self.database)
+        kill = HabitDB("Kill Harry", "yearly", voldemort)
         kill.store_habit()
         kill.check_off_habit("2021-12-05 12:54:24.999098")
         assert kill.last_completion == "2021-12-05"

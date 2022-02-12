@@ -264,7 +264,7 @@ def habit_creator(user):
     """
     habit_data = show_habit_data(user)
     names_and_periodicity = habit_data[["Name", "Periodicity"]].values.tolist()
-    return list(map(lambda x: hb.HabitDB(x[0], x[1], user, user.database), names_and_periodicity))
+    return list(map(lambda x: hb.HabitDB(x[0], x[1], user), names_and_periodicity))
 
 
 def calculate_longest_streak_per_habit(completed_habits):

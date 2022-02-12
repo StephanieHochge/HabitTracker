@@ -6,7 +6,7 @@ class User:
     """Every user instance represents one user of the application.
 
     Attributes:
-        username (str): the name of the user.
+        username ('str'): the name of the user
     """
 
     def __init__(self, username):
@@ -17,14 +17,13 @@ class User:
 
 
 class UserDB(User):
-    """This class is used to handle the application's users, as well as their data stored in the database. The UserDB
+    """This class is used to handle a user's statistics as well as their data stored in the database. The UserDB
     class is a subclass of User and therefore inherits the username from User.
 
     Attributes:
         username ('str'): the name of the user
         database ('sqlite3.connection'): the database connection which stores user data
         # TODO: überall den Type noch so angeben
-
     """
 
     def __init__(self, username, database):

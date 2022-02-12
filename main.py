@@ -178,7 +178,7 @@ def create_habit(user):
     :return: the newly created habit (type: habit.HabitDB instance)
     """
     habit_name, periodicity = input_new_habit(user)
-    habit = HabitDB(habit_name, periodicity, user, user.database)
+    habit = HabitDB(habit_name, periodicity, user)
     habit.store_habit()
     print(f"The habit \"{habit_name}\" with the periodicity \"{periodicity}\" was created.")
     return habit
