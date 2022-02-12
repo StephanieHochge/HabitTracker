@@ -10,11 +10,11 @@ class TestDB(test_data.DataForTestingPytest):
     Attributes: see the documentation of the DataForTestingPytest class
     """
 
-    def retrieve_data(self, table):
+    def retrieve_data(self, table: str):
         """retrieve all data of a table
 
-        :param table: the name of the table (type: str)
-        :return: the data stored in the table (type: list of tuples)
+        :param table: the name of the table ('str')
+        :return: the data ('tuple') stored in the table ('list')
         """
         cursor = self.database.cursor()
         cursor.execute(f"SELECT * FROM {table}")

@@ -21,12 +21,12 @@ import db
 import habit as hb
 
 
-def create_data_frame(database, table):
+def create_data_frame(database, table: str):
     """create a pandas dataframe from one of the database tables
 
-    :param database: the database which contains the desired tables and data (type: sqlite3.connection)
-    :param table: the table to be created - either "Habit", "HabitAppUser" or "Completions" (type: str)
-    :return: a data frame containing the table's data (type: pandas.core.frame.DataFrame)
+    :param database: the database which contains the desired tables and data ('sqlite3.connection')
+    :param table: the table to be created - either "Habit", "HabitAppUser" or "Completions" ('str')
+    :return: a data frame containing the table's data ('pandas.core.frame.DataFrame')
     """
     habit_columns = ["PKHabitID", "FKUserID", "Name", "Periodicity", "CreationTime"]
     user_columns = ["PKUserID", "UserName"]
@@ -39,8 +39,8 @@ def create_data_frame(database, table):
 def check_for_username(user):
     """check if the entered username is already in use in the database, in which user data is stored
 
-    :param user: the user (type: user.UserDB)
-    :return: True if the user name already exists and false if not (type: bool)
+    :param user: the user ('user.UserDB')
+    :return: True if the user name already exists and false if not ('bool')
     """
     user_df = create_data_frame(user.database, "HabitAppUser")
     users = list(user_df["UserName"])
@@ -50,8 +50,8 @@ def check_for_username(user):
 def show_habit_data(user):
     """filter the Habit table for habit data of the specified user
 
-    :param user: the user for whom habit data is to be shown (type: user.UserDB)
-    :return: a data frame containing only the habits and their data for one user (type: pandas.core.frame.DataFrame)
+    :param user: the user for whom habit data is to be shown ('user.UserDB')
+    :return: a data frame containing only the habits and their data for one user ('pandas.core.frame.DataFrame')
     """
     user_id = db.find_user_id(user)
     habit_df = create_data_frame(user.database, "Habit")
@@ -61,8 +61,8 @@ def show_habit_data(user):
 def return_completions(habit):
     """return a list of the completion dates for a specific habit
 
-    :param habit: the habit for which the completion dates are to be returned (type: habit.HabitDB)
-    :return: a list (type: list) containing all completion dates (type: str) of the habit
+    :param habit: the habit for which the completion dates are to be returned ('habit.HabitDB')
+    :return: a list (list) containing all completion dates ('str') of the habit
     """
     habit_id = db.find_habit_id(habit)
     completions_df = create_data_frame(habit.database, "Completions")
@@ -73,8 +73,8 @@ def return_completions(habit):
 def return_ordered_periodicities(user):
     """return a user's periodicities in the correct order (daily < weekly < monthly < yearly)
 
-    :param user: the user for whom periodicities are to be returned (type: user.UserDB)
-    :return: a list (type: list) of the correctly ordered periodicities (type: str)
+    :param user: the user for whom periodicities are to be returned ('user.UserDB')
+    :return: a list (list) of the correctly ordered periodicities ('str')
     """
     user_periodicities = (set([habit.periodicity for habit in user.defined_habits]))
     possible_periodicities = ["daily", "weekly", "monthly", "yearly"]  # to determine the order in the next step
@@ -85,10 +85,10 @@ def return_habit_info(user, periodicity=None):
     """return the name, periodicity and creation time of either all of the user's habits (periodicity = None) or
     only the habits with a certain periodicity.
 
-    :param user: the user (type: user.UserDB)
+    :param user: the user ('user.UserDB')
     :param periodicity: the periodicity for which information is to be returned ('str')
     :return: a data frame containing the name, periodicity and creation time of the desired habits
-    (type: pandas.core.frame.DataFrame)
+    ('pandas.core.frame.DataFrame')
     """
     habit_info = show_habit_data(user)
     if periodicity:
@@ -99,8 +99,8 @@ def return_habit_info(user, periodicity=None):
 def str_to_date(str_dates):
     """convert a list of dates as strings into a list of dates as datetime dates
 
-    :param str_dates: list (type: list) of dates as strings (type: str)
-    :return: a list (type: list) of datetime dates (type: datetime.date)
+    :param str_dates: list ('list') of dates as strings ('str')
+    :return: a list ('list') of datetime dates ('datetime.date')
     """
     return list(map(lambda x: date.fromisoformat(x), str_dates))
 
@@ -110,8 +110,8 @@ def weekly_start(check_date):
     habits). The period start is defined as the date where the period starts (is each day for daily habits and
     each Monday for weekly habits etc.).
 
-    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
-    :return: the date of the Monday before the passed in date (type: datetime.date)
+    :param check_date: the completion date for which the period start is to be determined ('datetime.date')
+    :return: the date of the Monday before the passed in date ('datetime.date')
     """
     diff_to_monday = timedelta(days=check_date.weekday())
     return check_date - diff_to_monday
@@ -120,8 +120,8 @@ def weekly_start(check_date):
 def monthly_start(check_date):
     """determine the first day of the month of the passed in date
 
-    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
-    :return: the first day of the passed in month (type: datetime.date)
+    :param check_date: the completion date for which the period start is to be determined ('datetime.date')
+    :return: the first day of the passed in month ('datetime.date')
     """
     diff_to_first = timedelta(days=check_date.day - 1)
     return check_date - diff_to_first
@@ -130,8 +130,8 @@ def monthly_start(check_date):
 def yearly_start(check_date):
     """determine the first day of the year of the passed in date
 
-    :param check_date: the completion date for which the period start is to be determined (type: datetime.date)
-    :return: the first day of the passed in year (type: datetime.date)
+    :param check_date: the completion date for which the period start is to be determined ('datetime.date')
+    :return: the first day of the passed in year ('datetime.date')
     """
     return date.fromisoformat(f"{check_date.year}-01-01")
 
@@ -140,9 +140,9 @@ def calculate_period_starts(periodicity, check_dates):
     """for each completion date of a habit, calculate the period start. The period start is defined as the date where
     the period starts (is each day for daily habits and each Monday for weekly habits etc.)
 
-    :param periodicity: the habit's periodicity (type: str)
-    :param check_dates: a list (type: list) of the habit's completion dates (dates: datetime.date or str)
-    :return: a list (type: list) of period starts (type: datetime.date) - can contain duplicates
+    :param periodicity: the habit's periodicity ('str')
+    :param check_dates: a list ('list') of the habit's completion dates (dates: 'datetime.date' or 'str')
+    :return: a list ('list') of period starts ('datetime.date') - can contain duplicates
     """
     if isinstance(check_dates[0], str):  # are dates already in datetime.date format?
         check_dates = str_to_date(check_dates)
@@ -159,9 +159,9 @@ def calculate_period_starts(periodicity, check_dates):
 def calculate_one_period_start(periodicity, check_date):
     """calculate the start of the period when a habit with the specified periodicity was completed
 
-    :param periodicity: the habit's periodicty (type: str)
-    :param check_date: the date the habit was checked off (type: datetime.date)
-    :return: the start of the period (type: datetime.date)
+    :param periodicity: the habit's periodicty ('str')
+    :param check_date: the date the habit was checked off ('datetime.date')
+    :return: the start of the period ('datetime.date')
     """
     period_start = calculate_period_starts(periodicity, [check_date])
     return period_start[0]
@@ -170,8 +170,8 @@ def calculate_one_period_start(periodicity, check_date):
 def tidy_starts(period_starts):
     """remove duplicates in the inserted list and sort the elements
 
-    :param period_starts: a list (type: list) of period starts (type: datetime.date)
-    :return: a sorted list (type: list) of period starts (type: datetime.date) without duplicates
+    :param period_starts: a list ('list') of period starts ('datetime.date')
+    :return: a sorted list ('list') of period starts ('datetime.date') without duplicates
     """
     return sorted(list(set(period_starts)))
 
@@ -180,8 +180,8 @@ def return_allowed_time(periodicity):
     """check what time difference is allowed between two habit completions according to the habit's periodicity
     so that the streak is not broken
 
-    :param periodicity: the habit's periodicity (type: str)
-    :return: the allowed time difference (type: datetime.timedelta)
+    :param periodicity: the habit's periodicity ('str')
+    :return: the allowed time difference ('datetime.timedelta')
     """
     timeliness = {"daily": timedelta(days=1),
                   "weekly": timedelta(days=7),
@@ -195,9 +195,9 @@ def return_allowed_time(periodicity):
 def add_future_period(tidy_period_starts, periodicity):
     """add a future period to correctly calculate streaks and breaks
 
-    :param tidy_period_starts: the sorted list (type: list) of period starts (type: datetime.dates) without duplicates
-    :param periodicity: the habit's periodicity (type: str)
-    :return: a list (type: list) of period starts (type: datetime.date) including the calculated future period
+    :param tidy_period_starts: the sorted list ('list') of period starts ('datetime.dates') without duplicates
+    :param periodicity: the habit's periodicity ('str')
+    :return: a list ('list') of period starts ('datetime.date') including the calculated future period
     """
     period_starts = tidy_period_starts  # so as not to change the actual list
     duration = return_allowed_time(periodicity)  # approximate duration of a period
@@ -212,8 +212,8 @@ def return_final_period_starts(habit):
     """prepare for streak and break analysis by performing all functions necessary to return a clean list of periods,
     in which the habit was performed at least once, including the future period to correctly calculate break indices.
 
-    :param habit: the habit which is to be analyzed (type: habit.HabitDB)
-    :return: a clean list (type: list) of period starts (type: datetime.date), marking the start of periods,
+    :param habit: the habit which is to be analyzed ('habit.HabitDB')
+    :return: a clean list ('list') of period starts ('datetime.date'), marking the start of periods,
     in which the habit was performed at least once
     """
     check_dates = return_completions(habit)
@@ -225,9 +225,9 @@ def return_final_period_starts(habit):
 def calculate_element_diffs(final_periods):
     """calculate the differences between two consecutive elements in a list
 
-    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+    :param final_periods: clean list ('list') of dates ('datetime.date') that correspond to the start
      of the periods, in which the habit was checked off, including one future period
-    :return: a list (type: list) of differences (type: datetime.timedelta) between two consecutive period starts
+    :return: a list ('list') of differences ('datetime.timedelta') between two consecutive period starts
     """
     return [t - s for s, t in zip(final_periods, final_periods[1:])]
 
@@ -236,10 +236,10 @@ def calculate_break_indices(final_periods, periodicity):
     """return for the list of final periods the indices, of the periods, after which a habit streak was broken
     (i.e., the indices, after which at least one period is missing in the course of time)
 
-    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+    :param final_periods: clean list ('list') of dates ('datetime.date') that correspond to the start
      of the periods, in which the habit was checked off, including one future period
-    :param periodicity: the habit's periodicity (type: str)
-    :return: a list (type: list) of the indices (type: int) which indicate the break of a streak
+    :param periodicity: the habit's periodicity ('str')
+    :return: a list ('list') of the indices ('int') which indicate the break of a streak
     """
     diffs = calculate_element_diffs(final_periods)
     allowed_time = return_allowed_time(periodicity)
@@ -250,8 +250,8 @@ def calculate_streak_lengths(habit):
     """for a habit, calculate the length of each streak (i.e., the number of periods in a row, in which the habit was
     completed at least once)
 
-    :param habit: the habit for which the streak lengths are to be calculated (type: habit.HabitDB)
-    :return: a list (type: list) of the habit's streak lengths (type: int)
+    :param habit: the habit for which the streak lengths are to be calculated ('habit.HabitDB')
+    :return: a list ('list') of the habit's streak lengths ('int')
     """
     final_periods = return_final_period_starts(habit)
     break_indices = calculate_break_indices(final_periods, habit.periodicity)  # due to the added future period,
@@ -264,8 +264,8 @@ def calculate_streak_lengths(habit):
 def calculate_longest_streak(habit):
     """calculate the longest streak of a habit
 
-    :param habit: the habit for which the longest streak is to be calculated (type: habit.HabitDB)
-    :return: the habit's longest streak (type: int)
+    :param habit: the habit for which the longest streak is to be calculated ('habit.HabitDB')
+    :return: the habit's longest streak ('int')
     """
     streak_lengths = calculate_streak_lengths(habit)
     return max(streak_lengths)
@@ -274,8 +274,8 @@ def calculate_longest_streak(habit):
 def habit_creator(user):
     """create a list of the user's habits
 
-    :param user: the user for whom the habit list is to be created (type: user.UserDB)
-    :return: a list (type: list) of habits (type: habit.HabitDB)
+    :param user: the user for whom the habit list is to be created ('user.UserDB')
+    :return: a list ('list') of habits ('habit.HabitDB')
     """
     habit_data = show_habit_data(user)
     names_and_periodicity = habit_data[["Name", "Periodicity"]].values.tolist()
@@ -285,8 +285,8 @@ def habit_creator(user):
 def calculate_longest_streak_per_habit(completed_habits):
     """calculate the longest streak for each habit in the passed in list of habits
 
-    :param completed_habits: a list (type: list) of habits which have been completed at least once (type: habit.HabitDB)
-    :return: a dictionary (type: dict) with the habit names (type: str) as keys and their longest streaks (type: int) 
+    :param completed_habits: a list ('list') of habits which have been completed at least once ('habit.HabitDB')
+    :return: a dictionary ('dict') with the habit names ('str') as keys and their longest streaks ('int')
     as values
     """
     if len(completed_habits) == 0:
@@ -302,7 +302,7 @@ def calculate_longest_streak_of_all(completed_habits):
     completed the most periods in a row (i.e., a daily habit has a better chance of becoming the best habit than
     a yearly habit)
 
-    :param completed_habits: a list (type: list) of habits (type: habit.HabitDB) that have been completed at least once
+    :param completed_habits: a list ('list') of habits ('habit.HabitDB') that have been completed at least once
     :return: the value of the longest streak of all habits as well as the corresponding habit name (or habit names,
     since it is possible that several habits have the same longest streak)
     """
@@ -319,11 +319,11 @@ def calculate_longest_streak_of_all(completed_habits):
 def completed_in_period(final_periods, periodicity, period):
     """check if the habit was completed in the passed in period.
 
-    :param period: the period to check for, either "current" or "previous" (type: str)
-    :param final_periods: clean list (type: list) of dates (type: datetime.date) that correspond to the start
+    :param period: the period to check for, either "current" or "previous" ('str')
+    :param final_periods: clean list ('list') of dates ('datetime.date') that correspond to the start
      of the periods, in which the habit was checked off, including one future period
-    :param periodicity: the habit's periodicity
-    :return: true if the list of final periods contains the previous period, false otherwise (type: bool)
+    :param periodicity: the habit's periodicity ('str')
+    :return: true if the list of final periods contains the previous period, false otherwise ('bool')
     """
     cur_period_start = calculate_one_period_start(periodicity, date.today())
     if period == "current":
@@ -336,9 +336,9 @@ def completed_in_period(final_periods, periodicity, period):
 def calculate_curr_streak(habit):
     """calculate the passed in habit's current streak.
 
-    :param habit: the habit (type: habit.HabitDB), for which the current streak is to be calculated
+    :param habit: the habit ('habit.HabitDB'), for which the current streak is to be calculated
     :return: the current streak (i.e., the current number of periods in a row, in which the user has
-    completed the habit) (type: int)
+    completed the habit) ('int')
     """
     final_periods = return_final_period_starts(habit)
     # if a habit was not completed in the previous period, the current streak is either 0 (not completed in
@@ -353,8 +353,8 @@ def calculate_curr_streak(habit):
 def calculate_break_no(habit):
     """calculate how often a habit's streaks were broken since the first completion
 
-    :param habit: the habit which is to be analyzed (type: habit.HabitDB)
-    :return: the number of breaks (type: int)
+    :param habit: the habit which is to be analyzed ('habit.HabitDB')
+    :return: the number of breaks ('int')
     """
     final_periods = return_final_period_starts(habit)
     break_indices = calculate_break_indices(final_periods, habit.periodicity)
@@ -374,8 +374,8 @@ def calculate_completion_rate(habit):
     in which the habit was completed divided by the number of periods in which the habit was not
     completed during the last four weeks. Is only calculated for daily or weekly habits.
 
-    :param habit: the habit whose completion rate is to be calculated (type: habit.HabitDB)
-    :return: the habit's completion rate during the last four weeks (type: float)
+    :param habit: the habit whose completion rate is to be calculated ('habit.HabitDB')
+    :return: the habit's completion rate during the last four weeks ('float')
     """
     final_periods = return_final_period_starts(habit)
     no_possible_periods = 28 if habit.periodicity == "daily" else 4
@@ -389,9 +389,9 @@ def calculate_completion_rate_per_habit(completed_habits):
     """for each daily or weekly habit that has been completed at least once, calculate the completion rate of
     the last four weeks
 
-    :param completed_habits: a list (type: list) of completed habits (type: habit.HabitDB)
-    :return: a dictionary (type: dict) with the name of each daily or weekly habit (type: str) as key and their
-     completions rates (type: float) as values
+    :param completed_habits: a list ('list') of completed habits ('habit.HabitDB')
+    :return: a dictionary ('dict') with the name of each daily or weekly habit ('str') as key and their
+     completions rates ('float') as values
     """
     frequent_habits = [habit for habit in completed_habits if habit.periodicity in ("daily", "weekly")]
     habit_names = [habit.name for habit in frequent_habits]
@@ -402,9 +402,9 @@ def calculate_completion_rate_per_habit(completed_habits):
 def calculate_worst_completion_rate_of_all(completed_habits):
     """calculate from all daily and weekly habits that have been completed at least once the lowest completion rate.
 
-    :param completed_habits: a list (type: list) of completed habits (type: habit.HabitDB)
-    :return: a tuple (type: tuple) containing the lowest completion rate (type: float) and the name(s) of the
-    habit(s) (type: str) that have the lowest completion rate(s)
+    :param completed_habits: a list ('list') of completed habits ('habit.HabitDB')
+    :return: a tuple ('tuple') containing the lowest completion rate ('float') and the name(s) of the
+    habit(s) ('str') that have the lowest completion rate(s)
     """
     completion_rates = calculate_completion_rate_per_habit(completed_habits)
     lowest_completion_rate = completion_rates[min(completion_rates, key=completion_rates.get)]
@@ -416,8 +416,8 @@ def calculate_worst_completion_rate_of_all(completed_habits):
 def find_completed_habits(habit_list):
     """from a list of habits, identify the habits that have been completed at least once.
 
-    :param habit_list: a list (type: list) of habits (type: habit.HabitDB)
-    :return: a list (type: list) of habits (type: habit.HabitDB) that have been completed at least once
+    :param habit_list: a list ('list') of habits ('habit.HabitDB')
+    :return: a list ('list') of habits ('habit.HabitDB') that have been completed at least once
     """
     check_dates = list(map(return_completions, habit_list))
     habit_indices = [index for index, value in enumerate(check_dates) if len(value) > 0]
@@ -433,8 +433,8 @@ def analysis_index():
 def analyze_all_habits(habit_list):
     """provide a detailed analysis of a user's habits that have been completed at least once.
 
-    :param habit_list: a list (type: list) of all defined habits (type: habit.HabitDB) of a user
-    :return: a dataframe (type: pandas.core.frame.DataFrame) containing a detailed analysis for each habit
+    :param habit_list: a list ('list') of all defined habits ('habit.HabitDB') of a user
+    :return: a dataframe ('pandas.core.frame.DataFrame') containing a detailed analysis for each habit
     """
     completed_habits = find_completed_habits(habit_list)
     habit_names = [habit.name for habit in completed_habits]
@@ -447,9 +447,9 @@ def analyze_all_habits(habit_list):
 def present_habit_analysis(data, habit_name):
     """present the analysis of a habit as a data frame.
 
-    :param data: a list (type: list) of the habit's statistics such as the longest streak, the current streak etc.
-    :param habit_name: the name of the habit whose analysis is to be presented (type: str)
-    :return: a dataframe presenting the habit's statistics (type: pandas.core.frame.DataFrame)
+    :param data: a list ('list') of the habit's statistics such as the longest streak, the current streak etc.
+    :param habit_name: the name of the habit whose analysis is to be presented ('str')
+    :return: a dataframe presenting the habit's statistics ('pandas.core.frame.DataFrame')
     """
     return pd.DataFrame(data, index=analysis_index(), columns=[habit_name])
 
@@ -457,10 +457,12 @@ def present_habit_analysis(data, habit_name):
 def list_to_df(analysis, data):
     """turn two lists into a dataframe.
 
-    :param analysis: a list (type: list) containg the type of analysis (type: str) that was carried out
-    :param data: a list (type: list) containing the data that is to be displayed
-    :return: a dataframe (type: pandas.core.frame.DataFrame) from the two lists
+    :param analysis: a list ('list') containg the type of analysis ('str') that was carried out
+    :param data: a list ('list') containing the data that is to be displayed
+    :return: a dataframe ('pandas.core.frame.DataFrame') from the two lists
     """
     return pd.DataFrame({'Analysis': analysis, 'Data': data})
 
 # File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet
+# jede Funktion wird genutzt
+# TODO: die einfachen Datentypen noch hinter die Parameter schreiben

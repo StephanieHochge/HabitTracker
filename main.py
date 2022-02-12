@@ -362,7 +362,6 @@ def cli():
 if __name__ == "__main__":
     cli()
 
-# TODO: add docstrings to all modules and __init__ constructors
-# TODO: test if all functions are used
 
 ### für jede Funktion, die ich testen wollte, existiert mind. 1 Test hier
+# alle Funktionen werden verwendet

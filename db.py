@@ -170,3 +170,4 @@ def check_for_user_data(database):
 
 
 # File wurde durchgegangen, für jede wichtige Funktion existiert an irgendeiner Stelle ein Test
+# jede Funktion wird genutzt
