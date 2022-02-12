@@ -4,6 +4,11 @@ import os
 
 
 class TestDB(test_data.DataForTestingPytest):
+    """This class tests the main functionalities provided by the application's database module (db.py)
+    using the test data it inherits from the DataForTestingPytest class.
+
+    Attributes: see the documentation of the DataForTestingPytest class
+    """
 
     def retrieve_data(self, table):
         """retrieve all data of a table

@@ -6,6 +6,11 @@ from user import UserDB
 
 
 class TestHabitAnalysis(test_data.DataForTestingPytest):
+    """This class tests the main functionalities provided by the application's analysis module (analyze.py)
+    using the test data it inherits from the DataForTestingPytest class.
+
+    Attributes: see the documentation of the DataForTestingPytest class
+    """
 
     def test_create_data_frame(self):
         """test whether dataframes can be created from database tables"""

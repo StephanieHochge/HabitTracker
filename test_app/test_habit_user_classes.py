@@ -8,6 +8,11 @@ import pytest
 
 
 class TestHabitUser(test_data.DataForTestingPytest):
+    """This class tests the main functionalities provided by the application's HabitDB (habit.py) and UserDB
+    (user.py) classes using the test data it inherits from the DataForTestingPytest class.
+
+    Attributes: see the documentation of the DataForTestingPytest class
+    """
 
     def test_habitDB(self):
         """tests whether habits can be stored and checked off and whether the last completion is calculated correctly"""

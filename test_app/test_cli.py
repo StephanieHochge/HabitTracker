@@ -4,11 +4,15 @@ from unittest.mock import patch
 
 import main
 import test_data
-from user import UserDB
 import analyze as ana
 
 
 class TestCli(test_data.DataForTestingPytest):
+    """This class tests the main functionalities provided by the application's command line interface (main.py)
+     using the test data it inherits from the DataForTestingPytest class.
+
+    Attributes: see the documentation of the DataForTestingPytest class
+    """
 
     @patch('main.input_username', return_value="Hermione")
     def test_create_new_user(self, mock_input):
