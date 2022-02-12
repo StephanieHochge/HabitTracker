@@ -1,8 +1,23 @@
-from datetime import date, timedelta, datetime
-import db
+"""This module contains the habit tracker's functionalities necessary to handle and analyze habit data,
+as well as user data.
+
+Examples of the most important functionalities include functions to
+    - show a user's habit data
+    - retrieve a habit's completions
+    - calculate a habit's longest streak
+    - calculate a habit's completion rate
+    - calculate a habit's number of streak breaks
+    - calculate a user's longest streak
+    - calculate a user's lowest completion rate
+    - calculate a user's best habit
+    - calculate a user's worst habit
+"""
+
+from datetime import date, timedelta
 
 import pandas as pd
 
+import db
 import habit as hb
 
 

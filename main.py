@@ -1,8 +1,19 @@
+"""This module contains the habit tracker's functionalities necessary to control the user flow and to
+expose the user to the command line interface.
+
+Examples of the most important functionalities include functions to
+    - create a new user
+    - login
+    - manage habits (create, delete or modify)
+    - inspect habits
+    - complete habits
+    - analyze habits
+"""
+
 import db
-from db import get_db
 from habit import HabitDB
 from user import UserDB
-import analyze as an
+import analyze as ana
 import questionary as qu
 from validators import HabitNameValidator, UserNameValidator
 from exceptions import UserNameNotExisting
@@ -140,7 +151,7 @@ def login(database):
         try:
             username = input_username(database, "login")
             user = UserDB(username, database)
-            if not an.check_for_username(user):  # check if a user with the entered name exists in the database
+            if not ana.check_for_username(user):  # check if a user with the entered name exists in the database
                 raise UserNameNotExisting(user.username)
         except UserNameNotExisting as e:
             print("\x1b[0;0;41m" + str(e) + "\x1b[0m")
@@ -267,7 +278,7 @@ def analyze_habits(user):
     else:
         habit = [habit for habit in user.completed_habits if habit.name == habit_to_analyze][0]
         data = habit.analyze_habit()
-        print(an.present_habit_analysis(data, habit.name))
+        print(ana.present_habit_analysis(data, habit.name))
 
 
 def manage_habits(user):
@@ -290,7 +301,7 @@ def inspect_habits(user):
 
     :param user: the user who wants to inspect the habits (type: user.UserDB)
     """
-    user_periodicities = an.return_ordered_periodicities(user)
+    user_periodicities = ana.return_ordered_periodicities(user)
     view_habits = qu.select("Which habits do you want to look at?",
                             choices=["all habits"] + [(x + " habits only") for x in user_periodicities]).ask()
     periodicity = None if view_habits == "all habits" else view_habits.replace(" habits only", "")
@@ -321,7 +332,7 @@ def determine_possible_actions(user):
 
 def cli():
     """expose the user to the CLI"""
-    main_database = get_db("main.db")
+    main_database = db.get_db("main.db")
     if not db.check_for_user_data(main_database):  # create test data only if no other data is existing
         test_data.DataForTestingCLI("main.db")
 

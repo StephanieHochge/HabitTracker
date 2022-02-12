@@ -1,3 +1,12 @@
+"""This module contains the habit tracker's functionalities necessary to store and modify user and habit data.
+
+Examples of the most important functionalities include functions to
+    - create the database connection and stucture
+    - store data in the tables
+    - retrieve data from the tables
+    - delete or modify data
+"""
+
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
