@@ -9,7 +9,7 @@ class User:
         username ('str'): the name of the user
     """
 
-    def __init__(self, username):
+    def __init__(self, username: str):
         self.username = username
 
     def __str__(self):
@@ -23,7 +23,6 @@ class UserDB(User):
     Attributes:
         username ('str'): the name of the user
         database ('sqlite3.connection'): the database connection which stores user data
-        # TODO: überall den Type noch so angeben
     """
 
     def __init__(self, username: str, database):

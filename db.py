@@ -13,11 +13,11 @@ from datetime import datetime
 
 
 # create database structure and tables
-def get_db(name):
+def get_db(name: str):
     """create a sqlite database connection with the specified table schema and the passed name
 
-    :param name: the name of the database connection (type: str)
-    :return: a database connection to the sqlite database with the specified name (type: sqlite3.connection)
+    :param name: the name of the database connection ('str')
+    :return: a database connection to the sqlite database with the specified name ('sqlite3.connection')
     """
     try:
         database = sqlite3.connect(name)
@@ -33,7 +33,7 @@ def create_tables(database):
     """create the data schema for the database containing three tables: the HabitAppUser, the Habit and the
     Completions table.
 
-    :param database: the database connection in which the tables are to be created (type: sqlite3.connection)
+    :param database: the database connection in which the tables are to be created ('sqlite3.connection')
     """
     cursor = database.cursor()
 
@@ -64,7 +64,7 @@ def create_tables(database):
 def add_user(user):
     """store a new user in the "HabitAppUser" table
 
-    :param user: the user who is to be stored in the database (type: user.UserDB)
+    :param user: the user who is to be stored in the database ('user.UserDB')
     """
     cursor = user.database.cursor()
     cursor.execute("INSERT INTO HabitAppUser(UserName) VALUES (?)", [user.username])
@@ -74,8 +74,8 @@ def add_user(user):
 def find_user_id(user):
     """find the user ID of the user
 
-    :param user: the user, whose user ID is to be found (type: user.UserDB)
-    :return: the user's user_id (type: int)
+    :param user: the user, whose user ID is to be found ('user.UserDB')
+    :return: the user's user_id ('int')
     """
     cursor = user.database.cursor()
     cursor.execute("SELECT PKUserID FROM HabitAppUser WHERE UserName = ?", [user.username])
@@ -83,11 +83,11 @@ def find_user_id(user):
     return user_id[0]
 
 
-def add_habit(habit, creation_datetime=None):
+def add_habit(habit, creation_datetime: str = None):
     """store a new habit in the Habit table
 
-    :param habit: the habit to store (type: habit.HabitDB)
-    :param creation_datetime: the datetime the habit was created (type: str)
+    :param habit: the habit to store ('habit.HabitDB')
+    :param creation_datetime: the datetime the habit was created ('str')
     """
     cursor = habit.database.cursor()
     user_id = find_user_id(habit.user)
@@ -101,8 +101,8 @@ def add_habit(habit, creation_datetime=None):
 def find_habit_id(habit):
     """find the habit id of a habit
 
-    :param habit: the habit for which the id is to be found (type: habit.HabitDB)
-    :return: the habit's id (type: int)
+    :param habit: the habit for which the id is to be found ('habit.HabitDB')
+    :return: the habit's id ('int')
     """
     cursor = habit.database.cursor()
     user_id = find_user_id(habit.user)
@@ -112,11 +112,11 @@ def find_habit_id(habit):
     return habit_id[0]
 
 
-def add_completion(habit, check_datetime=None):
+def add_completion(habit, check_datetime: str = None):
     """store a new completion to the Completion table
 
-    :param habit: the habit for which a new completion is to be stored
-    :param check_datetime: the datetime when the habit was checked off (type: str)
+    :param habit: the habit for which a new completion is to be stored ('habit.HabitDB')
+    :param check_datetime: the datetime when the habit was checked off ('str')
     """
     cursor = habit.database.cursor()
     if not check_datetime:
@@ -131,7 +131,7 @@ def add_completion(habit, check_datetime=None):
 def delete_habit(habit):
     """delete a habit and its corresponding data from the database
 
-    :param habit: the habit to be deleted (type: habit.HabitDB)
+    :param habit: the habit to be deleted ('habit.HabitDB')
     """
     # is tested in "test_habit_user_classes"
     habit_id = find_habit_id(habit)
@@ -140,12 +140,12 @@ def delete_habit(habit):
     habit.database.commit()
 
 
-def modify_habit(habit, name=None, periodicity=None):
+def modify_habit(habit, name: str = None, periodicity: str = None):
     """modify the habit's name, the habit's periodicity or both in the database
 
-    :param habit: the habit to be modified (type: habit.HabitDB)
-    :param name: the new name of the habit (type: str), if the user wants to change the name
-    :param periodicity: the new periodicity of the habit (type: str), if the user wants to change the periodicity
+    :param habit: the habit to be modified ('habit.HabitDB')
+    :param name: the new name of the habit ('str'), if the user wants to change the name
+    :param periodicity: the new periodicity of the habit ('str'), if the user wants to change the periodicity
     """
     # is tested in "test_habit_user_classes"
     habit_id = find_habit_id(habit)
@@ -160,8 +160,8 @@ def modify_habit(habit, name=None, periodicity=None):
 def check_for_user_data(database):
     """check if data has already been entered into the HabitAppUser table.
 
-    :param database: the database connection which stores the user data (type: sqlite3.connection)
-    :return: True if data has already been entered and False if not (type: bool)
+    :param database: the database connection which stores the user data ('sqlite3.connection')
+    :return: True if data has already been entered and False if not ('bool')
     """
     cursor = database.cursor()
     cursor.execute("SELECT * From HabitAppUser")
@@ -171,3 +171,4 @@ def check_for_user_data(database):
 
 # File wurde durchgegangen, für jede wichtige Funktion existiert an irgendeiner Stelle ein Test
 # jede Funktion wird genutzt
+# Datentypen wurden angepasst und neben die Argumente geschrieben

@@ -31,7 +31,7 @@ class HabitDB(Habit):
         periodicity ('str'): the habit's periodicity (either daily, weekly, monthly, or yearly) defining the time
                             frame in which a user wants to complete a habit.
         user ('user.UserDB'): the user who created the habit
-        database (sqlite3.connection): the database connection which stores user data
+        database ('sqlite3.connection'): the database connection which stores user data
     """
 
     def __init__(self, name: str, periodicity: str, user):
@@ -71,8 +71,10 @@ class HabitDB(Habit):
         multiplied by 100 and then rounded ('int', read-only)"""
         return round((ana.calculate_completion_rate(self))*100)
 
-    def store_habit(self, creation_time=None):
-        """store the habit in the database specified in the 'database' attribute"""
+    def store_habit(self, creation_time: str = None):
+        """store the habit in the database specified in the 'database' attribute
+
+        :param creation_time: the time the habit was created ('str')"""
         db.add_habit(self, creation_time)
 
     def check_off_habit(self, check_date: str = None):
@@ -110,3 +112,4 @@ class HabitDB(Habit):
         data.append(f"{self.completion_rate} %") if self.periodicity in ["daily", "weekly"] else data.append("---")
         return data
 
+# Datentypen wurden angepasst und neben die Argumente geschrieben

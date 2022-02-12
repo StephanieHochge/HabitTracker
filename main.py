@@ -27,12 +27,12 @@ def input_start_action():
     return qu.select("What do you want to do?", choices=["Login", "Create new user", "Exit"]).ask()
 
 
-def input_username(database, action):
+def input_username(database, action: str):
     """ask the user to input either a new (creating a new user) or an already existing username.
 
-    :param database: the database, in which user data shall be/is already stored (type: sqlite3 connection)
-    :param action: the action, the user wants to undergo (either "create new user" or "loing") (type: str)
-    :return: the new/already existing username
+    :param database: the database, in which user data shall be/is already stored ('sqlite3 connection')
+    :param action: the action, the user wants to undergo (either "create new user" or "loing") ('str')
+    :return: the new/already existing username ('str')
     """
     text = "Please choose a username: " if action == "create" else "Please enter your username: "
     username = qu.text(text, validate=UserNameValidator(database, action)).ask()
@@ -42,19 +42,19 @@ def input_username(database, action):
 def input_new_habit(user):
     """ask the user to specify a new habit (name and periodicity).
 
-    :param user: the user who wants to create a new habit (type: user.Userdb object)
-    :return: a tuple containg the name and the periodicity of the new habit (type: tuple)
+    :param user: the user who wants to create a new habit ('user.Userdb object')
+    :return: a tuple containg the name and the periodicity of the new habit ('tuple')
     """
     habit_name = qu.text("Which habit do you want to create?", validate=HabitNameValidator(user)).ask()
     periodicity = input_periodicity(habit_name.strip())  # strip: to delete leading und ending spaces
     return habit_name.strip(), periodicity
 
 
-def input_periodicity(habit_name):
+def input_periodicity(habit_name: str):
     """ask the user to specify the periodicity of a habit.
 
-    :param habit_name: the name of the habit (type: str)
-    :return: the selected periodicity (type: str)
+    :param habit_name: the name of the habit ('str')
+    :return: the selected periodicity ('str')
     """
     periodicity = qu.select(f"Which periodicity shall \"{habit_name}\" have?",
                             choices=["daily", "weekly", "monthly", "yearly"]).ask()
@@ -64,8 +64,8 @@ def input_periodicity(habit_name):
 def input_new_habit_name(user):
     """ask the user to input a new name.
 
-    :param user: the user who wants to modify the habit name (type: user.UserDB object)
-    :return: the new name (type: str)
+    :param user: the user who wants to modify the habit name ('user.UserDB')
+    :return: the new name ('str')
     """
     new_name = qu.text("Please enter a new name: ", validate=HabitNameValidator(user)).ask()
     return new_name
@@ -74,38 +74,38 @@ def input_new_habit_name(user):
 def input_habit_modify_target():
     """ask the user to input what part of the habit he wants to modify.
 
-    :return: the modification target (type: str)
+    :return: the modification target ('str')
     """
     target = qu.select("What part of the habit do you want to modify?", choices=["name", "periodicity", "both"]).ask()
     return target
 
 
-def input_chosen_habit(habit_action, tracked_habits):
+def input_chosen_habit(habit_action: str, tracked_habits: list):
     """ask the user to select a habit from the list of tracked habits.
 
-    :param habit_action: the action the user wants to perform with the habit, e.g. delete or check off,  (type: str)
-    :param tracked_habits: a list of the users tracked habits (type: str)
-    :return: the habit name the user chose (type: str)
+    :param habit_action: the action the user wants to perform with the habit, e.g. delete or check off ('str')
+    :param tracked_habits: a list ('list') of the users tracked habits ('str')
+    :return: the habit name the user chose ('str')
     """
     habit_name = qu.select(f"Which habit do you want to {habit_action}?", choices=tracked_habits).ask()
     return habit_name
 
 
-def confirm_delete(habit_name):
+def confirm_delete(habit_name: str):
     """ask the user for confirmation to perform the deletion of a habit and all its data.
 
-    :param habit_name: the name of the habit to be deleted (type: str)
-    :return: True if the user confirms the deletion, False if not (type: bool)
+    :param habit_name: the name of the habit to be deleted ('str')
+    :return: True if the user confirms the deletion, False if not ('bool')
     """
     return qu.confirm(f"Are you sure that you want to delete \"{habit_name}\" and all corresponding data?",
                       default=False).ask()
 
 
-def return_past_days(no_days):
+def return_past_days(no_days: int):
     """return the date of the day that is no_days away from the current date.
 
-    :param no_days: the number of days to be substracted from the current date (type: int)
-    :return: the date of the day that is no_days
+    :param no_days: the number of days to be substracted from the current date ('int')
+    :return: the date of the day that is no_days ('date')
     """
     return str(datetime.date.today() - datetime.timedelta(days=no_days))
 
@@ -113,7 +113,7 @@ def return_past_days(no_days):
 def input_check_day():
     """ask the user to specify the checkoff date and time by selecting one of the options presented.
 
-    :return: the selected checkoff date (type: str)
+    :return: the selected checkoff date ('str')
     """
     return qu.select("When did you complete your habit?",
                      choices=[f"just now", f"earlier today", f"yesterday", return_past_days(2), return_past_days(3),
@@ -124,8 +124,8 @@ def input_check_day():
 def create_new_user(database):
     """create a new user based on user input data and store the user in the specified sqlite3 database connection.
 
-    :param database: the database in which the user is to be stored (type: sqlite3 connection)
-    :return: the newly created and stored user (type: user.UserDB object)
+    :param database: the database in which the user is to be stored ('sqlite3.connection')
+    :return: the newly created and stored user ('user.UserDB')
     """
     username = input_username(database, "create")
     new_user = UserDB(username, database)
@@ -138,8 +138,8 @@ def login(database):
     """ask for a username and check whether the username exists in the database. If it does, return the corresponding
     user. It the login fails three times, return to the start menu.
 
-    :param database: The database, in which the user is stored (type: sqlite3 connection)
-    :return: The user (type: user.UserDB object) if the username exists in the database, else False.
+    :param database: The database, in which the user is stored ('sqlite3.connection')
+    :return: The user ('user.UserDB') if the username exists in the database, else False.
     """
     count = 0
     while True:
@@ -167,8 +167,8 @@ def start(database):
     """Ask the user what he wants to do. Depending on his choice, either let the user log in to the app, create a new
     user, or quit the application.
 
-    :param database: The database, in which the users are to be stored (type: sqlite3 connection)
-    :return: the current user (type: user.UserDB instance), if the user logged in successfully or successfully
+    :param database: The database, in which the users are to be stored ('sqlite3.connection')
+    :return: the current user ('user.UserDB'), if the user logged in successfully or successfully
     created a new user
     """
     start_action = input_start_action()
@@ -185,8 +185,8 @@ def start(database):
 def create_habit(user):
     """create a new habit by asking the user for a (valid) habit name and a periodicity.
 
-    :param user: the user who wants to create a new habit (type: user.UserDB)
-    :return: the newly created habit (type: habit.HabitDB instance)
+    :param user: the user who wants to create a new habit ('user.UserDB')
+    :return: the newly created habit ('habit.HabitDB')
     """
     habit_name, periodicity = input_new_habit(user)
     habit = HabitDB(habit_name, periodicity, user)
@@ -195,12 +195,12 @@ def create_habit(user):
     return habit
 
 
-def identify_habit(habit_action, user):
+def identify_habit(habit_action: str, user):
     """present a list of all habits the user defined and let the user choose one of these habits.
 
-    :param habit_action: the action which is to be done with the habit (e.g., "delete", †ype: str)
-    :param user: the user whose habits are displayed (type: user.UserDB)
-    :return: the habit which the user chose (type: habit.HabitDB)
+    :param habit_action: the action which is to be done with the habit (e.g., "delete") ('str')
+    :param user: the user whose habits are displayed ('user.UserDB')
+    :return: the habit which the user chose ('habit.HabitDB')
     """
     habit_name = input_chosen_habit(habit_action, user.defined_habits)
     return [habit for habit in user.defined_habits if habit.name == habit_name][0]
@@ -210,7 +210,7 @@ def delete_habit(user):
     """ask which habit the user wants to delete, ask for confirmation and then delete the habit and its corresponding
      data if the user confirms that the habit should be deleted.
 
-    :param user: the user who wants to delete a habit and its corresponding data (type: user.UserDB)
+    :param user: the user who wants to delete a habit and its corresponding data ('user.UserDB')
     """
     habit = identify_habit("delete", user)
     if confirm_delete(habit.name):
@@ -222,7 +222,7 @@ def modify_habit(user):
     """ask which habit the user wants to modify and for the modification target (name, periodicity, or both), then
     let the user modify the target and save the modification in the database.
 
-    :param user: the user who wants to modify a habit (type: user.UserDB)
+    :param user: the user who wants to modify a habit ('user.UserDB')
     """
     habit = identify_habit("modify", user)
     target = input_habit_modify_target()
@@ -243,7 +243,7 @@ def check_off_habit(user):
     """ask which habit the user wants to check off, then ask for the check date and store a completion for the
     selected habit and the selected check date.
 
-    :param user: the user who wants to check off the habit (type: user.UserDB)
+    :param user: the user who wants to check off the habit ('user.UserDB')
     """
     habit = identify_habit("check off", user)
     check_day = input_check_day()
@@ -265,7 +265,7 @@ def analyze_habits(user):
     """ask the user which habit s/he wants to analyse or if s/he wants to analyze all habits and then display
     the requested analysis.
 
-    :param user: the user who wants to analyze habit(s) (type: user.UserDB)
+    :param user: the user who wants to analyze habit(s) ('user.UserDB')
     """
     habit_names = [habit.name for habit in user.completed_habits]  # only completed habits can be analyzed
     habit_to_analyze = qu.select("Which habit(s) do you want to analyze?", choices=["All habits"] + habit_names).ask()
@@ -284,7 +284,7 @@ def analyze_habits(user):
 def manage_habits(user):
     """ask the user what kind of habit management they want to perform, and then start the desired process.
 
-    :param user: the user who wants to manage a habit (type: user.UserDB)
+    :param user: the user who wants to manage a habit ('user.UserDB')
     """
     manage_action = qu.select("What do you want to do with your habits?",
                               choices=["Create habit", "Delete habit", "Modify habit"]).ask()
@@ -299,7 +299,7 @@ def manage_habits(user):
 def inspect_habits(user):
     """ask the user which habit(s) they want to inspect and then display information about the requested habits.
 
-    :param user: the user who wants to inspect the habits (type: user.UserDB)
+    :param user: the user who wants to inspect the habits ('user.UserDB')
     """
     user_periodicities = ana.return_ordered_periodicities(user)
     view_habits = qu.select("Which habits do you want to look at?",
@@ -313,8 +313,8 @@ def determine_possible_actions(user):
     """determine the actions which a user can perform, depending on whether s/he has already created habits or not
     and whether the habits have already been completed.
 
-    :param user: the user for which the possible actions are to be determined (type: user.UserDB)
-    :return: the possible actions of the user (type: list)
+    :param user: the user for which the possible actions are to be determined ('user.UserDB')
+    :return: the possible actions of the user ('list')
     """
     actions = {
         "no habits": ["Create habit", "Exit"],
@@ -365,3 +365,4 @@ if __name__ == "__main__":
 
 ### für jede Funktion, die ich testen wollte, existiert mind. 1 Test hier
 # alle Funktionen werden verwendet
+# Datentypen wurden angepasst und neben die Argumente geschrieben

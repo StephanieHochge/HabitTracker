@@ -164,7 +164,9 @@ class DataForTesting:
         db.add_completion(self.dance_sh)
 
     def create_test_data(self, database):
-        """create all test data (i.e., users, habits, and habit completions) for the application"""
+        """create all test data (i.e., users, habits, and habit completions) for the application
+
+        :param database: the database connection in which the test data is to be stored ('sqlite3.connection')"""
         self.create_users(database)
         self.store_users()
         self.create_habits()
@@ -205,3 +207,5 @@ class DataForTestingCLI(DataForTesting):
     def __init__(self, database_name: str):
         self.database = db.get_db(database_name)
         self.create_test_data(self.database)
+
+# Datentypen wurden angepasst und neben die Argumente geschrieben
