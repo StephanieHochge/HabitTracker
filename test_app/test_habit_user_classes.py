@@ -87,7 +87,7 @@ class TestHabitUser(test_data.DataForTestingPytest):
     def test_analyze_habits(self):
         habit_comparison, statistics = self.user_sh.analyze_habits()
         assert len(habit_comparison.columns) == 5
-        assert "Clean bathroom" in statistics
+        assert "Clean bathroom" in statistics["Data"].to_list()
         assert self.user_sh.best_habit == "Brush teeth"
         assert self.user_sh.worst_habit == "Clean bathroom"
         assert self.user_sh.lowest_completion_rate == 0

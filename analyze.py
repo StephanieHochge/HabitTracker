@@ -446,6 +446,6 @@ def list_to_df(analysis, data):
     :param data: a list (type: list) containing the data that is to be displayed
     :return: a dataframe (type: pandas.core.frame.DataFrame) from the two lists
     """
-    return pd.DataFrame({'Analysis': analysis, 'data': data})
+    return pd.DataFrame({'Analysis': analysis, 'Data': data})
 
 # File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet
