@@ -261,7 +261,7 @@ def analyze_habits(user):
     if habit_to_analyze == "All habits":
         habit_comparison, analysis = user.analyze_habits()
         print(f"""Summary statistics:
-        {analysis}
+        {analysis.to_string(index=False)}
         A detailed comparison of all habits:
         {habit_comparison}""")
     else:
@@ -294,7 +294,8 @@ def inspect_habits(user):
     view_habits = qu.select("Which habits do you want to look at?",
                             choices=["all habits"] + [(x + " habits only") for x in user_periodicities]).ask()
     periodicity = None if view_habits == "all habits" else view_habits.replace(" habits only", "")
-    print(user.return_habit_information(periodicity))
+    habit_information = user.return_habit_information(periodicity)
+    print(habit_information.to_string(index=False))
 
 
 def determine_possible_actions(user):

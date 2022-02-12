@@ -26,7 +26,7 @@ class UserDB(User):
         # TODO: überall den Type noch so angeben
     """
 
-    def __init__(self, username, database):
+    def __init__(self, username: str, database):
         User.__init__(self, username)
         self.database = database
 
@@ -81,7 +81,7 @@ class UserDB(User):
         """store the user in the database specified in the 'database' attribute"""
         db.add_user(self)
 
-    def return_habit_information(self, periodicity=None):
+    def return_habit_information(self, periodicity: str = None):
         """return the name, periodicity and creation time of either all of the user's habits (periodicity = None) or
         only the habits with a certain periodicity.
 
@@ -92,7 +92,7 @@ class UserDB(User):
         habit_info = ana.return_habit_info(self, periodicity)
         if not periodicity:
             habit_info = habit_info.sort_values("Periodicity")
-        return habit_info.to_string(index=False)
+        return habit_info
 
     def analyze_habits(self):
         """return an analysis of the user's habits. The analysis consists of summary statistics (the user's
@@ -110,4 +110,4 @@ class UserDB(User):
                 f"{round((self.lowest_completion_rate*100))} %"]
         analysis_df = ana.list_to_df(analysis, data)
         habit_comparison = ana.analyze_all_habits(self.defined_habits)
-        return habit_comparison, analysis_df.to_string(index=False)
+        return habit_comparison, analysis_df

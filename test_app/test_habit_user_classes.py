@@ -71,6 +71,19 @@ class TestHabitUser(test_data.DataForTestingPytest):
         user_df = ana.create_data_frame(user.database, "HabitAppUser")
         assert user.username in user_df["UserName"].to_list()
 
+    def test_user_habits(self):
+        assert self.user_sh.habit_names == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom", "Go to dentist",
+                                            "Sleep"]
+        completed_names = [habit.name for habit in self.user_sh.completed_habits]
+        assert "Sleep" not in completed_names
+        assert "Brush teeth" in completed_names
+
+    def test_return_habit_information(self):
+        habit_info = self.user_sh.return_habit_information()
+        assert "weekly" in habit_info["Periodicity"].to_list()
+        habit_daily_info = self.user_sh.return_habit_information(periodicity="daily")
+        assert "weekly" not in habit_daily_info["Periodicity"].to_list()
+
     def test_analyze_habits(self):
         habit_comparison, statistics = self.user_sh.analyze_habits()
         assert len(habit_comparison.columns) == 5
@@ -84,3 +97,5 @@ class TestHabitUser(test_data.DataForTestingPytest):
         self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=7)))
         self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=8)))
         assert self.user_hp.lowest_completion_rate == round(((3/28)*100))
+
+# meiner Meinung nach wurden alle wichtigen Funktionen der Habit und User Klassen getestet
