@@ -113,7 +113,7 @@ class UserDB(User):
         analysis = ["Habit(s) with the longest streak: ", "longest streak of all: ",
                     "Habit(s) with the lowest completion rate (last 4 weeks): ",
                     "lowest completion rate of all: "]
-        data = [self.best_habit, f"{self.longest_streak} periods", self.worst_habit,
+        data = [self.best_habit, f"{self.longest_streak} period(s)", self.worst_habit,
                 f"{self.lowest_completion_rate} %"]
         analysis_df = ana.list_to_df(analysis, data)
         habit_comparison = ana.analyze_all_habits(self.defined_habits)

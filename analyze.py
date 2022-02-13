@@ -362,7 +362,8 @@ def calculate_break_no(habit):
     # break indices due to the consideration of the future period
     curr_period = completed_in_period(final_periods, habit.periodicity, "current")
     prev_period = completed_in_period(final_periods, habit.periodicity, "previous")
-    if curr_period or prev_period:
+    if curr_period or prev_period:  # for this reason break calculation only works for completion dates in the past
+        # or at the current date
         return len(break_indices) - 1
     else:
         return len(break_indices)
