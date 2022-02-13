@@ -39,7 +39,7 @@ class TestDB(test_data.DataForTestingPytest):
         assert len(self.retrieve_data("Habit")) == 9
         cursor = self.database.cursor()  # look for the user_id of a habit
         cursor.execute("SELECT FKUserID FROM Habit WHERE Name = ? AND PKHabitID = ?",
-                       ("Conjuring", 9))
+                       ("Kill Harry", 9))
         user_id = cursor.fetchone()[0]
         assert user_id == 4
 

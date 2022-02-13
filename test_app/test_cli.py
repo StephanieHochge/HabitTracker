@@ -14,13 +14,13 @@ class TestCli(test_data.DataForTestingPytest):
     Attributes: see the documentation of the DataForTestingPytest class
     """
 
-    @patch('main.input_username', return_value="Hermione")
+    @patch('main.input_username', return_value="Dumbledore")
     def test_create_new_user(self, mock_input):
         """test that it is possible to create a new user"""
         new_user = main.create_new_user(self.database)
         user_df = ana.create_data_frame(self.database, "HabitAppUser")
-        assert new_user.username == "Hermione"
-        assert "Hermione" in user_df["UserName"].to_list()
+        assert new_user.username == "Dumbledore"
+        assert "Dumbledore" in user_df["UserName"].to_list()
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_fail(self, mock_stdout):
@@ -38,20 +38,20 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_success(self, mock_stdout):
         """test that it is possible to log in using a correct username"""
-        with patch('main.input_username', return_value="StephanieHochge"):
+        with patch('main.input_username', return_value="HarryP"):
             main.login(self.database)
-            assert mock_stdout.getvalue() == "Logged in as StephanieHochge.\n"
+            assert mock_stdout.getvalue() == "Logged in as HarryP.\n"
 
-    @patch('main.input_new_habit', return_value=("feed Hedwig", "daily"))
+    @patch('main.input_new_habit', return_value=("Fight", "daily"))
     def test_create_habit(self, mock_input):
         """test that it is possible to create a new habit"""
         new_habit = main.create_habit(self.voldemort)
         habit_df = ana.create_data_frame(self.database, "Habit")
-        assert new_habit.name == "feed Hedwig"
+        assert new_habit.name == "Fight"
         assert new_habit.periodicity == "daily"
-        assert "feed Hedwig" in habit_df["Name"].to_list()
+        assert "Fight" in habit_df["Name"].to_list()
 
-    @patch('main.input_chosen_habit', return_value="Sleep")
+    @patch('main.input_chosen_habit', return_value="Conjuring")
     def test_identify_habit(self, mock_input):
         """test that it is possible to identify the correct habit of the user"""
         habit = main.identify_habit("delete", self.harry_p)
@@ -59,47 +59,48 @@ class TestCli(test_data.DataForTestingPytest):
         assert habit.user == self.harry_p
 
     @patch('main.confirm_delete', return_value=True)
-    @patch('main.input_chosen_habit', return_value="Dance")
+    @patch('main.input_chosen_habit', return_value="Read books")
     def test_delete_habit(self, mock_habit, mock_confirm):
         """test if it is possible to delete a habit"""
-        assert "Dance" in self.hermione_g.habit_names
+        assert "Read books" in self.hermione_g.habit_names
         main.delete_habit(self.hermione_g)
-        assert "Dance" not in self.hermione_g.habit_names
+        assert "Read books" not in self.hermione_g.habit_names
 
     @patch('main.input_habit_modify_target', return_value="name")
-    @patch('main.input_new_habit_name', return_value="Clean flat")
-    @patch('main.input_chosen_habit', return_value="Clean bathroom")
+    @patch('main.input_new_habit_name', return_value="Kill Tom Riddle")
+    @patch('main.input_chosen_habit', return_value="Kill Voldemort")
     def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
         """test if it is possible to rename a habit without changing its periodicity"""
         main.modify_habit(self.harry_p)
-        assert "Clean bathroom" not in self.harry_p.habit_names
+        assert "Kill Voldemort" not in self.harry_p.habit_names
+        assert "Kill Tom Riddle" in self.harry_p.habit_names
 
     @patch('main.input_habit_modify_target', return_value="both")
     @patch('main.input_periodicity', return_value="monthly")
-    @patch('main.input_new_habit_name', return_value="Clean flat")
-    @patch('main.input_chosen_habit', return_value="Clean bathroom")
+    @patch('main.input_new_habit_name', return_value="Kill Tom Riddle")
+    @patch('main.input_chosen_habit', return_value="Kill Voldemort")
     def test_modify_habit_both(self, mock_habit, mock_name, mock_periodicity, mock_target):
         """test if it possible to modify a habit's name and periodicity"""
         main.modify_habit(self.harry_p)
-        habit = [habit for habit in self.harry_p.defined_habits if habit.name == "Clean flat"][0]
-        assert "Clean bathroom" not in self.harry_p.habit_names
+        habit = [habit for habit in self.harry_p.defined_habits if habit.name == "Kill Tom Riddle"][0]
+        assert "Kill Voldemort" not in self.harry_p.habit_names
         assert habit.periodicity == "monthly"
 
-    @patch('main.input_chosen_habit', return_value="Conjuring")
+    @patch('main.input_chosen_habit', return_value="Kill Harry")
     @patch('main.input_check_day', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
         """test that it is possible to check off a habit at the current moment"""
         main.check_off_habit(self.voldemort)
         assert self.kill_harry_v.last_completion == str(datetime.date.today())
 
-    @patch('main.input_chosen_habit', return_value="Brush teeth")
+    @patch('main.input_chosen_habit', return_value="Feed Hedwig")
     @patch('main.input_check_day', return_value="earlier today")
     def test_check_off_habit_earlier(self, mock_now, mock_habit):
         """test that it is possible to check off a habit at the earlier today"""
         main.check_off_habit(self.harry_p)
         assert self.hedwig_hp.last_completion == str(datetime.date.today())
 
-    @patch('main.input_chosen_habit', return_value="Brush teeth")
+    @patch('main.input_chosen_habit', return_value="Feed Hedwig")
     @patch('main.input_check_day', return_value="yesterday")
     def test_check_off_habit_past(self, mock_check_date, mock_habit):
         main.check_off_habit(self.harry_p)
