@@ -367,4 +367,4 @@ if __name__ == "__main__":
 # alle Funktionen werden verwendet
 # Datentypen wurden angepasst und neben die Argumente geschrieben
 # TODO: Kommentare in Deutsch löschen (besonders unten in den Files)
-# TODO: App über CLI komplett testen: kann ich sie zum Einsturz bringen?
+# TODO: Darstellungsfehler der DataFrames versuchen zu beheben/testen, ob das über Terminal auch so ist

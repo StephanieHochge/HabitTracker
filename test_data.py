@@ -1,9 +1,9 @@
 import os
+from datetime import timedelta, datetime
 
 import db
 from habit import HabitDB
 from user import UserDB
-from datetime import date, timedelta, datetime
 
 
 class DataForTesting:
