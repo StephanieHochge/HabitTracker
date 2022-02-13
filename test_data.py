@@ -13,23 +13,23 @@ class DataForTesting:
     Habits differ in their periodicity as well as in how often they were completed.
 
     Attributes:
-        user_sh (user.UserDB): a test user with six habits, not all of which have already been completed
+        harry_p (user.UserDB): a test user with six habits, not all of which have already been completed
                                     (every available periodicity is used at least once by these habits).
-        user_rb (user.UserDB): a test user with two habits which have the same streak length and completion rate.
-        user_le (user.UserDB): a test user without any habits.
-        user_hp (user.UserDB): a test user that has one habit that has not yet been completed.
+        hermione_g (user.UserDB): a test user with two habits which have the same streak length and completion rate.
+        ron_w (user.UserDB): a test user without any habits.
+        voldemort (user.UserDB): a test user that has one habit that has not yet been completed.
 
         the following attributes are all habits ('habit.HabitDB') with varying periodicities,
         users and completion numbers:
-        - teeth_rb
-        - dance_rb
-        - teeth_sh
-        - dance_sh
-        - windows_sh
-        - bathroom_sh
-        - dentist_sh
-        - sleep_sh
+        - study_hg
+        - books_hg
+        - hedwig_hp
+        - ginny_hp
+        - malfoy_hp
+        - quidditch_hp
+        - kill_voldemort_hp
         - conjure_hp
+        - kill_harry_v
     """
 
     def create_users(self, database):
@@ -37,131 +37,131 @@ class DataForTesting:
 
         :param database: the database connection where the test users are to be stored ('sqlite3.connection')
         """
-        self.user_sh = UserDB("StephanieHochge", database)
-        self.user_rb = UserDB("RajaBe", database)
-        self.user_le = UserDB("LibertyEvans", database)
-        self.user_hp = UserDB("HarryPotter", database)
+        self.harry_p = UserDB("HarryP", database)
+        self.hermione_g = UserDB("HermioneG", database)
+        self.ron_w = UserDB("RonW", database)
+        self.voldemort = UserDB("Voldemort", database)
 
     def store_users(self):
         """store the test users in the database"""
-        db.add_user(self.user_sh)
-        db.add_user(self.user_rb)
-        db.add_user(self.user_le)
-        db.add_user(self.user_hp)
+        db.add_user(self.harry_p)
+        db.add_user(self.hermione_g)
+        db.add_user(self.ron_w)
+        db.add_user(self.voldemort)
 
     def create_habits(self):
         """create the test users' habits"""
-        self.teeth_rb = HabitDB("Brush teeth", "daily", self.user_rb)
-        self.dance_rb = HabitDB("Dance", "weekly", self.user_rb)
-        self.teeth_sh = HabitDB("Brush teeth", "daily", self.user_sh)
-        self.dance_sh = HabitDB("Dance", "weekly", self.user_sh)
-        self.windows_sh = HabitDB("Clean windows", "monthly", self.user_sh)
-        self.bathroom_sh = HabitDB("Clean bathroom", "weekly", self.user_sh)
-        self.dentist_sh = HabitDB("Go to dentist", "yearly", self.user_sh)
-        self.sleep_sh = HabitDB("Sleep", "daily", self.user_sh)
-        self.conjure_hp = HabitDB("Conjuring", "daily", self.user_hp)
+        self.study_hg = HabitDB("Study", "daily", self.hermione_g)
+        self.books_hg = HabitDB("Read books", "weekly", self.hermione_g)
+        self.hedwig_hp = HabitDB("Feed Hedwig", "daily", self.harry_p)
+        self.ginny_hp = HabitDB("Meet Ginny", "weekly", self.harry_p)
+        self.malfoy_hp = HabitDB("Tease Malfoy", "monthly", self.harry_p)
+        self.quidditch_hp = HabitDB("Train Quidditch", "weekly", self.harry_p)
+        self.kill_voldemort_hp = HabitDB("Kill Voldemort", "yearly", self.harry_p)
+        self.conjure_hp = HabitDB("Conjuring", "daily", self.harry_p)
+        self.kill_harry_v = HabitDB("Kill Harry", "daily", self.voldemort)
 
     def store_habits(self):
         """store the test users' habits in the database"""
-        db.add_habit(self.teeth_rb)
-        db.add_habit(self.dance_rb)
-        db.add_habit(self.teeth_sh, "2021-11-30 07:54:24.999098")
-        db.add_habit(self.dance_sh, "2021-10-31 07:54:24.999098")
-        db.add_habit(self.windows_sh, "2021-10-31 07:54:24.999098")
-        db.add_habit(self.bathroom_sh, "2022-10-31 07:56:24.999098")
-        db.add_habit(self.dentist_sh, "2022-10-31 07:56:24.999098")
-        db.add_habit(self.sleep_sh)
+        db.add_habit(self.study_hg)
+        db.add_habit(self.books_hg)
+        db.add_habit(self.hedwig_hp, "2021-11-30 07:54:24.999098")
+        db.add_habit(self.ginny_hp, "2021-10-31 07:54:24.999098")
+        db.add_habit(self.malfoy_hp, "2021-10-31 07:54:24.999098")
+        db.add_habit(self.quidditch_hp, "2022-10-31 07:56:24.999098")
+        db.add_habit(self.kill_voldemort_hp, "2022-10-31 07:56:24.999098")
         db.add_habit(self.conjure_hp)
+        db.add_habit(self.kill_harry_v)
 
     def store_habit_completions(self):
         """store completion data for the test habits"""
-        db.add_completion(self.teeth_rb)
-        db.add_completion(self.teeth_rb, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.study_hg)
+        db.add_completion(self.study_hg, "2021-12-02 07:56:24.999098")
 
-        db.add_completion(self.dance_rb, "2021-12-02 07:56:24.999098")
-        db.add_completion(self.dance_rb, "2021-12-31 07:56:24.999098")
+        db.add_completion(self.books_hg, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.books_hg, "2021-12-31 07:56:24.999098")
 
-        db.add_completion(self.teeth_sh, "2021-12-01 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-01 09:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-02 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-04 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-05 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-07 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-08 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-09 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-10 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-11 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-12 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-13 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-14 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-15 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-16 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-17 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-18 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-19 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-20 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-21 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-22 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-23 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-24 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-25 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-26 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-27 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-29 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-30 07:56:24.999098")
-        db.add_completion(self.teeth_sh, "2021-12-31 07:56:24.999098")
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=2, days=2)))
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=1)))
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1)))
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=3)))
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=4)))
-        db.add_completion(self.teeth_sh, str(datetime.now() - timedelta(weeks=1, days=5)))
+        db.add_completion(self.hedwig_hp, "2021-12-01 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-01 09:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-04 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-05 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-07 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-08 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-09 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-10 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-11 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-12 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-13 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-14 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-15 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-16 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-17 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-18 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-19 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-20 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-21 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-22 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-23 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-24 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-25 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-26 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-27 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-29 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-30 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-31 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=2, days=2)))
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=1, days=1)))
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=1)))
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=1, days=3)))
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=1, days=4)))
+        db.add_completion(self.hedwig_hp, str(datetime.now() - timedelta(weeks=1, days=5)))
 
-        db.add_completion(self.dance_sh, "2021-11-06 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-07 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-11 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-13 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-14 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-21 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-25 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-27 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-11-28 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-02 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-04 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-05 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-16 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-18 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-19 07:56:24.999098")
-        db.add_completion(self.dance_sh, "2021-12-30 07:56:24.999098")
-        db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=1)))
-        db.add_completion(self.dance_sh, str(datetime.now() - timedelta(weeks=2)))
+        db.add_completion(self.ginny_hp, "2021-11-06 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-07 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-11 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-13 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-14 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-21 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-25 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-27 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-11-28 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-02 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-04 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-05 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-16 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-18 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-19 07:56:24.999098")
+        db.add_completion(self.ginny_hp, "2021-12-30 07:56:24.999098")
+        db.add_completion(self.ginny_hp, str(datetime.now() - timedelta(weeks=1)))
+        db.add_completion(self.ginny_hp, str(datetime.now() - timedelta(weeks=2)))
 
-        db.add_completion(self.bathroom_sh, "2021-11-06 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2021-11-13 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2021-11-20 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2021-12-04 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2021-12-11 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2021-12-18 07:56:24.999098")
-        db.add_completion(self.bathroom_sh, "2022-01-01 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-11-06 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-11-13 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-11-20 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-12-04 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-12-11 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2021-12-18 07:56:24.999098")
+        db.add_completion(self.quidditch_hp, "2022-01-01 07:56:24.999098")
 
-        db.add_completion(self.windows_sh, "2021-06-23 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2021-07-06 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2021-09-15 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2021-10-02 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2021-11-17 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2021-12-30 07:56:24.999098")
-        db.add_completion(self.windows_sh, "2022-01-30 07:56:24.999098")
-        db.add_completion(self.windows_sh)
+        db.add_completion(self.malfoy_hp, "2021-06-23 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2021-07-06 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2021-09-15 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2021-10-02 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2021-11-17 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2021-12-30 07:56:24.999098")
+        db.add_completion(self.malfoy_hp, "2022-01-30 07:56:24.999098")
+        db.add_completion(self.malfoy_hp)
 
-        db.add_completion(self.dentist_sh, "2022-01-05 07:56:24.999098")
-        db.add_completion(self.dentist_sh, "2021-12-05 07:56:24.999098")
+        db.add_completion(self.kill_voldemort_hp, "2022-01-05 07:56:24.999098")
+        db.add_completion(self.kill_voldemort_hp, "2021-12-05 07:56:24.999098")
 
-        db.add_completion(self.teeth_sh, "2021-12-03 07:56:24.999098")
+        db.add_completion(self.hedwig_hp, "2021-12-03 07:56:24.999098")
 
-        db.add_completion(self.dance_sh, "2021-12-21 07:56:24.999098")
-        db.add_completion(self.dance_sh)
+        db.add_completion(self.ginny_hp, "2021-12-21 07:56:24.999098")
+        db.add_completion(self.ginny_hp)
 
     def create_test_data(self, database):
         """create all test data (i.e., users, habits, and habit completions) for the application

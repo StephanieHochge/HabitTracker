@@ -31,43 +31,43 @@ class TestHabitUser(test_data.DataForTestingPytest):
         kill.check_off_habit("2021-12-05 12:54:24.999098")
         assert kill.last_completion == "2021-12-05"
 
-        assert self.teeth_sh.last_completion == str(date.today() - timedelta(weeks=1))
+        assert self.hedwig_hp.last_completion == str(date.today() - timedelta(weeks=1))
 
     def test_delete_habit(self):
         """test that it is possible to delete a habit and its corresponding data from the Habit and Completion tables"""
         len_completions = len(ana.create_data_frame(self.database, "Completions"))
-        len_habit_data = len(ana.return_completions(self.teeth_rb))
-        assert db.find_habit_id(self.teeth_rb) == 1
-        self.teeth_rb.delete_habit()
+        len_habit_data = len(ana.return_completions(self.study_hg))
+        assert db.find_habit_id(self.study_hg) == 1
+        self.study_hg.delete_habit()
         with pytest.raises(TypeError):
-            db.find_habit_id(self.teeth_rb)
+            db.find_habit_id(self.study_hg)
         len_completions_after_del = len(ana.create_data_frame(self.database, "Completions"))
         assert len_completions_after_del == (len_completions - len_habit_data)
 
     def test_modify_habit(self):
-        self.dance_rb.modify_habit(name="Ballet", periodicity="daily")
-        assert self.dance_rb.periodicity == "daily"
-        assert self.dance_rb.name == "Ballet"
-        assert "Ballet" in self.user_rb.habit_names
-        self.bathroom_sh.modify_habit(name="Flat")
-        assert "Flat" in self.user_sh.habit_names
+        self.books_hg.modify_habit(name="Ballet", periodicity="daily")
+        assert self.books_hg.periodicity == "daily"
+        assert self.books_hg.name == "Ballet"
+        assert "Ballet" in self.hermione_g.habit_names
+        self.quidditch_hp.modify_habit(name="Flat")
+        assert "Flat" in self.harry_p.habit_names
 
     def test_analyze_habit(self):
-        analysis_teeth = self.teeth_sh.analyze_habit()
+        analysis_teeth = self.hedwig_hp.analyze_habit()
         assert len(analysis_teeth) == 6
-        assert self.teeth_sh.completion_rate == round(((6/28)*100))
-        assert self.teeth_sh.current_streak == 0
-        assert self.teeth_sh.breaks_total == 6
-        assert self.teeth_sh.best_streak == 21
+        assert self.hedwig_hp.completion_rate == round(((6 / 28) * 100))
+        assert self.hedwig_hp.current_streak == 0
+        assert self.hedwig_hp.breaks_total == 6
+        assert self.hedwig_hp.best_streak == 21
 
-        self.bathroom_sh.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=1)))
-        assert self.bathroom_sh.completion_rate == 25
+        self.quidditch_hp.check_off_habit(str(datetime.now() - timedelta(weeks=1, days=1)))
+        assert self.quidditch_hp.completion_rate == 25
 
-        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=2)))
-        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=3)))
-        self.sleep_sh.check_off_habit(str(datetime.now() - timedelta(days=4)))
-        assert self.sleep_sh.best_streak == 3
-        assert self.sleep_sh.completion_rate == round(((3/28)*100))
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=2)))
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=3)))
+        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=4)))
+        assert self.conjure_hp.best_streak == 3
+        assert self.conjure_hp.completion_rate == round(((3 / 28) * 100))
 
     def test_userDB(self):
         """test whether users can be stored in the database"""
@@ -77,31 +77,31 @@ class TestHabitUser(test_data.DataForTestingPytest):
         assert user.username in user_df["UserName"].to_list()
 
     def test_user_habits(self):
-        assert self.user_sh.habit_names == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom", "Go to dentist",
+        assert self.harry_p.habit_names == ["Brush teeth", "Dance", "Clean windows", "Clean bathroom", "Go to dentist",
                                             "Sleep"]
-        completed_names = [habit.name for habit in self.user_sh.completed_habits]
+        completed_names = [habit.name for habit in self.harry_p.completed_habits]
         assert "Sleep" not in completed_names
         assert "Brush teeth" in completed_names
 
     def test_return_habit_information(self):
-        habit_info = self.user_sh.return_habit_information()
+        habit_info = self.harry_p.return_habit_information()
         assert "weekly" in habit_info["Periodicity"].to_list()
-        habit_daily_info = self.user_sh.return_habit_information(periodicity="daily")
+        habit_daily_info = self.harry_p.return_habit_information(periodicity="daily")
         assert "weekly" not in habit_daily_info["Periodicity"].to_list()
 
     def test_analyze_habits(self):
-        habit_comparison, statistics = self.user_sh.analyze_habits()
+        habit_comparison, statistics = self.harry_p.analyze_habits()
         assert len(habit_comparison.columns) == 5
         assert "Clean bathroom" in statistics["Data"].to_list()
-        assert self.user_sh.best_habit == "Brush teeth"
-        assert self.user_sh.worst_habit == "Clean bathroom"
-        assert self.user_sh.lowest_completion_rate == 0
-        assert self.user_sh.longest_streak == 21
+        assert self.harry_p.best_habit == "Brush teeth"
+        assert self.harry_p.worst_habit == "Clean bathroom"
+        assert self.harry_p.lowest_completion_rate == 0
+        assert self.harry_p.longest_streak == 21
 
-        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=6)))
-        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=7)))
-        self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=8)))
-        assert self.user_hp.lowest_completion_rate == round(((3/28)*100))
+        self.kill_harry_v.check_off_habit(str(datetime.now() - timedelta(days=6)))
+        self.kill_harry_v.check_off_habit(str(datetime.now() - timedelta(days=7)))
+        self.kill_harry_v.check_off_habit(str(datetime.now() - timedelta(days=8)))
+        assert self.voldemort.lowest_completion_rate == round(((3 / 28) * 100))
 
         # test if the lowest completion rate is calculated correctly if the user does not have any daily or
         # weekly habtis

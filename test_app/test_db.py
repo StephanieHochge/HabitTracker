@@ -26,13 +26,13 @@ class TestDB(test_data.DataForTestingPytest):
 
     def test_find_user_id(self):
         """test whether the correct user ID is returned"""
-        assert db.find_user_id(self.user_sh) == 1
-        assert db.find_user_id(self.user_hp) == 4
+        assert db.find_user_id(self.harry_p) == 1
+        assert db.find_user_id(self.voldemort) == 4
 
     def test_find_habit_id(self):
         """test whether the correct habit ID is returned"""
-        assert db.find_habit_id(self.teeth_rb) == 1
-        assert db.find_habit_id(self.dance_sh) == 4
+        assert db.find_habit_id(self.study_hg) == 1
+        assert db.find_habit_id(self.ginny_hp) == 4
 
     def test_habit_table_db(self):
         """test whether data was added to the habit table and whether they have the correct user_id"""
