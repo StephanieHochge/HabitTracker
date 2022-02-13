@@ -103,4 +103,13 @@ class TestHabitUser(test_data.DataForTestingPytest):
         self.conjure_hp.check_off_habit(str(datetime.now() - timedelta(days=8)))
         assert self.user_hp.lowest_completion_rate == round(((3/28)*100))
 
+        # test if the lowest completion rate is calculated correctly if the user does not have any daily or
+        # weekly habtis
+        hulk = UserDB("Hulk", self.database)
+        hulk.store_user()
+        strong = HabitDB("Be strong", "monthly", hulk)
+        strong.store_habit()
+        assert hulk.lowest_completion_rate == "---"
+        assert hulk.worst_habit == "---"
+
 # meiner Meinung nach wurden alle wichtigen Funktionen der Habit und User Klassen getestet

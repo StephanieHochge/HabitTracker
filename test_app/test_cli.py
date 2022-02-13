@@ -40,7 +40,7 @@ class TestCli(test_data.DataForTestingPytest):
         """test that it is possible to log in using a correct username"""
         with patch('main.input_username', return_value="StephanieHochge"):
             main.login(self.database)
-            assert mock_stdout.getvalue() == "Logged in as StephanieHochge\n"
+            assert mock_stdout.getvalue() == "Logged in as StephanieHochge.\n"
 
     @patch('main.input_new_habit', return_value=("feed Hedwig", "daily"))
     def test_create_habit(self, mock_input):

@@ -65,16 +65,24 @@ class UserDB(User):
         read-only). The completion rate is defined as the number of periods, in which the habit was completed
         divided by the number of periods in which the habit was not completed during the last four weeks
         (full weeks for weekly habits)."""
-        lowest_completion_rate, _ = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
-        return round((lowest_completion_rate*100))
+        user_periodicities = ana.return_ordered_periodicities(self)
+        if "daily" in user_periodicities or "weekly" in user_periodicities:  # completion rate is only calculated
+            # for daily and weekly habits
+            lowest_completion_rate, _ = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
+            return round((lowest_completion_rate*100))
+        else:
+            return "---"
 
     @property
     def worst_habit(self):
         """the worst habit is the daily or weekly habit with which the user struggled the most last month, i.e.,
         the habit with the lowest completion rate ('str', read-only)"""
-        _, worst_habit = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
-        worst_habit = ", ".join(worst_habit)
-        return worst_habit
+        if self.lowest_completion_rate == "---":  # completion rate is only calculated for daily and weekly habits
+            return "---"
+        else:
+            _, worst_habit = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
+            worst_habit = ", ".join(worst_habit)
+            return worst_habit
 
     def store_user(self):
         """store the user in the database specified in the 'database' attribute"""
@@ -106,7 +114,7 @@ class UserDB(User):
                     "Habit(s) with the lowest completion rate (last 4 weeks): ",
                     "lowest completion rate of all: "]
         data = [self.best_habit, f"{self.longest_streak} periods", self.worst_habit,
-                f"{round((self.lowest_completion_rate*100))} %"]
+                f"{self.lowest_completion_rate} %"]
         analysis_df = ana.list_to_df(analysis, data)
         habit_comparison = ana.analyze_all_habits(self.defined_habits)
         return habit_comparison, analysis_df

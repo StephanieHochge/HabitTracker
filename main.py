@@ -159,7 +159,7 @@ def login(database):
             if count < 3:
                 print("\x1b[0;0;41m" + "Please try again." + "\x1b[0m")
         else:
-            print(f"Logged in as {username}")
+            print(f"Logged in as {username}.")
             return user
 
 
