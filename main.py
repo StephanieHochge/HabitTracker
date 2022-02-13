@@ -202,7 +202,7 @@ def identify_habit(habit_action: str, user):
     :param user: the user whose habits are displayed ('user.UserDB')
     :return: the habit which the user chose ('habit.HabitDB')
     """
-    habit_name = input_chosen_habit(habit_action, user.defined_habits)
+    habit_name = input_chosen_habit(habit_action, user.habit_names)
     return [habit for habit in user.defined_habits if habit.name == habit_name][0]
 
 
@@ -366,3 +366,5 @@ if __name__ == "__main__":
 ### für jede Funktion, die ich testen wollte, existiert mind. 1 Test hier
 # alle Funktionen werden verwendet
 # Datentypen wurden angepasst und neben die Argumente geschrieben
+# TODO: Kommentare in Deutsch löschen (besonders unten in den Files)
+# TODO: App über CLI komplett testen: kann ich sie zum Einsturz bringen?
