@@ -29,15 +29,35 @@ Besides these statistics, you also have the ability to display all your habits t
 
 ## Installation
 
-- fork and clone the repo
+To install the Habit Tracker, you should have the following programs installed:
+- Python 3.6 or higher
+- Pip
+
+Download all files from this repository and save them to your target directory. Before you can start the Habit Tracker, you need to install the project's requirements. It is recommended to do this in a virtual environment (see https://docs.python.org/3/tutorial/venv.html for an explanation). First, create the virtual environment in your target directory.
 
 ```shell
-git clone https://github.com/yourgithubusername/habitist-streak
+python -m venv your_venv_name
 ```
 
+Then, activate your newly created virtual environment.
+
+On Windows, run:
 ```shell
-pip install -r requirements.txt
+your_venv_name\Scripts\activate.bat
 ```
+
+On Unix or MacOS, run:
+```shell
+source your_venv_name/bin/activate
+```
+
+Afterwards, you can install the project's requirements inside your virtual environment.
+
+```shell
+python -m pip install -r requirements.txt
+```
+
+Finally, you are ready to start the application!
 
 ## Usage
 
