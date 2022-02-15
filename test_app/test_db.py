@@ -21,7 +21,7 @@ class TestDB(test_data.DataForTestingPytest):
         return cursor.fetchall()
 
     def test_user_table_db(self):
-        """test whether data was added to the HabitAppUser table"""
+        """test whether data was added to the 'HabitAppUser' table"""
         assert len(self.retrieve_data("HabitAppUser")) == 4
 
     def test_find_user_id(self):
@@ -35,18 +35,18 @@ class TestDB(test_data.DataForTestingPytest):
         assert db.find_habit_id(self.ginny_hp) == 4
 
     def test_habit_table_db(self):
-        """test whether data was added to the habit table and whether they have the correct user_id"""
+        """test whether data was added to the 'Habit' table and whether the correct user_id is stored"""
         assert len(self.retrieve_data("Habit")) == 9
-        cursor = self.database.cursor()  # look for the user_id of a habit
+        cursor = self.database.cursor()  # look for the habit's user_id
         cursor.execute("SELECT FKUserID FROM Habit WHERE Name = ? AND PKHabitID = ?",
                        ("Kill Harry", 9))
         user_id = cursor.fetchone()[0]
         assert user_id == 4
 
     def test_completions_table_db(self):
-        """test whether data was added to the completions table"""
+        """test whether data was added to the 'Completions' table"""
         assert len(self.retrieve_data("Completions")) == 79
-        cursor = self.database.cursor()  # look for the user_id of a habit
+        cursor = self.database.cursor()  # look for the habit's user_id
         cursor.execute("SELECT FKHabitID FROM Completions WHERE CompletionDate = ? AND PKCompletionsID = ?",
                        ("2021-12-01", 5))
         habit_id = cursor.fetchone()[0]
@@ -58,6 +58,3 @@ class TestDB(test_data.DataForTestingPytest):
         assert db.check_for_user_data(second_database) is False
         assert db.check_for_user_data(self.database) is True
         os.remove("test2.db")
-
-
-# File wurde getestet, meiner Meinung nach wurden die wichtigsten Funktionen der database getestet

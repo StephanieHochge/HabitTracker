@@ -8,19 +8,19 @@ from user import UserDB
 
 class DataForTesting:
     """This class creates test data for the application that can be used to the test the application's
-    functionality using pytest. It provides four test users with a total of nine test habits. The test users differ
-    in how many habits they have create (from zero to six) and whether they have already completed habits.
-    Habits differ in their periodicity as well as in how often they were completed.
+    functionality at runtime or using pytest. It provides four test users with a total of nine test habits.
+    The test users differ in how many habits they have created (from zero to six) and whether they have
+    already completed habits. Habits differ in their periodicity as well as in how often they were completed.
 
     Attributes:
         harry_p (user.UserDB): a test user with six habits, not all of which have already been completed
                                     (every available periodicity is used at least once by these habits).
         hermione_g (user.UserDB): a test user with two habits which have the same streak length and completion rate.
         ron_w (user.UserDB): a test user without any habits.
-        voldemort (user.UserDB): a test user that has one habit that has not yet been completed.
+        voldemort (user.UserDB): a test user with one habit that has not yet been completed.
 
-        the following attributes are all habits ('habit.HabitDB') with varying periodicities,
-        users and completion numbers:
+        The following attributes are all habits ('habit.HabitDB') with varying periodicities,
+        users and completion times:
         - study_hg
         - books_hg
         - hedwig_hp
@@ -175,7 +175,7 @@ class DataForTesting:
 
 
 class DataForTestingPytest(DataForTesting):
-    """This class creates the test data provided by the DataForTesting class and stores is it in a
+    """This class creates the test data provided by the DataForTesting class and stores it in a
     test database. The data can then be used for testing the application's main functionalities using
     pytest.
 
@@ -194,8 +194,9 @@ class DataForTestingPytest(DataForTesting):
 
 
 class DataForTestingCLI(DataForTesting):
-    """This class creates the test data provided by the DataForTesting class and stores is it in the
-    database specified. The data can then be used for testing the application's main functionalities using the CLI.
+    """This class creates the test data provided by the DataForTesting class and stores it in the
+    database specified. The data can then be used for testing the application's main functionalities at runtime
+    using the CLI.
 
     Attributes:
         database ('sqlite3.connection'): the database which stores the test data.
@@ -207,5 +208,3 @@ class DataForTestingCLI(DataForTesting):
     def __init__(self, database_name: str):
         self.database = db.get_db(database_name)
         self.create_test_data(self.database)
-
-# Datentypen wurden angepasst und neben die Argumente geschrieben

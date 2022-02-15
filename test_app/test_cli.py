@@ -24,16 +24,16 @@ class TestCli(test_data.DataForTestingPytest):
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_fail(self, mock_stdout):
-        """test that entering an unknown username leads to a failed login"""
+        """test that entering an unknown username results in a failed login"""
         with patch('main.input_username', return_value="UnknownUser"):
             main.login(self.database)
-            assert mock_stdout.getvalue() == "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
-                                             "\x1b[0;0;41mPlease try again.\x1b[0m\n" \
-                                             "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
-                                             "\x1b[0;0;41mPlease try again.\x1b[0m\n" \
-                                             "\x1b[0;0;41mA user with this username does not exist.\x1b[0m\n" \
-                                             "\x1b[0;0;41mLogin failed three times. Do you perhaps want to perform " \
-                                             "another action?\x1b[0m\n"
+            assert mock_stdout.getvalue() == "A user with this username does not exist.\n" \
+                                             "Please try again.\n" \
+                                             "A user with this username does not exist.\n" \
+                                             "Please try again.\n" \
+                                             "A user with this username does not exist.\n" \
+                                             "Login failed three times. Do you perhaps want to perform " \
+                                             "another action?\n"
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_login_success(self, mock_stdout):
@@ -71,9 +71,11 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('main.input_chosen_habit', return_value="Kill Voldemort")
     def test_modify_habit_name(self, mock_habit, mock_name, mock_target):
         """test if it is possible to rename a habit without changing its periodicity"""
+        assert self.kill_voldemort_hp.periodicity == "yearly"
         main.modify_habit(self.harry_p)
         assert "Kill Voldemort" not in self.harry_p.habit_names
         assert "Kill Tom Riddle" in self.harry_p.habit_names
+        assert self.kill_voldemort_hp.periodicity == "yearly"
 
     @patch('main.input_habit_modify_target', return_value="both")
     @patch('main.input_periodicity', return_value="monthly")
@@ -89,25 +91,26 @@ class TestCli(test_data.DataForTestingPytest):
     @patch('main.input_chosen_habit', return_value="Kill Harry")
     @patch('main.input_check_day', return_value="just now")
     def test_check_off_habit_now(self, mock_now, mock_habit):
-        """test that it is possible to check off a habit at the current moment"""
+        """test that it is possible to check off a habit with the current moment as time of check off"""
         main.check_off_habit(self.voldemort)
         assert self.kill_harry_v.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Feed Hedwig")
     @patch('main.input_check_day', return_value="earlier today")
     def test_check_off_habit_earlier(self, mock_now, mock_habit):
-        """test that it is possible to check off a habit at the earlier today"""
+        """test that it is possible to check off a habit with 'earlier today' as time of check off"""
         main.check_off_habit(self.harry_p)
         assert self.hedwig_hp.last_completion == str(datetime.date.today())
 
     @patch('main.input_chosen_habit', return_value="Feed Hedwig")
     @patch('main.input_check_day', return_value="yesterday")
     def test_check_off_habit_past(self, mock_check_date, mock_habit):
+        """test that it is possible to check off a habit with yesterday as time of check off"""
         main.check_off_habit(self.harry_p)
         assert self.hedwig_hp.last_completion == str(datetime.date.today() - datetime.timedelta(days=1))
 
     def test_determine_possible_actions(self):
-        """test that the possible actions of a user are correctly determined"""
+        """test that the possible actions of a user are determined correctly"""
         actions = {
             "no habits": ["Create habit", "Exit"],
             "habit without data": ["Manage habits", "Look at habits", "Check off habit", "Exit"],
@@ -116,5 +119,3 @@ class TestCli(test_data.DataForTestingPytest):
         assert main.determine_possible_actions(self.harry_p) == actions["habit with data"]
         assert main.determine_possible_actions(self.ron_w) == actions["no habits"]
         assert main.determine_possible_actions(self.voldemort) == actions["habit without data"]
-
-# File wurde getestet, meiner Meinung nach wurden die wichtigsten Funktionen der CLI getestet

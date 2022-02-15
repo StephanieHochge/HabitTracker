@@ -1,4 +1,4 @@
-# My Habit Tracker Project
+# The Habit Tracker
 
 The habit tracker can be used to monitor and manage your habits by enabling you to define habits of various types and document their execution at any point in time. After a habit has been executed for the first time, it is also possible to display useful statistics for that habit that can motivate you to complete the habit more often. By providing login and registration features, It is also possible to manage the habits of several users. 
 

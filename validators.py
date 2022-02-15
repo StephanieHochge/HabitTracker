@@ -28,7 +28,7 @@ class UserNameValidator(Validator):
 
         raise:
             a validation error in case the currently entered username does not meet all requirements.
-            The user can then make a new entry/modify his entry.
+            The user can then make a new entry/modify his/her entry.
         """
         user = UserDB(document.text, self.database)
         user_existing = an.check_for_username(user)
@@ -85,5 +85,3 @@ class HabitNameValidator(Validator):
                 message="Habit already existing. Please choose another name.",
                 cursor_position=len(document.text),
             )
-
-

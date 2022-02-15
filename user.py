@@ -46,8 +46,8 @@ class UserDB(User):
 
     @property
     def longest_streak(self):
-        """the value of the longest streak of all habits, i.e., the maximum number of periods in a row that a user
-        has completed one of his habits ('int', read-only)"""
+        """the value of the longest streak of all habits, i.e., the maximum number of consecutive periods in a row
+        that a user has completed a habits ('int', read-only)"""
         longest_streak, _ = ana.calculate_longest_streak_of_all(self.completed_habits)
         return longest_streak
 
@@ -61,12 +61,11 @@ class UserDB(User):
 
     @property
     def lowest_completion_rate(self):
-        """the value of the lowest completion rate of all habits, multiplied by 100 and then rounded ('int',
-        read-only). The completion rate is defined as the number of periods, in which the habit was completed
-        divided by the number of periods in which the habit was not completed during the last four weeks
-        (full weeks for weekly habits)."""
+        """the value of the lowest completion rate of all habits. The completion rate is defined as
+        the percentage of time periods in the last four weeks (full weeks for weekly habits) in which the
+        habit was completed at least once."""
         user_periodicities = ana.return_ordered_periodicities(self)
-        if "daily" in user_periodicities or "weekly" in user_periodicities:  # completion rate is only calculated
+        if "daily" in user_periodicities or "weekly" in user_periodicities:  # the completion rate is only calculated
             # for daily and weekly habits
             lowest_completion_rate, _ = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
             return round((lowest_completion_rate*100))
@@ -77,7 +76,7 @@ class UserDB(User):
     def worst_habit(self):
         """the worst habit is the daily or weekly habit with which the user struggled the most last month, i.e.,
         the habit with the lowest completion rate ('str', read-only)"""
-        if self.lowest_completion_rate == "---":  # completion rate is only calculated for daily and weekly habits
+        if self.lowest_completion_rate == "---":  # the completion rate is only calculated for daily and weekly habits
             return "---"
         else:
             _, worst_habit = ana.calculate_worst_completion_rate_of_all(self.completed_habits)
@@ -90,7 +89,7 @@ class UserDB(User):
 
     def return_habit_information(self, periodicity: str = None):
         """return the name, periodicity and creation time of either all of the user's habits (periodicity = None) or
-        only the habits with a certain periodicity.
+        only the habits with a certain periodicity (e.g., periodicity = 'daily').
 
         :param periodicity: the periodicity for which information is to be returned ('str', optional)
         :return: a data frame containing the name, periodicity and creation time of the desired habits
@@ -103,7 +102,7 @@ class UserDB(User):
 
     def analyze_habits(self):
         """return an analysis of the user's habits. The analysis consists of summary statistics (the user's
-        best habit, longest streak, worst habit and lowest completion rate), as well as a detailed analysis
+        best habit(s), longest streak, worst habit(s) and lowest completion rate), as well as a detailed analysis
         of each habit (periodicity, last completion, longest streak, current streak, total breaks, completion
         rate).
 

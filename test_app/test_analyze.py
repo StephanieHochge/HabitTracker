@@ -22,7 +22,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert len(completions_df) == 79
 
     def test_check_for_username(self):
-        """test whether the database can be checked for the assistance of usernames"""
+        """test whether the database can be checked for the existance of usernames"""
         harry_p_existing = ana.check_for_username(self.harry_p)
         assert harry_p_existing is True
         harry_p = UserDB("HarryPotter", self.database)
@@ -36,7 +36,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert "Conjuring" in defined_habits["Name"].to_list()
 
     def test_return_completions(self):
-        """test if a habit's completion dates are correctly returned"""
+        """test if a habit's completion dates are returned correctly"""
         habit_completions_ginny_hp = ana.return_completions(self.ginny_hp)
         assert len(habit_completions_ginny_hp) == 20
         habit_completions_books_hg = ana.return_completions(self.books_hg)
@@ -50,6 +50,8 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.return_ordered_periodicities(self.voldemort) == ["daily"]
 
     def test_return_habit_info(self):
+        """test wehther habit information can be returned correctly for all habits and for habits with
+        a certain periodicity"""
         all_habits = ana.return_habit_info(self.harry_p)
         assert len(all_habits) == 6
         weekly_habits = ana.return_habit_info(self.harry_p, "weekly")
@@ -58,7 +60,8 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert len(quaterly_habits) == 0
 
     def test_calculate_period_starts(self):
-        """tests if the period starts corresponding to the completion dates of a habit are calculated correctly"""
+        """tests if the period starts corresponding to the completion dates and the periodicity
+        of a habit are calculated correctly"""
         # test weekly_start, monthly_start and yearly_start functions
         assert ana.weekly_start(date(2022, 1, 26)) == date(2022, 1, 24)
         assert ana.monthly_start(date(2022, 2, 26)) == date(2022, 2, 1)
@@ -107,7 +110,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert len(final_periods_voldemort) == 3
 
     def test_calculate_break_indices(self):
-        """test if it is possible to correctly calculate a habit's break indices"""
+        """test if it is possible to calculate a habit's break indices correctly"""
         # test calculate_element_diffs function
         dates = [date(2021, 7, 3), date(2021, 7, 9), date(2021, 7, 10), date(2021, 8, 10)]
         assert ana.calculate_element_diffs(dates) == [timedelta(days=6), timedelta(days=1), timedelta(days=31)]
@@ -135,8 +138,8 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.calculate_longest_streak(self.kill_voldemort_hp) == 2
 
     def test_calculate_longest_streak_of_all(self):
-        """test if the longest streak of all habits of a user is correctly calculated"""
-        # test habit creator function
+        """test if the longest streak of all habits of a user is calculated correctly"""
+        # test habit_creator function
         habits_hp = ana.habit_creator(self.harry_p)
         assert len(habits_hp) == 6
         habits_hg = ana.habit_creator(self.hermione_g)
@@ -185,7 +188,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.calculate_curr_streak(self.hedwig_hp) == 0
         assert ana.calculate_curr_streak(self.ginny_hp) == 3
         assert ana.calculate_curr_streak(self.books_hg) == 0
-        self.books_hg.check_off_habit(check_date=str(datetime.now()))
+        self.books_hg.check_off_habit(check_time=str(datetime.now()))
         assert ana.calculate_curr_streak(self.books_hg) == 1
         assert ana.calculate_curr_streak(self.malfoy_hp) == 6
 
@@ -207,8 +210,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         assert ana.calculate_break_no(self.conjure_hp) == 0
 
     def test_calculate_worst_completion_rate_of_all(self):
-        """test if a user's lowest completion rate and the corresponding habit(s) are correctly determined"""
-
+        """test if a user's lowest completion rate and the corresponding habit(s) are determined correctly"""
         # test if completions rates per habit are correctly calculated
         self.books_hg.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
         self.study_hg.check_off_habit(str(datetime.now() - timedelta(weeks=1)))
@@ -227,7 +229,7 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         completion_rates_hg = ana.calculate_completion_rate_per_habit(completed_habits_hg)
         assert list(completion_rates_hg.values()) == [7 / 28, 1 / 4]
 
-        # test if the lowest completion rate and the corresponding habit is correctly identified
+        # test if the lowest completion rate and the corresponding habit is identified correctly
         lowest_completion_rate_hp, worst_habit_hp = ana.calculate_worst_completion_rate_of_all(completed_habits_hp)
         assert round(lowest_completion_rate_hp) == 0
         assert worst_habit_hp == ["Train Quidditch"]
@@ -246,5 +248,3 @@ class TestHabitAnalysis(test_data.DataForTestingPytest):
         habits_with_data_hg = ana.find_completed_habits(habit_list_hg)
         comparison_data_hg = ana.analyze_all_habits(habits_with_data_hg)
         assert list(comparison_data_hg) == ["Study", "Read books"]
-
-# File wurde durchgegangen, jede Funktion ist dokumentiert und alle wichtigen Funktionen wurden getestet

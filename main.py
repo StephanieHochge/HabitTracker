@@ -1,7 +1,7 @@
 """This module contains the habit tracker's functionalities necessary to control the user flow and to
 expose the user to the command line interface.
 
-Examples of the most important functionalities include functions to
+The most important functionalities include functions to
     - create a new user
     - login
     - manage habits (create, delete or modify)
@@ -28,10 +28,10 @@ def input_start_action():
 
 
 def input_username(database, action: str):
-    """ask the user to input either a new (creating a new user) or an already existing username.
+    """ask the user to input either a new (creating a new user) or an already existing username
 
     :param database: the database, in which user data shall be/is already stored ('sqlite3 connection')
-    :param action: the action, the user wants to undergo (either "create new user" or "loing") ('str')
+    :param action: the action, the user wants to undertake (either "create new user" or "loing") ('str')
     :return: the new/already existing username ('str')
     """
     text = "Please choose a username: " if action == "create" else "Please enter your username: "
@@ -40,7 +40,7 @@ def input_username(database, action: str):
 
 
 def input_new_habit(user):
-    """ask the user to specify a new habit (name and periodicity).
+    """ask the user to create a new habit by choosing a name and a periodicity
 
     :param user: the user who wants to create a new habit ('user.Userdb object')
     :return: a tuple containg the name and the periodicity of the new habit ('tuple')
@@ -51,7 +51,7 @@ def input_new_habit(user):
 
 
 def input_periodicity(habit_name: str):
-    """ask the user to specify the periodicity of a habit.
+    """ask the user to specify the periodicity of a habit
 
     :param habit_name: the name of the habit ('str')
     :return: the selected periodicity ('str')
@@ -62,7 +62,7 @@ def input_periodicity(habit_name: str):
 
 
 def input_new_habit_name(user):
-    """ask the user to input a new name.
+    """ask the user to input a new name for the habit
 
     :param user: the user who wants to modify the habit name ('user.UserDB')
     :return: the new name ('str')
@@ -72,16 +72,16 @@ def input_new_habit_name(user):
 
 
 def input_habit_modify_target():
-    """ask the user to input what part of the habit he wants to modify.
+    """ask the user to input what part of the habit s/he wants to modify
 
-    :return: the modification target ('str')
+    :return: the modification's target ('str')
     """
     target = qu.select("What part of the habit do you want to modify?", choices=["name", "periodicity", "both"]).ask()
     return target
 
 
 def input_chosen_habit(habit_action: str, tracked_habits: list):
-    """ask the user to select a habit from the list of tracked habits.
+    """ask the user to select a habit from the list of tracked habits
 
     :param habit_action: the action the user wants to perform with the habit, e.g. delete or check off ('str')
     :param tracked_habits: a list ('list') of the users tracked habits ('str')
@@ -92,7 +92,7 @@ def input_chosen_habit(habit_action: str, tracked_habits: list):
 
 
 def confirm_delete(habit_name: str):
-    """ask the user for confirmation to perform the deletion of a habit and all its data.
+    """ask the user for confirmation to perform the deletion of a habit and all its data
 
     :param habit_name: the name of the habit to be deleted ('str')
     :return: True if the user confirms the deletion, False if not ('bool')
@@ -102,16 +102,16 @@ def confirm_delete(habit_name: str):
 
 
 def return_past_days(no_days: int):
-    """return the date of the day that is no_days away from the current date.
+    """return the date of the day that is no_days away from the current date
 
     :param no_days: the number of days to be substracted from the current date ('int')
-    :return: the date of the day that is no_days ('date')
+    :return: the date of the day that is no_days away from the current date ('date')
     """
     return str(datetime.date.today() - datetime.timedelta(days=no_days))
 
 
 def input_check_day():
-    """ask the user to specify the checkoff date and time by selecting one of the options presented.
+    """ask the user to specify the checkoff date and time by selecting one of the options presented
 
     :return: the selected checkoff date ('str')
     """
@@ -120,9 +120,9 @@ def input_check_day():
                               return_past_days(4), return_past_days(5)]).ask()
 
 
-# Functions to perform the main functionalities of the habit tracker
+# Functions to perform the main functionalities of the habit tracker's cli
 def create_new_user(database):
-    """create a new user based on user input data and store the user in the specified sqlite3 database connection.
+    """create a new user based on user input and store the user in the specified sqlite3 database connection
 
     :param database: the database in which the user is to be stored ('sqlite3.connection')
     :return: the newly created and stored user ('user.UserDB')
@@ -136,7 +136,7 @@ def create_new_user(database):
 
 def login(database):
     """ask for a username and check whether the username exists in the database. If it does, return the corresponding
-    user. It the login fails three times, return to the start menu.
+    user. It the login fails three times, return to the start menu
 
     :param database: The database, in which the user is stored ('sqlite3.connection')
     :return: The user ('user.UserDB') if the username exists in the database, else False.
@@ -144,9 +144,7 @@ def login(database):
     count = 0
     while True:
         if count == 3:  # after entering an incorrect username thrice, return to the start menu
-            print("\x1b[0;0;41m" +
-                  "Login failed three times. Do you perhaps want to perform another action?"
-                  + "\x1b[0m")  # add red highlight to the text
+            print("Login failed three times. Do you perhaps want to perform another action?")
             return False
         try:
             username = input_username(database, "login")
@@ -154,18 +152,18 @@ def login(database):
             if not ana.check_for_username(user):  # check if a user with the entered name exists in the database
                 raise UserNameNotExisting(user.username)
         except UserNameNotExisting as e:
-            print("\x1b[0;0;41m" + str(e) + "\x1b[0m")
+            print(str(e))
             count += 1
             if count < 3:
-                print("\x1b[0;0;41m" + "Please try again." + "\x1b[0m")
+                print("Please try again.")
         else:
             print(f"Logged in as {username}.")
             return user
 
 
 def start(database):
-    """Ask the user what he wants to do. Depending on his choice, either let the user log in to the app, create a new
-    user, or quit the application.
+    """Ask the user what s/he wants to do. Depending on her/his choice, either let the user log in to the app,
+     create a new user, or quit the application
 
     :param database: The database, in which the users are to be stored ('sqlite3.connection')
     :return: the current user ('user.UserDB'), if the user logged in successfully or successfully
@@ -179,11 +177,10 @@ def start(database):
         current_user = login(database) if start_action == "Login" else create_new_user(database)
         return current_user if current_user else start(database)  # if the login was unsuccessful, the introductory
         # question is asked again and the user has the ability to choose a different action
-    # TODO: @Chris: diese Funktion hab ich jetzt nicht getestet (ich wüsste nicht wie), ist das in Ordnung?
 
 
 def create_habit(user):
-    """create a new habit by asking the user for a (valid) habit name and a periodicity.
+    """create a new habit by asking the user for a (valid) habit name and periodicity
 
     :param user: the user who wants to create a new habit ('user.UserDB')
     :return: the newly created habit ('habit.HabitDB')
@@ -196,7 +193,7 @@ def create_habit(user):
 
 
 def identify_habit(habit_action: str, user):
-    """present a list of all habits the user defined and let the user choose one of these habits.
+    """present a list of all habits the user defined and let the user choose one of these habits
 
     :param habit_action: the action which is to be done with the habit (e.g., "delete") ('str')
     :param user: the user whose habits are displayed ('user.UserDB')
@@ -208,7 +205,7 @@ def identify_habit(habit_action: str, user):
 
 def delete_habit(user):
     """ask which habit the user wants to delete, ask for confirmation and then delete the habit and its corresponding
-     data if the user confirms that the habit should be deleted.
+     data if the user confirms that the habit should be deleted
 
     :param user: the user who wants to delete a habit and its corresponding data ('user.UserDB')
     """
@@ -220,7 +217,7 @@ def delete_habit(user):
 
 def modify_habit(user):
     """ask which habit the user wants to modify and for the modification target (name, periodicity, or both), then
-    let the user modify the target and save the modification in the database.
+    let the user modify the target and save the modification in the database
 
     :param user: the user who wants to modify a habit ('user.UserDB')
     """
@@ -236,12 +233,11 @@ def modify_habit(user):
         new_periodicity = input_periodicity(habit.name)
         habit.modify_habit(periodicity=new_periodicity)
         print(f"The habit's periodicity was successfully changed to {habit.periodicity}.")
-        # TODO: @Chris: sehr schlimm, dass die beiden if-Teile so gleich sind?
 
 
 def check_off_habit(user):
     """ask which habit the user wants to check off, then ask for the check date and store a completion for the
-    selected habit and the selected check date.
+    selected habit and the selected check date
 
     :param user: the user who wants to check off the habit ('user.UserDB')
     """
@@ -263,7 +259,7 @@ def check_off_habit(user):
 
 def analyze_habits(user):
     """ask the user which habit s/he wants to analyse or if s/he wants to analyze all habits and then display
-    the requested analysis.
+    the requested analysis
 
     :param user: the user who wants to analyze habit(s) ('user.UserDB')
     """
@@ -282,7 +278,7 @@ def analyze_habits(user):
 
 
 def manage_habits(user):
-    """ask the user what kind of habit management they want to perform, and then start the desired process.
+    """ask the user what kind of habit management they want to perform, and then start the desired process
 
     :param user: the user who wants to manage a habit ('user.UserDB')
     """
@@ -297,7 +293,7 @@ def manage_habits(user):
 
 
 def inspect_habits(user):
-    """ask the user which habit(s) they want to inspect and then display information about the requested habits.
+    """ask the user which habit(s) they want to inspect and then display information about the requested habits
 
     :param user: the user who wants to inspect the habits ('user.UserDB')
     """
@@ -311,7 +307,7 @@ def inspect_habits(user):
 
 def determine_possible_actions(user):
     """determine the actions which a user can perform, depending on whether s/he has already created habits or not
-    and whether the habits have already been completed.
+    and whether the habits have already been completed
 
     :param user: the user for which the possible actions are to be determined ('user.UserDB')
     :return: the possible actions of the user ('list')
@@ -339,7 +335,7 @@ def cli():
     current_user = start(main_database)
     counter = 0
     while True:
-        counter += 1  # to improve usability
+        counter += 1
         possible_actions = determine_possible_actions(current_user)
         if counter > 1:
             qu.text("Press \"enter\" to proceed to the main menu.").ask()
@@ -361,10 +357,3 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-
-
-### für jede Funktion, die ich testen wollte, existiert mind. 1 Test hier
-# alle Funktionen werden verwendet
-# Datentypen wurden angepasst und neben die Argumente geschrieben
-# TODO: Kommentare in Deutsch löschen (besonders unten in den Files)
-# TODO: Darstellungsfehler der DataFrames versuchen zu beheben/testen, ob das über Terminal auch so ist

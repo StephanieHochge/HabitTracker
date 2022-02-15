@@ -1,5 +1,5 @@
 class UserNameNotExisting(Exception):
-    """Indicates that a user with the entered user name does not exist.
+    """Indicate that a user with the entered user name does not exist.
     Is raised when a user tries to login with a username that is not stored in the database, i.e., unused.
 
     Attributes:
