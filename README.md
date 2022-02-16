@@ -86,7 +86,7 @@ To test the functions of the app, you can log in using the username of four dumm
 Additionally, the habit tracker includes a test suite to test its main features using pytest. To execute this test suite, run the following command: 
 
 ```shell
-pytest .
+pytest 
 ```
 
 Note that you most likely need adminstrator privileges to run the tests. On Windows, make sure to open the command prompt as an administrator. 
