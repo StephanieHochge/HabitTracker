@@ -89,7 +89,7 @@ Additionally, the habit tracker includes a test suite to test its main features 
 pytest 
 ```
 
-Note that you most likely need adminstrator privileges to run the tests. On Windows, make sure to open the command prompt as an administrator. 
+Note that you most likely need administrator privileges to run the tests. On Windows, make sure to open the command prompt as an administrator. 
 
 On MacOS, run the following command. 
 
