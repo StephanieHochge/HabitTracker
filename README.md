@@ -29,11 +29,11 @@ Besides these statistics, you also have the ability to display all your habits t
 
 ## Installation
 
-To install the Habit Tracker, you should have the following programs installed:
-- Python 3.6 or higher
+To install the habit tracker, you should have the following programs installed:
+- Python 3.7 or higher
 - Pip
 
-Download all files from this repository and save them to your target directory. Before you can start the Habit Tracker, you need to install the project's requirements. It is recommended to do this in a virtual environment (see https://docs.python.org/3/tutorial/venv.html for an explanation). First, create the virtual environment in your target directory.
+Download all files from this repository and save them to your target directory. Before you can start the habit tracker, you need to install the project's requirements. It is recommended to do this in a virtual environment (see https://docs.python.org/3/tutorial/venv.html for an explanation). First, create the virtual environment in your target directory.
 
 ```shell
 python -m venv your_venv_name
@@ -61,13 +61,13 @@ Finally, you are ready to start the application!
 
 ## Usage
 
-To start the habit tracker, run the following command.
+To start the habit tracker, run the following command. Keep in mind that if you used a virtual environment to install the requirements, you must activate it first before starting the habit tracker. 
 
 ```shell
 python main.py
 ```
 
-After installing and launching the app, you will first be presented with the welcome screen, where you have the option to either login or create a new user. If you are using the app for the first time, you will need to create a new user to be able to login. Once you have chosen a valid username, you will be automatically logged into the system and can start tracking your habits. However, please note down your username, as there is no way to retrieve it later if you forget it.
+After installing and launching the app, you will first be presented with the welcome screen, where you have the option to either log in or create a new user. If you are using the app for the first time, you will need to create a new user to be able to log in. Once you have chosen a valid username, you will be automatically logged into the system and can start tracking your habits. However, please note down your username, as there is no way to retrieve it later if you forget it.
 
 ![StartMenu.png](StartMenu.png)
 

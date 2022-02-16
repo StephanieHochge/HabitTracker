@@ -185,12 +185,8 @@ class DataForTestingPytest(DataForTesting):
     """
     def setup_method(self):
         """create the database connection, create the test data and save it in the database"""
-        self.database = db.get_db("test.db")
+        self.database = db.get_db(":memory:")  # creates the database only in memory
         self.create_test_data(self.database)
-
-    def teardown_method(self):
-        """delete the test database after testing"""
-        os.remove("test.db")
 
 
 class DataForTestingCLI(DataForTesting):
