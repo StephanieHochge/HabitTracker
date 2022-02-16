@@ -54,7 +54,6 @@ class TestDB(test_data.DataForTestingPytest):
 
     def test_user_data_existing(self):
         """test whether it is possible to check if user data is already existing"""
-        second_database = db.get_db("test2.db")
+        second_database = db.get_db(":memory:")
         assert db.check_for_user_data(second_database) is False
         assert db.check_for_user_data(self.database) is True
-        os.remove("test2.db")
